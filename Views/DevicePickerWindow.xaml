@@ -1,0 +1,64 @@
+<Window
+    x:Class="SoundMeeter.Views.DevicePickerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Binding Title}"
+    Width="460"
+    Height="420"
+    MinWidth="360"
+    MinHeight="300"
+    Background="#1E1E1E"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,8"
+            FontSize="12"
+            Foreground="#CCC"
+            Text="Choose audio device. None removes the assignment." />
+
+        <ListBox
+            x:Name="DeviceList"
+            Grid.Row="1"
+            Background="#2B2B2B"
+            BorderBrush="#555"
+            BorderThickness="1"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Width="16"
+                            Foreground="#7C7C7C"
+                            Text="{Binding Icon}" />
+                        <TextBlock Foreground="#EEE" Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel
+            Grid.Row="2"
+            Margin="0,10,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Margin="0,0,8,0"
+                Padding="18,5"
+                Content="Cancel"
+                IsCancel="True" />
+            <Button
+                Padding="18,5"
+                Content="OK"
+                IsDefault="True"
+                Click="OnOkClick" />
+        </StackPanel>
+    </Grid>
+</Window>

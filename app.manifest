@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+	<!--
+	  Версию НЕ подставлять через MSBuild-свойство: SDK встраивает манифест как есть,
+	  литерал попадает в exe, и Windows отказывается запускать приложение
+	  («Не удалось запустить из-за неверной конфигурации»). Расхождение с AssemblyVersion
+	  безвредно: SoundMeeter не использует SxS, манифест нужен только для
+	  requireAdministrator. При смене версии правится вручную.
+	-->
+	<assemblyIdentity version="1.0.0.0" name="SoundMeeter.app"/>
+	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+		<security>
+			<requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+				<requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+			</requestedPrivileges>
+		</security>
+	</trustInfo>
+</assembly>

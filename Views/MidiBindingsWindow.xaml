@@ -1,0 +1,164 @@
+<Window
+    x:Class="SoundMeeter.Views.MidiBindingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="MIDI bindings"
+    Width="720"
+    Height="560"
+    MinWidth="640"
+    MinHeight="400"
+    Background="#1E1E1E"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Foreground="#CCC"
+                Text="MIDI input:" />
+            <ComboBox
+                Grid.Column="1"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding Devices}"
+                SelectedValue="{Binding SelectedDeviceName}"
+                SelectedValuePath="Name" />
+        </Grid>
+
+        <Border
+            Grid.Row="1"
+            Margin="0,8"
+            Padding="8,4"
+            Background="#2B2B2B"
+            CornerRadius="3">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="11" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </StackPanel.Resources>
+                <TextBlock Foreground="#9A9A9A" Text="Status: " />
+                <TextBlock Foreground="#EEE" Text="{Binding Status}" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style x:Key="CellLabel" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="10" />
+                        <Setter Property="Foreground" Value="#AAA" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                    </Style>
+                    <Style x:Key="CellDisplay" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="10" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="0,2,0,0" />
+                        <Setter Property="Foreground" Value="#EEE" />
+                    </Style>
+                    <Style x:Key="CellButton" TargetType="Button">
+                        <Setter Property="FontSize" Value="10" />
+                        <Setter Property="Padding" Value="6,2" />
+                        <Setter Property="Margin" Value="0,4,4,0" />
+                    </Style>
+                    <Style x:Key="StripHeader" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Foreground" Value="#DDD" />
+                        <Setter Property="Margin" Value="0,10,0,6" />
+                    </Style>
+                </StackPanel.Resources>
+
+                <ItemsControl ItemsSource="{Binding Strips}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource StripHeader}" Text="{Binding Title}" />
+                                <ItemsControl ItemsSource="{Binding Params}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+<Border
+                                                    Width="118"
+                                                    Margin="0,0,6,6"
+                                                    Padding="6"
+                                                    Background="#262626"
+                                                    BorderBrush="#3A3A3A"
+                                                    BorderThickness="1"
+                                                    CornerRadius="3">
+                                                    <StackPanel>
+                                                        <TextBlock
+                                                            FontSize="10"
+                                                            Foreground="#9A9A9A"
+                                                            TextAlignment="Center"
+                                                            Text="{Binding Descriptor.Label}" />
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            FontWeight="Bold"
+                                                            Text="{Binding Display, Mode=OneWay}"
+                                                            TextAlignment="Center" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Button
+                                                                Style="{StaticResource CellButton}"
+                                                                Command="{Binding LearnCommand}"
+                                                                Content="Learn" />
+                                                            <Button
+                                                                Style="{StaticResource CellButton}"
+                                                                Command="{Binding ClearCommand}"
+                                                                Content="✕"
+                                                                IsEnabled="{Binding IsBound}" />
+                                                        </StackPanel>
+                                                        <CheckBox
+                                                            Margin="0,4,0,0"
+                                                            HorizontalAlignment="Center"
+                                                            Content="PTT"
+                                                            FontSize="10"
+                                                            Foreground="#CCC"
+                                                            IsChecked="{Binding Ptt}"
+                                                            Visibility="{Binding IsMomentaryCapable, Converter={StaticResource BoolToVis}}" />
+                                                    </StackPanel>
+                                                </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel
+            Grid.Row="3"
+            Margin="0,10,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Padding="18,5"
+                Content="Close"
+                IsCancel="True"
+                Click="OnCloseClick" />
+        </StackPanel>
+    </Grid>
+</Window>
