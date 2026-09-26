@@ -1,0 +1,89 @@
+<UserControl
+    x:Class="SoundMeeter.Views.Controls.OutputStripView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="360"
+    d:DesignWidth="138"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border
+        Width="138"
+        Margin="0,0,10,6"
+        Padding="6"
+        Background="#3E3E42"
+        CornerRadius="3"
+        Opacity="{Binding IsAvailable, Converter={StaticResource BoolToOpacity}}">
+        <StackPanel>
+            <!--  Имя канала: сверху стрипа, над именем устройства (ПКМ — переименовать).  -->
+            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
+
+            <DockPanel Margin="0,0,0,4" LastChildFill="True">
+                <Button
+                    Width="18"
+                    Height="18"
+                    Margin="4,0,0,0"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnRemoveClick"
+                    Content="×"
+                    DockPanel.Dock="Right"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="#AAA"
+                    ToolTip="Remove strip" />
+                <Button
+                    Padding="0"
+                    HorizontalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnBusNameClick"
+                    Content="{Binding Name}"
+                    FontSize="11"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    ToolTip="Choose output device" />
+            </DockPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource MeterAndFader}" />
+
+            <TextBlock
+                Margin="0,2,0,4"
+                HorizontalAlignment="Center"
+                FontSize="10"
+                Foreground="#AAA"
+                Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
+
+            <UniformGrid Columns="3">
+                <ToggleButton
+                    Margin="0,0,2,0"
+                    Content="M"
+                    IsChecked="{Binding IsMono}"
+                    Style="{StaticResource LedToggle}"
+                    ToolTip="Mono" />
+                <ToggleButton
+                    Margin="1,0"
+                    Content="S"
+                    IsChecked="{Binding IsSolo}"
+                    Style="{StaticResource LedToggle}"
+                    ToolTip="Solo" />
+                <ToggleButton
+                    Margin="2,0,0,0"
+                    Content="MUTE"
+                    IsChecked="{Binding IsMuted}"
+                    Style="{StaticResource LedToggle}"
+                    ToolTip="Mute" />
+            </UniformGrid>
+        </StackPanel>
+    </Border>
+</UserControl>

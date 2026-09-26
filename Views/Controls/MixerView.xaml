@@ -1,0 +1,86 @@
+<UserControl
+    x:Class="SoundMeeter.Views.Controls.MixerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="400"
+    d:DesignWidth="1200"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource GroupHeader}"
+                        Text="INPUTS" />
+                    <Button
+                        Width="20"
+                        Height="20"
+                        Margin="8,0,0,0"
+                        Padding="0"
+                        Command="{Binding AddInputCommand}"
+                        Content="＋"
+                        FontSize="14"
+                        ToolTip="Add input strip" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Inputs}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:InputStripView
+                                RemoveCommand="{Binding DataContext.RemoveInputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <Border
+                Width="1"
+                Margin="4,20,10,0"
+                Background="#3F3F46" />
+
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource GroupHeader}" Text="OUTPUTS" />
+                    <Button
+                        Width="20"
+                        Height="20"
+                        Margin="8,0,0,0"
+                        Padding="0"
+                        Command="{Binding AddBusCommand}"
+                        Content="＋"
+                        FontSize="14"
+                        ToolTip="Add output strip" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Buses}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:OutputStripView
+                                RemoveCommand="{Binding DataContext.RemoveBusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

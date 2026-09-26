@@ -1,0 +1,230 @@
+<UserControl
+    x:Class="SoundMeeter.Views.Controls.InputStripView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="420"
+    d:DesignWidth="138"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border
+        Width="138"
+        MinHeight="200"
+        Margin="0,0,10,6"
+        Padding="6"
+        AllowDrop="True"
+        CornerRadius="3"
+        DragEnter="Device_DragEnter"
+        DragLeave="Device_DragLeave"
+        DragOver="Device_DragEnter"
+        Drop="Device_Drop">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Background" Value="#3E3E42" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
+                        <Setter Property="BorderBrush" Value="#4FC3F7" />
+                        <Setter Property="Background" Value="#354B58" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Имя канала: сверху стрипа, над именем устройства (ПКМ — переименовать).  -->
+            <ContentControl
+                Grid.Row="0"
+                Content="{Binding}"
+                ContentTemplate="{StaticResource StripTitleTemplate}" />
+
+            <DockPanel
+                Grid.Row="1"
+                Margin="0,0,0,4"
+                LastChildFill="True">
+                <Button
+                    Width="18"
+                    Height="18"
+                    Margin="4,0,0,0"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnRemoveClick"
+                    Content="×"
+                    DockPanel.Dock="Right"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="#AAA"
+                    ToolTip="Remove strip" />
+                <Button
+                    Padding="0"
+                    HorizontalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnInputNameClick"
+                    Content="{Binding Name}"
+                    FontSize="11"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    ToolTip="Choose input source" />
+            </DockPanel>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ContentControl
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Height="200"
+                    VerticalAlignment="Top"
+                    Content="{Binding}"
+                    ContentTemplate="{StaticResource MeterAndFader}" />
+
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,2,0,4"
+                    HorizontalAlignment="Center"
+                    FontSize="10"
+                    Foreground="#AAA"
+                    Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
+
+                <UniformGrid
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Columns="1">
+                    <Button
+                        x:Name="OutBtn"
+                        Margin="2"
+                        Click="OnOutClick"
+                        Content="{Binding OutButtonText}"
+                        IsEnabled="{Binding HasHardware}"
+                        Style="{StaticResource RouteBtn}"
+                        ToolTip="Hardware outputs (для прослушивания)" />
+                    <Button
+                        x:Name="VirtBtn"
+                        Margin="2"
+                        Click="OnVirtClick"
+                        Content="{Binding VirtButtonText}"
+                        IsEnabled="{Binding HasVirtual}"
+                        Style="{StaticResource RouteBtn}"
+                        ToolTip="Virtual outputs (VB-Cable / VAC)" />
+                    <ToggleButton
+                        Margin="2"
+                        Content="MONO"
+                        IsChecked="{Binding IsMono}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="Mono" />
+                    <ToggleButton
+                        Margin="2"
+                        Content="SOLO"
+                        IsChecked="{Binding IsSolo}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="Solo" />
+                    <ToggleButton
+                        Margin="2"
+                        Content="MUTE"
+                        IsChecked="{Binding IsMuted}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="Mute" />
+                    <ToggleButton
+                        x:Name="DenBtn"
+                        Margin="2"
+                        Content="DEN"
+                        IsChecked="{Binding DenoiserEnabled}"
+                        MouseRightButtonUp="OnDenRightClick"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="Denoiser (RNNoise): настройки — ПКМ" />
+                </UniformGrid>
+
+                <Popup
+                    x:Name="OutPopup"
+                    Width="240"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=OutBtn}"
+                    StaysOpen="False">
+                    <Border
+                        Padding="6"
+                        Background="#2B2B2B"
+                        BorderBrush="#555"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Text="Hardware outputs (для прослушивания)" />
+                            <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding HardwareOutputs}" />
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <Popup
+                    x:Name="VirtPopup"
+                    Width="240"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=VirtBtn}"
+                    StaysOpen="False">
+                    <Border
+                        Padding="6"
+                        Background="#2B2B2B"
+                        BorderBrush="#555"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Text="Virtual outputs (VB-Cable / VAC)" />
+                            <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding VirtualOutputs}" />
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <Popup
+                    x:Name="DenPopup"
+                    Width="240"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=DenBtn}"
+                    StaysOpen="False">
+                    <controls:DenoiserSettingsView />
+                </Popup>
+            </Grid>
+
+            <controls:StripAppsView Grid.Row="3" />
+        </Grid>
+    </Border>
+</UserControl>
