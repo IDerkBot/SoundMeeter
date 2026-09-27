@@ -1,8 +1,8 @@
+using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using SoundMeeter.Models;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using SoundMeeter.Services.Logging;
 
 namespace SoundMeeter.Audio;
 
@@ -22,7 +22,18 @@ public sealed class InputSource
     private readonly InputChannelModel _model;
     private readonly SampleRingBuffer _ring = new(SampleRate * Channels * BufferSeconds);
     private readonly DenoiserDsp? _denoiser;
+    private readonly ILogger _logger = AppLog.For<InputSource>();
     private IWaveIn? _waveIn;
+
+    /// <summary>
+    /// Ресемплер на случай, если устройство отдаёт не 48 кГц. Пересоздаётся при
+    /// смене частоты (переподключение устройства, смена формата по требованию
+    /// драйвера) — состояние фильтра при этом не наследуется намеренно: старт
+    /// «с нуля» на пустом кольцевом буфере даёт плавный выход из тишины, тогда
+    /// как продолжение прерванного состояния дало бы щелчок.
+    /// </summary>
+    private PolyphaseResampler? _resampler;
+    private int _resamplerRate;
 
     // Буферы конверсии
     private float[] _decoded = Array.Empty<float>();
@@ -38,7 +49,7 @@ public sealed class InputSource
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RNNoise unavailable: {ex.Message}");
+            _logger.LogWarning(ex, "RNNoise недоступен для «{Strip}»: {Message}", _model.Name, ex.Message);
             _denoiser = null;
         }
     }
@@ -79,6 +90,11 @@ public sealed class InputSource
             loopback.StartRecording();
             _waveIn = loopback;
         }
+
+        _logger.LogInformation(
+            "Strip «{Strip}» opened: device={Device} mic={IsMic} requested={Rate} Hz/{Channels} ch, actual={Actual}",
+            _model.Name, _model.DeviceId, _model.IsMicrophone, SampleRate, Channels,
+            Describe(_waveIn.WaveFormat));
     }
 
     public void Stop()
@@ -94,9 +110,13 @@ public sealed class InputSource
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Stop capture failed for {_model.Name}: {ex.Message}");
+            _logger.LogWarning(ex, "Остановка захвата «{Strip}» не удалась: {Message}", _model.Name, ex.Message);
         }
         waveIn.Dispose();
+
+        _resampler = null;
+        _resamplerRate = 0;
+        _logger.LogInformation("Strip «{Strip}» closed: device={Device}", _model.Name, _model.DeviceId);
     }
 
     public void Dispose()
@@ -138,66 +158,125 @@ public sealed class InputSource
                 }
             }
 
-            // 3) Частота -> 48кГц
+            // 3) Частота -> 48кГц. WASAPI в общем режиме сам приводит поток к
+            //    запрошенному формату, но драйвер вправе отдать и свой: тогда
+            //    пересчёт делает ресемплер с полосой ограничения, а не линейная
+            //    интерполяция (SM-A01).
             float[] outBuf = _stereo;
             int outFrames = frames;
             if (fmt.SampleRate != SampleRate)
             {
-                outFrames = (int)((long)frames * SampleRate / fmt.SampleRate);
-                if (_resampled.Length < outFrames * 2)
-                    _resampled = new float[outFrames * 2];
-                ResampleLinear(_stereo, frames, fmt.SampleRate, _resampled, outFrames);
+                outFrames = Resample(_stereo, frames, fmt.SampleRate);
                 outBuf = _resampled;
             }
-
-            // 4) Денойзер RNNoise (48кГц/стерео) — только если включён и доступен
-            if (_model.DenoiserEnabled && _denoiser != null)
+            else
             {
-                outFrames = _denoiser.Process(outBuf, outFrames);
-                if (outFrames == 0) return;
+                _resampler = null;
+                _resamplerRate = 0;
             }
+
+            if (outFrames <= 0) return;
+
+            // 4) Денойзер RNNoise (48кГц/стерео) — только если включён и доступен.
+            //    Процессор держит фиксированную задержку в 10 мс и всегда
+            //    возвращает ровно outFrames, поэтому буфер не раздувается.
+            if (_model.DenoiserEnabled && _denoiser != null)
+                _denoiser.Process(outBuf, outFrames);
 
             _ring.Write(outBuf.AsSpan(0, outFrames * 2));
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Input {_model.Name} capture error: {ex.Message}");
+            // Исключение здесь проглатывает целый пакет аудио, поэтому след
+            // обязателен: иначе поломка видна только как «звук иногда пропадает».
+            _logger.LogError(ex, "Ошибка обработки пакета на «{Strip}»: {Message}", _model.Name, ex.Message);
         }
     }
 
+    /// <summary>
+    /// Приводит пакет к 48 кГц и возвращает число кадров в <see cref="_resampled"/>.
+    /// Длина считается ресемплером накопительно (точное рациональное отношение),
+    /// поэтому «плавающего» буфера не возникает; здесь только выделяется память
+    /// с запасом на округление.
+    /// </summary>
+    private int Resample(float[] source, int frames, int sourceRate)
+    {
+        if (_resampler == null || _resamplerRate != sourceRate)
+        {
+            _resampler = new PolyphaseResampler(sourceRate, SampleRate, Channels);
+            _resamplerRate = sourceRate;
+            _logger.LogInformation(
+                "Strip «{Strip}»: ресемплер {From} -> {To} Hz, {Taps} отсчётов фильтра",
+                _model.Name, sourceRate, SampleRate, _resampler.Taps);
+        }
+
+        var capacity = (int)Math.Ceiling(frames * (double)SampleRate / sourceRate) + 8;
+        if (_resampled.Length < capacity * Channels)
+            _resampled = new float[capacity * Channels];
+
+        return _resampler.Process(source, frames, _resampled, capacity);
+    }
+
+    private static string Describe(WaveFormat format) =>
+        $"{format.SampleRate} Hz/{format.Channels} ch/{format.BitsPerSample} bit {format.Encoding}";
+
+    /// <summary>
+    /// Приводит межленточные байты к float. Поддерживаются IEEE float32 и PCM
+    /// 16/24/32 бит — все четыре формата обрабатываются одинаково и одинаково
+    /// ограничены длиной пакета: лишние «хвостовые» байты (их не бывает у WASAPI,
+    /// но бывает у программных источников) игнорируются, а не портят соседние сэмплы.
+    /// </summary>
     private static void DecodeToFloat(byte[] src, int byteCount, WaveFormat fmt, float[] dst, int frames)
     {
-        if (fmt.Encoding == WaveFormatEncoding.IeeeFloat)
+        int channels = fmt.Channels;
+        int total = frames * channels;
+        if (total > dst.Length) total = dst.Length;
+
+        if (fmt.Encoding == WaveFormatEncoding.IeeeFloat && fmt.BitsPerSample == 32)
         {
-            Buffer.BlockCopy(src, 0, dst, 0, byteCount);
+            int samples = Math.Min(total, byteCount / 4);
+            if (samples > 0) Buffer.BlockCopy(src, 0, dst, 0, samples * 4);
+            if (samples < total) Array.Clear(dst, samples, total - samples);
             return;
         }
 
-        int channels = fmt.Channels;
         switch (fmt.BitsPerSample)
         {
             case 16:
-                for (int i = 0, p = 0; i < byteCount / 2; i++, p++)
-                    dst[p] = BitConverter.ToInt16(src, i * 2) / 32768f;
+            {
+                int samples = Math.Min(total, byteCount / 2);
+                for (int i = 0; i < samples; i++)
+                    dst[i] = BitConverter.ToInt16(src, i * 2) / 32768f;
+                if (samples < total) Array.Clear(dst, samples, total - samples);
                 break;
+            }
             case 24:
-                for (int i = 0, p = 0; i < frames; i++)
+            {
+                int framesToRead = Math.Min(frames, byteCount / (channels * 3));
+                int written = 0;
+                for (int f = 0; f < framesToRead; f++)
                 {
-                    for (int c = 0; c < channels; c++, p++)
+                    for (int c = 0; c < channels; c++, written++)
                     {
-                        int b = i * channels * 3 + c * 3;
+                        int b = f * channels * 3 + c * 3;
                         int value = src[b] | (src[b + 1] << 8) | (src[b + 2] << 16);
                         if ((value & 0x800000) != 0) value |= unchecked((int)0xFF000000);
-                        dst[p] = value / 8388608f;
+                        dst[written] = value / 8388608f;
                     }
                 }
+                if (written < total) Array.Clear(dst, written, total - written);
                 break;
+            }
             case 32:
-                for (int i = 0, p = 0; i < byteCount / 4; i++, p++)
-                    dst[p] = BitConverter.ToInt32(src, i * 4) / 2147483648f;
+            {
+                int samples = Math.Min(total, byteCount / 4);
+                for (int i = 0; i < samples; i++)
+                    dst[i] = BitConverter.ToInt32(src, i * 4) / 2147483648f;
+                if (samples < total) Array.Clear(dst, samples, total - samples);
                 break;
+            }
             default:
-                Array.Clear(dst, 0, frames * channels);
+                Array.Clear(dst, 0, total);
                 break;
         }
     }
@@ -218,23 +297,6 @@ public sealed class InputSource
             }
             dst[f * 2] = left;
             dst[f * 2 + 1] = right;
-        }
-    }
-
-    private static void ResampleLinear(float[] src, int srcFrames, int srcRate, float[] dst, int dstFrames)
-    {
-        if (srcFrames <= 1) return;
-        double ratio = srcRate / (double)SampleRate; // позиция входа на один выходной сэмпл
-
-        for (int i = 0; i < dstFrames; i++)
-        {
-            double pos = i * ratio;
-            int i0 = (int)pos;
-            int i1 = Math.Min(i0 + 1, srcFrames - 1);
-            float frac = (float)(pos - i0);
-
-            dst[i * 2] = src[i0 * 2] + (src[i1 * 2] - src[i0 * 2]) * frac;
-            dst[i * 2 + 1] = src[i0 * 2 + 1] + (src[i1 * 2 + 1] - src[i0 * 2 + 1]) * frac;
         }
     }
 }

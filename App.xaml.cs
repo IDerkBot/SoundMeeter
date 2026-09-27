@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Services;
+using SoundMeeter.Services.Logging;
 using SoundMeeter.ViewModels;
 using SoundMeeter.Views;
 using System.Windows;
@@ -16,6 +17,11 @@ namespace SoundMeeter
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // Журнал поднимаем первым: иначе ранние ошибки (настройки, каталог
+            // устройств) снова останутся без следа — ровно та проблема, ради
+            // которой логирование и заводилось (SM-A03).
+            AppLog.Initialize(Microsoft.Extensions.Logging.LogLevel.Information);
 
             var services = new ServiceCollection();
             services.AddSingleton<IAudioEngine, WasapiAudioEngine>();
@@ -40,6 +46,10 @@ namespace SoundMeeter
             var engine = ServiceProvider.GetRequiredService<IAudioEngine>();
             var saved = await settingsService.LoadAsync();
             settingsService.Settings = saved ?? new Models.AppSettings();
+
+            // Уровень журнала — тоже настройка: подхватываем сохранённый.
+            AppLog.SetLevel(AppLog.ParseLevel(settingsService.Settings.LogLevel));
+
             var viewModel = ServiceProvider.GetRequiredService<MainViewModel>();
 
             // Сначала восстанавливаем пресет: возвращаем оба списка стрипов И
@@ -69,6 +79,14 @@ namespace SoundMeeter
             catch
             {
                 // Игнорируем ошибки завершения.
+            }
+            try
+            {
+                AppLog.Shutdown();
+            }
+            catch
+            {
+                // Игнорируем ошибки закрытия журнала.
             }
             base.OnExit(e);
         }

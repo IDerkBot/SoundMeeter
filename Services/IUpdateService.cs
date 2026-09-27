@@ -32,11 +32,24 @@ namespace SoundMeeter.Services
         string Extract(string zipPath, string versionTag);
 
         /// <summary>
-        /// Запущает фоновый скрипт, который дождётся выхода процесса, заменит файлы
-        /// в <see cref="InstallDirectory"/> и перезапустит приложение. Возвращает сразу,
-        /// дальше вызывающий обязан закрыть приложение.
+        /// Проверяет целостность распакованной сборки и вычисляет точный список
+        /// файлов, которые обновление удалит из <see cref="InstallDirectory"/>.
+        /// Бросает исключение, если архив не является сборкой SoundMeeter.
         /// </summary>
-        void ApplyAndRestart(string payloadDirectory, UpdateInfo update);
+        UpdatePlan PlanUpdate(string payloadDirectory, UpdateInfo update);
+
+        /// <summary>
+        /// Запускает фоновый скрипт, который дождётся выхода процесса, заменит файлы
+        /// в <see cref="InstallDirectory"/>, удалит ровно <see cref="UpdatePlan.FilesToDelete"/>
+        /// и перезапустит приложение. Возвращает сразу, дальше вызывающий обязан
+        /// закрыть приложение.
+        /// </summary>
+        void ApplyAndRestart(UpdatePlan plan);
+
+        /// <summary>
+        /// Диалог подтверждения: список удаляемых файлов, готовый к показу.
+        /// </summary>
+        string FormatPlanReport(UpdatePlan plan);
 
         /// <summary>Открывает страницу релиза в браузере.</summary>
         void OpenReleasePage(UpdateInfo update);

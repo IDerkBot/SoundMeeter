@@ -6,6 +6,16 @@
 /// </summary>
 public class AppSettings
 {
+    /// <summary>
+    /// Версия схемы файла настроек (SM-A05). 0 — формат до введения версионирования
+    /// (то есть любой settings.json, написанный прошлыми сборками).
+    /// Текущая версия: <see cref="SettingsMigrator.CurrentSchemaVersion"/>.
+    /// </summary>
+    public int SchemaVersion { get; set; }
+
+    /// <summary>Уровень детализации журнала (Trace/Debug/Information/Warning/Error).</summary>
+    public string LogLevel { get; set; } = "Information";
+
     public List<DeviceRouteRule> PersistentRoutes { get; set; } = new();
     public bool EngineWasRunning { get; set; }
     public List<InputChannelModel> Inputs { get; set; } = new();

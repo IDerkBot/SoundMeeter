@@ -1,6 +1,8 @@
-﻿using NAudio.CoreAudioApi;
+﻿using Microsoft.Extensions.Logging;
+using NAudio.CoreAudioApi;
 using SoundMeeter.AudioPolicy;
 using SoundMeeter.Models;
+using SoundMeeter.Services.Logging;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -11,11 +13,18 @@ namespace SoundMeeter.Services
     public class AudioService : IAudioService, IDisposable
     {
         private readonly ISettingsService _settingsService;
+        private readonly ILogger _logger = AppLog.For<AudioService>();
 
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly Dictionary<uint, BitmapImage> _iconCache = new();
         private readonly object _cacheLock = new();
         private Timer? _refreshTimer;
+
+        /// <summary>
+        /// Пути приложений, о сбросе которых уже сообщили: опрос идёт каждые две
+        /// секунды, и без этого журнал забивался бы одной и той же строкой.
+        /// </summary>
+        private readonly HashSet<string> _reportedResetFailures = new(StringComparer.OrdinalIgnoreCase);
 
         public event EventHandler? AudioDevicesChanged;
         public event EventHandler? AppsChanged;
@@ -158,6 +167,13 @@ namespace SoundMeeter.Services
                             completedResets.Contains(r.ExecutablePath) && !failedResets.Contains(r.ExecutablePath)) > 0)
                         _settingsService.Save();
                 }
+
+                foreach (var path in failedResets)
+                {
+                    if (!_reportedResetFailures.Add(path)) continue;
+                    _logger.LogWarning("Не удалось сбросить маршрут приложения {App} на системный вывод", path);
+                }
+
                 return apps;
             });
         }
@@ -223,24 +239,28 @@ namespace SoundMeeter.Services
             {
                 try
                 {
-                    // Вызываем проверенный метод из SoundDeck. 
+                    // Вызываем проверенный метод из SoundDeck.
                     // Если deviceId пустой или null, AppRouter сам сбросит маршрут на системный по умолчанию.
                     int hr = AppRouter.SetRoute(processId, deviceId ?? "");
 
                     if (hr == 0) // S_OK
                     {
                         LastError = "";
+                        _logger.LogInformation("Маршрут PID {Pid} -> {Device}",
+                            processId, string.IsNullOrEmpty(deviceId) ? "<системный вывод>" : deviceId);
                         return (true, string.Empty);
                     }
 
                     LastError = hr == AppRouter.ProcessNoAudio
                         ? $"Windows не применила маршрут для PID {processId} (0x{hr:X8}). Проверьте аудиосессию приложения и выбранное устройство."
                         : $"Ошибка COM: HRESULT 0x{hr:X8}";
+                    _logger.LogWarning("Маршрутизация PID {Pid} не выполнена, HRESULT=0x{HResult:X8}", processId, hr);
                     return (false, LastError);
                 }
                 catch (Exception ex)
                 {
                     LastError = ex.Message;
+                    _logger.LogError(ex, "Маршрутизация PID {Pid} упала: {Message}", processId, ex.Message);
                     return (false, ex.Message);
                 }
             });

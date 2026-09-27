@@ -4,14 +4,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="{Binding Title}"
     Width="460"
-    Height="420"
+    Height="460"
     MinWidth="360"
     MinHeight="300"
     Background="#1E1E1E"
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -24,28 +33,73 @@
             Foreground="#CCC"
             Text="Choose audio device. None removes the assignment." />
 
-        <ListBox
-            x:Name="DeviceList"
-            Grid.Row="1"
-            Background="#2B2B2B"
-            BorderBrush="#555"
-            BorderThickness="1"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock
-                            Width="16"
-                            Foreground="#7C7C7C"
-                            Text="{Binding Icon}" />
-                        <TextBlock Foreground="#EEE" Text="{Binding Name}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <!--  Поиск по названию + фильтр по типу устройства (MIC/SPK)  -->
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox
+                x:Name="SearchBox"
+                Grid.Column="0"
+                Tag="🔍 Search device name..."
+                TextChanged="OnSearchChanged" />
+
+            <ComboBox
+                x:Name="KindBox"
+                Grid.Column="1"
+                Width="104"
+                Margin="8,0,0,0"
+                VerticalAlignment="Stretch"
+                DisplayMemberPath="Label"
+                SelectionChanged="OnKindChanged"
+                ToolTip="Show only microphones or only speakers" />
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <ListBox
+                x:Name="DeviceList"
+                Background="#2B2B2B"
+                BorderBrush="#555"
+                BorderThickness="1"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectionChanged="OnDeviceSelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                Foreground="#7C7C7C"
+                                Text="{Binding Icon}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Foreground="#EEE"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTip="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock
+                x:Name="EmptyHint"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Foreground="#808080"
+                IsHitTestVisible="False"
+                Text="Nothing found"
+                Visibility="Collapsed" />
+        </Grid>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="0,10,0,0"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
@@ -55,6 +109,7 @@
                 Content="Cancel"
                 IsCancel="True" />
             <Button
+                x:Name="OkButton"
                 Padding="18,5"
                 Content="OK"
                 IsDefault="True"

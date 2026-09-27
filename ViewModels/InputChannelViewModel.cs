@@ -136,13 +136,33 @@ public partial class InputChannelViewModel : ObservableObject
 
         foreach (var bus in buses)
         {
-            var enabled = model.BusRouting.GetValueOrDefault(bus.Id)?.Enabled ?? false;
-            var option = new OutputOptionViewModel(bus.Id, bus.Name, enabled, OnOptionToggled, OnOptionHidden);
+            var route = model.BusRouting.GetValueOrDefault(bus.Id);
+            var option = new OutputOptionViewModel(
+                bus.Id,
+                bus.Name,
+                bus.ChannelName,
+                route?.Enabled ?? false,
+                route?.GainDb ?? 0f,
+                OnOptionToggled,
+                OnOptionGainChanged,
+                OnOptionHidden);
             if (IsVirtualCable(bus.Name)) VirtualOutputs.Add(option);
             else HardwareOutputs.Add(option);
         }
 
         RefreshCounts();
+    }
+
+    /// <summary>
+    /// Обновляет подпись выхода во всех попапах стрипа после переименования
+    /// канала на стрипе выхода: показываем имя канала, а не устройства.
+    /// </summary>
+    public void UpdateBusChannelName(string busId, string? channelName)
+    {
+        foreach (var option in HardwareOutputs)
+            if (option.BusId == busId) option.SetChannelName(channelName);
+        foreach (var option in VirtualOutputs)
+            if (option.BusId == busId) option.SetChannelName(channelName);
     }
 
     public string OutButtonText => $"OUT {HardwareOutputs.Count(o => o.IsEnabled)}/{HardwareOutputs.Count} ▾";
@@ -229,6 +249,17 @@ public partial class InputChannelViewModel : ObservableObject
         _markDirty();
         RefreshCounts();
     }
+
+    /// <summary>
+    /// Индивидуальная посылка входа в эту шину. Применяется на лету: тап читает
+    /// GainDb из живого объекта маршрута, пересоздавать аудиопоток не нужно.
+    /// </summary>
+    private void OnOptionGainChanged(OutputOptionViewModel option, float gainDb)
+    {
+        _engine.SetRouteGain(Model.Id, option.BusId, gainDb);
+        _markDirty();
+    }
+
 
     /// <summary>
     /// Скрыть устройство из попапов OUT/VIRT: удаляет стрип шины и помечает

@@ -6,6 +6,9 @@ using System.Collections.ObjectModel;
 
 namespace SoundMeeter.ViewModels;
 
+/// <summary>Пункт выпадающего списка режима кнопки.</summary>
+public sealed record MidiButtonModeOption(MidiButtonMode Value, string Name);
+
 /// <summary>
 /// Ячейка параметра стрипа для MIDI-окна: метка, текущая привязка, Learn/Clear.
 /// </summary>
@@ -13,18 +16,31 @@ public partial class MidiParamCell : ObservableObject
 {
     private bool _refreshing;
 
+    private static readonly IReadOnlyList<MidiButtonModeOption> AllModes = new[]
+    {
+        new MidiButtonModeOption(MidiButtonMode.Toggle, "Toggle"),
+        new MidiButtonModeOption(MidiButtonMode.Hold, "Hold (PTT)"),
+        new MidiButtonModeOption(MidiButtonMode.Latch, "Latch")
+    };
+
     public required MidiParameterDescriptor Descriptor { get; init; }
     public required MidiBindingsViewModel Owner { get; init; }
     public required string TargetType { get; init; }
     public required string StripId { get; init; }
 
-    /// <summary>true — кнопку можно повесить как PTT (кнопочный параметр входного стрипа).</summary>
-    public bool IsMomentaryCapable =>
-        Descriptor.Shape == MidiParamShape.Button && TargetType == "Input";
+    /// <summary>Параметр — кнопка: доступны режим работы и обратная полярность.</summary>
+    public bool IsButton => Descriptor.Shape == MidiParamShape.Button;
 
-    /// <summary>Галочка PTT: привязка работает по удержанию, а не переключением.</summary>
+    /// <summary>Режимы кнопки: переключение, удержание (PTT), кнопка с фиксацией.</summary>
+    public IReadOnlyList<MidiButtonModeOption> ModeOptions => AllModes;
+
+    /// <summary>Режим кнопки: Toggle / Hold (PTT) / Latch (кнопка с фиксацией).</summary>
     [ObservableProperty]
-    private bool _ptt;
+    private MidiButtonMode _mode = MidiButtonMode.Toggle;
+
+    /// <summary>true — обратная полярность CC (0 = нажато, 127 = отпущено).</summary>
+    [ObservableProperty]
+    private bool _isInverted;
 
     [ObservableProperty]
     private string _display = "unbound";
@@ -41,9 +57,14 @@ public partial class MidiParamCell : ObservableObject
     [RelayCommand]
     private void Clear() => Owner.ClearBinding(this);
 
-    partial void OnPttChanged(bool value)
+    partial void OnModeChanged(MidiButtonMode value)
     {
-        if (!_refreshing) Owner.SetMomentary(this, value);
+        if (!_refreshing) Owner.SetMode(this, value);
+    }
+
+    partial void OnIsInvertedChanged(bool value)
+    {
+        if (!_refreshing) Owner.SetInverted(this, value);
     }
 
     public void Refresh()
@@ -52,7 +73,8 @@ public partial class MidiParamCell : ObservableObject
         IsBound = binding != null;
         Display = binding == null ? "unbound" : FormatBinding(binding);
         _refreshing = true;
-        Ptt = binding?.IsMomentary ?? false;
+        Mode = binding?.Mode ?? MidiButtonMode.Toggle;
+        IsInverted = binding?.IsInverted ?? false;
         _refreshing = false;
     }
 
@@ -159,7 +181,7 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
         if (value == NoneDevice.Name)
         {
             _main.Engine.Midi.DeviceName = null;
-            _main.MidiService.Open(null);
+            _main.MidiService.Close();
             _main.MidiSettingsChanged();
             OnPropertyChanged(nameof(IsOpen));
             UpdateStatus();
@@ -179,6 +201,7 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
 
         _main.Engine.Midi.DeviceName = value;
         _main.MidiService.Open(value);
+        // MidiSettingsChanged сбрасывает и отслеживание нажатий: устройство сменилось.
         _main.MidiSettingsChanged();
         RefreshAll();
         UpdateStatus();
@@ -210,12 +233,21 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
         UpdateStatus();
     }
 
-    /// <summary>Галочка PTT: переключаем режим существующей привязки (удержание/переключение).</summary>
-    public void SetMomentary(MidiParamCell cell, bool momentary)
+    /// <summary>Режим кнопки: переключение / удержание (PTT) / кнопка с фиксацией.</summary>
+    public void SetMode(MidiParamCell cell, MidiButtonMode mode)
     {
         var binding = FindBinding(cell.TargetType, cell.StripId, cell.Descriptor.Key);
-        if (binding == null || binding.IsMomentary == momentary) return;
-        binding.IsMomentary = momentary;
+        if (binding == null || binding.Mode == mode) return;
+        binding.Mode = mode;
+        _main.MidiSettingsChanged();
+    }
+
+    /// <summary>Обратная полярность CC: 0 = нажато, 127 = отпущено.</summary>
+    public void SetInverted(MidiParamCell cell, bool inverted)
+    {
+        var binding = FindBinding(cell.TargetType, cell.StripId, cell.Descriptor.Key);
+        if (binding == null || binding.IsInverted == inverted) return;
+        binding.IsInverted = inverted;
         _main.MidiSettingsChanged();
     }
 
@@ -247,7 +279,8 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
             Channel = msg.Channel,
             Control = msg.Control,
             MessageKind = msg.Kind,
-            IsMomentary = cell.Ptt
+            Mode = cell.Mode,
+            IsInverted = cell.IsInverted
         });
 
         _main.MidiSettingsChanged();

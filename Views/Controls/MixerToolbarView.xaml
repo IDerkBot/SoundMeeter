@@ -35,6 +35,12 @@
             ToolTip="Проверить обновления через GitHub Releases" />
         <Button
             Height="34"
+            Margin="0,0,6,0"
+            Click="OnLogsClick"
+            Content="Logs"
+            ToolTip="Журнал работы приложения, уровень детализации и копирование диагностики" />
+        <Button
+            Height="34"
             Command="{Binding ToggleRunCommand}"
             Content="{Binding IsRunning, Converter={StaticResource BoolToStartStop}}">
             <Button.Resources>

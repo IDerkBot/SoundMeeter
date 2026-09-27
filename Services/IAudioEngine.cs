@@ -29,6 +29,12 @@ public interface IAudioEngine : IDisposable
     /// <summary>Включает/выключает маршрут вход → шина (применяется на лету).</summary>
     void SetRoute(string inputId, string busId, bool enabled);
 
+    /// <summary>
+    /// Индивидуальная посылка входа в шину, дБ (применяется на лету, без
+    /// пересоздания аудиопотока). Диапазон ограничен движком.
+    /// </summary>
+    void SetRouteGain(string inputId, string busId, float gainDb);
+
     /// <summary>Solo для входного стрипа: при активном solo несоло-входы замолкают.</summary>
     void SetInputSolo(string inputId, bool value);
 

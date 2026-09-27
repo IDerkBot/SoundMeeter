@@ -42,8 +42,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <controls:InputStripView
-                                RemoveCommand="{Binding DataContext.RemoveInputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            <controls:InputStripView RemoveCommand="{Binding DataContext.RemoveInputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -75,8 +74,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <controls:OutputStripView
-                                RemoveCommand="{Binding DataContext.RemoveBusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            <controls:OutputStripView RemoveCommand="{Binding DataContext.RemoveBusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

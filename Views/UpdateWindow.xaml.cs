@@ -17,6 +17,13 @@ namespace SoundMeeter.Views
             InitializeComponent();
             ViewModel = new UpdateViewModel(updates, update);
             DataContext = ViewModel;
+
+            // План обновления показываем диалогом: удаление файлов необратимо,
+            // и решение должен принимать человек, а не код (SM-A06).
+            ViewModel.ConfirmPlan = (_, report) => MessageBox.Show(
+                this, report, "Установить обновление?",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+
             ViewModel.InstallCompleted += (_, _) =>
                 Dispatcher.BeginInvoke(new Action(() => Application.Current?.Shutdown()));
         }

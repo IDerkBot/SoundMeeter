@@ -260,6 +260,9 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="Padding" Value="8,6" />
+        <!--  Подсказка (watermark) берётся из Tag, чтобы каждый экран
+              мог задать свою подсказку, не копируя шаблон.  -->
+        <Setter Property="Tag" Value="🔍 Поиск по названию, издателю..." />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -276,7 +279,7 @@
                                 VerticalAlignment="Center"
                                 Foreground="#808080"
                                 IsHitTestVisible="False"
-                                Text="🔍 Поиск по названию, издателю..."
+                                Text="{TemplateBinding Tag}"
                                 Visibility="Collapsed" />
                         </Grid>
                     </Border>
@@ -293,33 +296,59 @@
         </Setter>
     </Style>
 
-    <!--  Чекбокс выбора выхода в попапе  -->
+    <!--  Чекбокс выбора выхода + индивидуальная посылка в этот выход (дБ)  -->
     <DataTemplate x:Key="OutputOptionTemplate">
-        <DockPanel Margin="0,3" LastChildFill="True">
-            <Button
-                Width="16"
-                Height="16"
-                Margin="2,0,0,0"
-                Padding="0"
-                Background="Transparent"
-                BorderThickness="0"
-                Command="{Binding HideCommand}"
-                Content="✕"
-                DockPanel.Dock="Right"
-                FontSize="10"
-                Foreground="#888"
-                ToolTip="Hide this output device from all strips" />
-            <CheckBox
-                VerticalAlignment="Center"
-                VerticalContentAlignment="Center"
-                IsChecked="{Binding IsEnabled, Mode=TwoWay}">
-                <TextBlock
+        <StackPanel Margin="0,3">
+            <DockPanel LastChildFill="True">
+                <Button
+                    Width="16"
+                    Height="16"
+                    Margin="2,0,0,0"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{Binding HideCommand}"
+                    Content="✕"
+                    DockPanel.Dock="Right"
                     FontSize="10"
-                    Text="{Binding Name}"
-                    TextTrimming="CharacterEllipsis"
-                    ToolTip="{Binding Name}" />
-            </CheckBox>
-        </DockPanel>
+                    Foreground="#888"
+                    ToolTip="Скрыть это устройство со всех стрипов" />
+                <CheckBox
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    IsChecked="{Binding IsEnabled, Mode=TwoWay}">
+                    <TextBlock
+                        FontSize="10"
+                        Text="{Binding Title}"
+                        TextTrimming="CharacterEllipsis"
+                        ToolTip="{Binding ToolTip}" />
+                </CheckBox>
+            </DockPanel>
+
+            <!-- Посылка в этот выход: тот же параметр GainDb, что хранится
+                 в settings.json. Показывается только у включённого маршрута. -->
+            <DockPanel
+                Margin="20,1,2,0"
+                Visibility="{Binding ShowGain, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock
+                    Width="34"
+                    VerticalAlignment="Center"
+                    FontSize="9"
+                    Foreground="#9A9A9A"
+                    Text="{Binding GainText}" />
+                <Slider
+                    Height="14"
+                    IsMoveToPointEnabled="True"
+                    IsSnapToTickEnabled="False"
+                    LargeChange="1"
+                    Maximum="{Binding MaxGainDb}"
+                    Minimum="{Binding MinGainDb}"
+                    SmallChange="0.5"
+                    Style="{StaticResource DenSlider}"
+                    ToolTip="Посылка стрипа в этот выход, дБ (применяется сразу)"
+                    Value="{Binding GainDb, Mode=TwoWay}" />
+            </DockPanel>
+        </StackPanel>
     </DataTemplate>
 
     <!--  Поверхность имени стрипа и поле правки подключены к коду- behind

@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
 
 namespace SoundMeeter.ViewModels;
 
-// Применение MIDI-привязок: непрерывные параметры, кнопки и PTT.
+// Применение MIDI-привязок: непрерывные параметры и кнопки (переключение,
+// удержание-PTT, кнопка с фиксацией).
 public partial class MainViewModel
 {
     private readonly IMidiService _midi;
@@ -14,7 +16,33 @@ public partial class MainViewModel
     public IMidiService MidiService => _midi;
 
     /// <summary>Уведомляет VM об изменении MIDI-настроек (из окна привязок).</summary>
-    public void MidiSettingsChanged() => MarkDirty();
+    public void MidiSettingsChanged()
+    {
+        ResetMidiButtonStates();
+        _logger.LogInformation("MIDI-настройки изменены: устройство «{Device}», привязок {Count}",
+            _engine.Midi.DeviceName ?? "<не выбрано>", _engine.Midi.Bindings.Count);
+        MarkDirty();
+    }
+
+    /// <summary>
+    /// Сбрасывает отслеживание нажатий: сменилось устройство, привязка или её
+    /// режим — иначе первое же сообщение будет съедено как «уже нажато».
+    /// </summary>
+    public void ResetMidiButtonStates()
+    {
+        // PTT-кнопки, которые сейчас «зажаты», надо вернуть в прежнее состояние,
+        // иначе параметр останется включённым навсегда.
+        if (_pttRestore.Count > 0)
+        {
+            foreach (var pair in _pttRestore)
+            {
+                var binding = _engine.Midi.Bindings.FirstOrDefault(b => ButtonKey(b) == pair.Key);
+                if (binding != null) SetButtonState(binding, pair.Value);
+            }
+            _pttRestore.Clear();
+        }
+        _midiPressed.Clear();
+    }
 
     /// <summary>MIDI-сообщение пришло — применяем к привязкам (на UI-потоке).</summary>
     private void OnMidiMessageReceived(MidiMessageInfo msg)
@@ -37,11 +65,8 @@ public partial class MainViewModel
 
             switch (descriptor.Shape)
             {
-                case MidiParamShape.Button when binding.IsMomentary:
-                    ApplyMidiMomentary(binding, msg);
-                    break;
                 case MidiParamShape.Button:
-                    ApplyMidiButton(binding, descriptor, msg);
+                    ApplyMidiButton(binding, msg);
                     break;
                 default:
                     ApplyMidiContinuous(binding, descriptor, msg);
@@ -51,7 +76,7 @@ public partial class MainViewModel
     }
 
     /// <summary>
-    /// Сопоставляет сообщение с привязкой. Для PTT на NoteOn дополнительно
+    /// Сопоставляет сообщение с привязкой. Для привязки к ноте дополнительно
     /// принимаем NoteOff — отпускание ноты приходит именно этим событием.
     /// </summary>
     private static bool MatchesKind(MidiBinding binding, MidiMessageInfo msg)
@@ -66,6 +91,8 @@ public partial class MainViewModel
             ? msg.Value / 16383f
             : msg.Value / 127f;
         float value = descriptor.Min + (descriptor.Max - descriptor.Min) * normalized;
+        _logger.LogDebug("MIDI {Param} = {Value:F2} ({Target} {Strip})",
+            binding.Parameter, value, binding.TargetType, binding.StripId);
 
         switch (binding.TargetType)
         {
@@ -82,88 +109,140 @@ public partial class MainViewModel
         }
     }
 
-    private void ApplyMidiButton(MidiBinding binding, MidiParameterDescriptor descriptor, MidiMessageInfo msg)
-    {
-        // Кнопка: переключаем по фронту нажатия (value>=64, velocity>0).
-        // Отпускание (NoteOff / CC<64) лишь помечает кнопку отпущенной.
-        bool pressed = msg.Kind switch
-        {
-            MidiMessageKind.NoteOn => msg.Value > 0,
-            MidiMessageKind.NoteOff => false,
-            _ => msg.Value >= 64
-        };
+    private static string ButtonKey(MidiBinding binding) =>
+        $"{binding.TargetType}|{binding.StripId}|{binding.Parameter}";
 
-        string key = $"{binding.TargetType}|{binding.StripId}|{binding.Parameter}";
+    /// <summary>
+    /// Нажата ли кнопка. Для CC обычная полярность — 127 = нажато, но кнопки
+    /// с фиксацией на части MIDI-микшеров шлют наоборот (0 = нажато, 127 = отпущено);
+    /// такая полярность включается флагом IsInverted у привязки.
+    /// </summary>
+    private static bool IsPressed(MidiBinding binding, MidiMessageInfo msg) => msg.Kind switch
+    {
+        MidiMessageKind.NoteOn => msg.Value > 0,
+        MidiMessageKind.NoteOff => false,
+        _ => binding.IsInverted ? msg.Value < 64 : msg.Value >= 64
+    };
+
+    /// <summary>
+    /// Кнопочная привязка. Режим определяет, что делать с фронтом нажатия:
+    /// Toggle — переключить, Hold — включить и вернуть по отпусканию,
+    /// Latch — поставить параметр ровно в присланное контроллером состояние.
+    /// </summary>
+    private void ApplyMidiButton(MidiBinding binding, MidiMessageInfo msg)
+    {
+        bool pressed = IsPressed(binding, msg);
+
+        string key = ButtonKey(binding);
         bool wasPressed = _midiPressed.TryGetValue(key, out var prev) && prev;
         _midiPressed[key] = pressed;
         if (pressed == wasPressed) return;
-        if (!pressed) return; // только фронт нажатия
 
-        switch (binding.TargetType)
+        // Режим кнопки виден только здесь: по журналу понятно, почему параметр
+        // переключился (Toggle) или удержался (Hold/Latch).
+        _logger.LogInformation("MIDI {Param} [{Mode}] {State} ({Target} {Strip})",
+            binding.Parameter, binding.Mode, pressed ? "нажато" : "отпущено",
+            binding.TargetType, binding.StripId);
+
+        switch (binding.Mode)
         {
-            case "Input":
-                var input = Inputs.FirstOrDefault(i => i.Id == binding.StripId);
-                if (input == null) return;
-                ToggleButton(input, binding.Parameter);
+            case MidiButtonMode.Hold:
+                ApplyMidiHold(binding, key, pressed);
                 break;
-            case "Bus":
-                var bus = Buses.FirstOrDefault(b => b.Id == binding.StripId);
-                if (bus == null) return;
-                ToggleButton(bus, binding.Parameter);
+            case MidiButtonMode.Latch:
+                ApplyMidiLatch(binding, pressed);
+                break;
+            default:
+                if (!pressed) return; // Toggle реагирует только на фронт нажатия
+                ToggleButton(binding);
                 break;
         }
     }
 
     /// <summary>
-    /// Momentary-привязка (PTT): пока кнопка нажата — параметр активен
+    /// PTT по удержанию: пока кнопка нажата — параметр активен
     /// (Mute — микрофон открыт, Solo/Mono/Denoiser — включены), на отпускание
     /// возвращается прежнее состояние.
     /// </summary>
-    private void ApplyMidiMomentary(MidiBinding binding, MidiMessageInfo msg)
+    private void ApplyMidiHold(MidiBinding binding, string key, bool pressed)
     {
-        bool pressed = msg.Kind switch
-        {
-            MidiMessageKind.NoteOn => msg.Value > 0,
-            MidiMessageKind.NoteOff => false,
-            _ => msg.Value >= 64
-        };
-
-        string key = $"{binding.TargetType}|{binding.StripId}|{binding.Parameter}";
-        bool wasPressed = _midiPressed.TryGetValue(key, out var prev) && prev;
-        _midiPressed[key] = pressed;
-        if (pressed == wasPressed) return;
-
-        if (binding.TargetType != "Input") return;
-
-        var input = Inputs.FirstOrDefault(i => i.Id == binding.StripId);
-        if (input == null) return;
-
-        string parameter = binding.Parameter;
-        if (!IsMomentaryParam(parameter)) return;
+        if (!IsButtonParam(binding.Parameter)) return;
 
         if (pressed)
         {
             // Запомнили состояние до нажатия и включили параметр.
-            _pttRestore[key] = GetButtonState(input, parameter);
-            SetButtonState(input, parameter, MomentaryActiveValue(parameter));
+            _pttRestore[key] = GetButtonState(binding);
+            SetButtonState(binding, ButtonActiveValue(binding.Parameter));
         }
-        else if (_pttRestore.TryGetValue(key, out var restore))
+        else if (_pttRestore.Remove(key, out var restore))
         {
             // Отпустили — вернули прежнее состояние.
-            SetButtonState(input, parameter, restore);
-            _pttRestore.Remove(key);
+            SetButtonState(binding, restore);
         }
     }
 
-    private static bool IsMomentaryParam(string parameter) => parameter switch
+    /// <summary>
+    /// Кнопка с фиксацией: контроллер шлёт не нажатие, а состояние
+    /// («включено»/«выключено»), поэтому параметр ставится ровно в это состояние.
+    /// Одно нажатие фиксированной кнопки включает микрофон, следующее — выключает.
+    /// </summary>
+    private void ApplyMidiLatch(MidiBinding binding, bool pressed)
+    {
+        if (!IsButtonParam(binding.Parameter)) return;
+        bool active = ButtonActiveValue(binding.Parameter);
+        SetButtonState(binding, pressed == active);
+    }
+
+    private static bool IsButtonParam(string parameter) => parameter switch
     {
         "IsMuted" or "IsSolo" or "IsMono" or "DenoiserEnabled" => true,
         _ => false
     };
 
-    /// <summary>Значение параметра, пока кнопка PTT нажата (Mute — открыть звук).</summary>
-    private static bool MomentaryActiveValue(string parameter) =>
+    /// <summary>Значение параметра, пока кнопка нажата (Mute — открыть звук).</summary>
+    private static bool ButtonActiveValue(string parameter) =>
         parameter == "IsMuted" ? false : true;
+
+    private void ToggleButton(MidiBinding binding)
+    {
+        switch (binding.TargetType)
+        {
+            case "Input":
+                var input = Inputs.FirstOrDefault(i => i.Id == binding.StripId);
+                if (input != null) ToggleButton(input, binding.Parameter);
+                break;
+            case "Bus":
+                var bus = Buses.FirstOrDefault(b => b.Id == binding.StripId);
+                if (bus != null) ToggleButton(bus, binding.Parameter);
+                break;
+        }
+    }
+
+    private bool GetButtonState(MidiBinding binding) => binding.TargetType switch
+    {
+        "Input" => Inputs.FirstOrDefault(i => i.Id == binding.StripId) is { } input
+            ? GetButtonState(input, binding.Parameter)
+            : false,
+        "Bus" => Buses.FirstOrDefault(b => b.Id == binding.StripId) is { } bus
+            ? GetButtonState(bus, binding.Parameter)
+            : false,
+        _ => false
+    };
+
+    private void SetButtonState(MidiBinding binding, bool value)
+    {
+        switch (binding.TargetType)
+        {
+            case "Input":
+                var input = Inputs.FirstOrDefault(i => i.Id == binding.StripId);
+                if (input != null) SetButtonState(input, binding.Parameter, value);
+                break;
+            case "Bus":
+                var bus = Buses.FirstOrDefault(b => b.Id == binding.StripId);
+                if (bus != null) SetButtonState(bus, binding.Parameter, value);
+                break;
+        }
+    }
 
     private static bool GetButtonState(InputChannelViewModel vm, string parameter) => parameter switch
     {
@@ -171,6 +250,14 @@ public partial class MainViewModel
         "IsSolo" => vm.IsSolo,
         "IsMono" => vm.IsMono,
         "DenoiserEnabled" => vm.DenoiserEnabled,
+        _ => false
+    };
+
+    private static bool GetButtonState(OutputBusViewModel vm, string parameter) => parameter switch
+    {
+        "IsMuted" => vm.IsMuted,
+        "IsSolo" => vm.IsSolo,
+        "IsMono" => vm.IsMono,
         _ => false
     };
 
@@ -182,6 +269,16 @@ public partial class MainViewModel
             case "IsSolo": vm.IsSolo = value; break;
             case "IsMono": vm.IsMono = value; break;
             case "DenoiserEnabled": vm.DenoiserEnabled = value; break;
+        }
+    }
+
+    private static void SetButtonState(OutputBusViewModel vm, string parameter, bool value)
+    {
+        switch (parameter)
+        {
+            case "IsMuted": vm.IsMuted = value; break;
+            case "IsSolo": vm.IsSolo = value; break;
+            case "IsMono": vm.IsMono = value; break;
         }
     }
 

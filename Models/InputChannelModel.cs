@@ -28,13 +28,13 @@ public class InputChannelModel
     /// </summary>
     public bool DenoiserEnabled { get; set; }
 
-    /// <summary>Noise Remover, 0..100% — доля денойзерного сигнала во входном миксе.</summary>
+    /// <summary>Noise Remover, 0..100% — доля денойзерного сигнала в миксе с исходным.</summary>
     public float DenoiserNoiseRemover { get; set; } = 100f;
 
-    /// <summary>Dry / Wet Balance, 0..100% — финальный кросфейд между сухим и обработанным сигналом.</summary>
+    /// <summary>Dry / Wet Balance, 0..100% — финальный кросфейд между исходным и обработанным сигналом.</summary>
     public float DenoiserDryWet { get; set; } = 100f;
 
-    /// <summary>Formant Low, дБ (−24..+24) — EQ-пик ~500 Гц на обработанном сигнале.</summary>
+    /// <summary>Formant Low, дБ (−24..+24) — EQ-пик ~500 Гц.</summary>
     public float DenoiserFormantLowDb { get; set; }
 
     /// <summary>Formant Medium, дБ (−24..+24) — EQ-пик ~1.5 кГц.</summary>

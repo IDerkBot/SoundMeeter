@@ -27,6 +27,27 @@ namespace SoundMeeter.Views.Controls
             window.ShowDialog();
         }
 
+        /// <summary>Окно просмотра журнала и копирования диагностики.</summary>
+        private void OnLogsClick(object sender, RoutedEventArgs e)
+        {
+            var owner = Window.GetWindow(this);
+            if (owner is null) return;
+
+            // Окно одно на приложение: держать второй просмотрщик незачем, а
+            // DataContext у него общий с главным окном.
+            if (owner.OwnedWindows.OfType<LogWindow>().FirstOrDefault() is { } existing)
+            {
+                if (existing.IsVisible)
+                {
+                    existing.Activate();
+                    return;
+                }
+                existing.Close();
+            }
+
+            new LogWindow { Owner = owner }.Show();
+        }
+
         /// <summary>Ручная проверка обновлений: сама проверка в VM, окно открываем здесь.</summary>
         private async void OnCheckUpdatesClick(object sender, RoutedEventArgs e)
         {

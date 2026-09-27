@@ -11,6 +11,7 @@ public partial class OutputBusViewModel : ObservableObject
 {
     private readonly IAudioEngine _engine;
     private readonly Action _markDirty;
+    private readonly Action<OutputBusModel> _onTitleChanged;
     private string _renameOriginal = "";
 
     public OutputBusModel Model { get; }
@@ -66,11 +67,13 @@ public partial class OutputBusViewModel : ObservableObject
     [ObservableProperty]
     private float _peakLevel;
 
-    public OutputBusViewModel(IAudioEngine engine, OutputBusModel model, Action markDirty)
+    public OutputBusViewModel(IAudioEngine engine, OutputBusModel model, Action markDirty,
+        Action<OutputBusModel>? onTitleChanged = null)
     {
         Model = model;
         _engine = engine;
         _markDirty = markDirty;
+        _onTitleChanged = onTitleChanged ?? (_ => { });
         _name = model.Name;
         _channelName = model.ChannelName;
         _volumeDb = model.VolumeDb;
@@ -84,6 +87,8 @@ public partial class OutputBusViewModel : ObservableObject
     {
         Model.ChannelName = value ?? "";
         OnPropertyChanged(nameof(Title));
+        //  Подписи в попапах OUT/VIRT показывают имя канала, а не устройства.  */
+        _onTitleChanged(Model);
         _markDirty();
     }
 

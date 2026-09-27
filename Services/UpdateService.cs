@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
+using SoundMeeter.Services.Logging;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -30,6 +32,7 @@ namespace SoundMeeter.Services
         private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly HttpClient _http;
+        private readonly ILogger _logger = AppLog.For<UpdateService>();
         private bool _disposed;
 
         public UpdateService() : this(new HttpClient()) { }
@@ -69,6 +72,8 @@ namespace SoundMeeter.Services
 
         public async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation("Проверка обновлений: {Owner}/{Repo}, текущая версия {Version}",
+                Owner, Repo, CurrentVersion);
             try
             {
                 using var response = await _http
@@ -80,11 +85,13 @@ namespace SoundMeeter.Services
                     // 404 — релизов ещё нет. Это не поломка, просто обновляться не от чего.
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
+                        _logger.LogInformation("Релизов в {Owner}/{Repo} пока нет", Owner, Repo);
                         return new UpdateCheckResult(true, false, null,
                             $"{CurrentVersion} — релизов в {Owner}/{Repo} пока нет");
                     }
 
                     // 403/429 — лимит запросов к API, к самому приложению отношения не имеет.
+                    _logger.LogWarning("GitHub API вернул {Status}", (int)response.StatusCode);
                     return UpdateCheckResult.Failed(
                         $"GitHub API вернул {(int)response.StatusCode} {response.ReasonPhrase}");
                 }
@@ -93,7 +100,10 @@ namespace SoundMeeter.Services
                 var dto = JsonSerializer.Deserialize<GitHubReleaseDto>(json, JsonOptions);
 
                 if (dto?.TagName is null || !AppVersion.TryParse(dto.TagName, out var version))
+                {
+                    _logger.LogWarning("Тег релиза не разобран: {Tag}", dto?.TagName);
                     return UpdateCheckResult.Failed("не удалось разобрать тег релиза");
+                }
 
                 var asset = SelectAsset(dto.Assets);
                 var update = new UpdateInfo
@@ -109,10 +119,14 @@ namespace SoundMeeter.Services
 
                 if (version <= CurrentVersion)
                 {
+                    _logger.LogInformation("Установленная версия {Version} актуальна (последний релиз {Tag})",
+                        CurrentVersion, dto.TagName);
                     return new UpdateCheckResult(true, false, null,
                         $"{CurrentVersion} — установленная версия актуальна");
                 }
 
+                _logger.LogInformation("Доступно обновление {Version} (установлено {Current}), ассет: {Asset}",
+                    version, CurrentVersion, asset?.Name ?? "нет");
                 return new UpdateCheckResult(true, true, update,
                     asset == null
                         ? $"Доступна версия {version}, но без portable-архива"
@@ -120,10 +134,12 @@ namespace SoundMeeter.Services
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
+                _logger.LogInformation("Проверка обновлений отменена");
                 return UpdateCheckResult.Failed("проверка отменена");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Проверка обновлений не удалась: {Message}", ex.Message);
                 return UpdateCheckResult.Failed(ex.Message);
             }
         }
@@ -170,6 +186,8 @@ namespace SoundMeeter.Services
 
             Directory.CreateDirectory(UpdateRoot);
             var target = Path.Combine(UpdateRoot, SafeFileName(asset.Name) + ".zip");
+            _logger.LogInformation("Скачивание обновления: {Name} ({Size} байт) -> {Target}",
+                asset.Name, asset.Size, target);
 
             using var response = await _http
                 .GetAsync(asset.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
@@ -193,8 +211,15 @@ namespace SoundMeeter.Services
                     written += read;
                     if (expected > 0) progress?.Report(Math.Clamp((double)written / expected, 0, 1));
                 }
+
+                // Обрыв связи на середине даёт «успешно» распакованный мусор без
+                // этой проверки: размер не совпал — файл неполный, применять нельзя.
+                if (expected > 0 && written != expected)
+                    throw new InvalidDataException(
+                        $"Архив обновления недокачан: получено {written} из {expected} байт.");
             }
 
+            _logger.LogInformation("Архив скачан: {Target} ({Size} байт)", target, new FileInfo(target).Length);
             return target;
         }
 
@@ -209,15 +234,35 @@ namespace SoundMeeter.Services
             Directory.CreateDirectory(target);
 
             ZipFile.ExtractToDirectory(zipPath, target);
-            return FindPayloadRoot(target);
+            var payload = FindPayloadRoot(target);
+            _logger.LogInformation("Архив распакован: {Zip} -> {Payload}", zipPath, payload);
+            return payload;
         }
 
-        public void ApplyAndRestart(string payloadDirectory, UpdateInfo update) =>
-            UpdateApplier.ApplyAndRestart(payloadDirectory, InstallDirectory, ExecutablePath, UpdateRoot, update);
+        public UpdatePlan PlanUpdate(string payloadDirectory, UpdateInfo update) =>
+            UpdateApplier.Plan(payloadDirectory, InstallDirectory, ExecutablePath, UpdateRoot, update);
+
+        public void ApplyAndRestart(UpdatePlan plan) => UpdateApplier.ApplyAndRestart(plan);
+
+        public string FormatPlanReport(UpdatePlan plan)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append("Проверка архива обновления ").AppendLine(plan.TagName);
+            foreach (var note in plan.ValidationNotes)
+                sb.Append("  • ").AppendLine(note);
+
+            sb.AppendLine();
+            sb.AppendLine(UpdateApplier.FormatDeletionList(plan.FilesToDelete));
+            sb.AppendLine();
+            sb.Append("Каталог: ").AppendLine(plan.InstallDirectory);
+            sb.Append("Ключи автозапуска и папка настроек %APPDATA%\\SoundMeeter не затрагиваются.");
+            return sb.ToString();
+        }
 
         public void OpenReleasePage(UpdateInfo update)
         {
             if (string.IsNullOrWhiteSpace(update.HtmlUrl)) return;
+            _logger.LogInformation("Открываем страницу релиза {Tag}: {Url}", update.TagName, update.HtmlUrl);
             Process.Start(new ProcessStartInfo(update.HtmlUrl) { UseShellExecute = true })?.Dispose();
         }
 

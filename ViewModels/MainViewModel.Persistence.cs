@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
+using SoundMeeter.Services.Logging;
 
 namespace SoundMeeter.ViewModels;
 
@@ -9,6 +11,7 @@ public partial class MainViewModel
     private readonly SettingsService _settings;
     private readonly System.Threading.Timer _saveTimer;
     private readonly object _dirtyLock = new();
+    private readonly ILogger _logger = AppLog.For<MainViewModel>();
     private bool _dirty;
 
     /// <summary>
@@ -20,10 +23,19 @@ public partial class MainViewModel
         {
             _engine.ApplyPreset(saved);
             if (saved.EngineWasRunning) _engine.Start();
+
+            _logger.LogInformation(
+                "Preset restored: {Inputs} inputs, {Buses} buses, engine was running: {WasRunning}, MIDI: {Midi}",
+                saved.Inputs.Count, saved.Outputs.Count, saved.EngineWasRunning,
+                string.IsNullOrWhiteSpace(saved.Midi?.DeviceName) ? "not set" : saved.Midi.DeviceName);
         }
         else
         {
             _engine.EnsureDefaultStrips();
+            if (_settings.HasUnsupportedNewerSchema)
+                _logger.LogWarning("Настройки не применены: {Report}", _settings.LoadReport);
+            else
+                _logger.LogInformation("Сохранённых настроек нет — создан минимальный набор стрипов");
         }
 
         // Открываем MIDI-устройство, сохранённое в пресете.
@@ -40,10 +52,11 @@ public partial class MainViewModel
         try
         {
             _settings.SaveSync(_engine.CreateSnapshot());
+            _logger.LogDebug("Settings saved on exit");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+            _logger.LogError(ex, "Не удалось сохранить настройки при выходе: {Message}", ex.Message);
         }
     }
 
@@ -74,7 +87,7 @@ public partial class MainViewModel
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+            _logger.LogError(ex, "Фоновое сохранение настроек не удалось: {Message}", ex.Message);
         }
     }
 }

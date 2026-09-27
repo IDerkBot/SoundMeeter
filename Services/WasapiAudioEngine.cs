@@ -1,10 +1,11 @@
-﻿using NAudio.CoreAudioApi;
+﻿using Microsoft.Extensions.Logging;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SoundMeeter.Audio;
 using SoundMeeter.Models;
+using SoundMeeter.Services.Logging;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace SoundMeeter.Services;
 
@@ -19,6 +20,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
     private readonly SoloState _soloState = new();
     private readonly List<DeviceInfo> _catalog = new();
     private readonly HashSet<string> _removedDeviceIds = new();
+    private readonly ILogger _logger = AppLog.For<WasapiAudioEngine>();
 
     public List<InputChannelModel> InputsInternal { get; } = new();
     public List<OutputBusModel> BusesInternal { get; } = new();
@@ -136,6 +138,8 @@ public sealed class WasapiAudioEngine : IAudioEngine
             ApplyRoutingUnlocked();
             IsRunning = true;
         }
+        _logger.LogInformation("Engine started: {Inputs} inputs, {Buses} buses, {Taps} active routes",
+            InputsInternal.Count, BusesInternal.Count, _taps.Count);
         StateChanged?.Invoke();
     }
 
@@ -158,11 +162,12 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
             foreach (var busOut in _openBuses.Values)
             {
-                try { busOut.Out.Stop(); } catch { }
+                try { busOut.Out.Stop(); } catch (Exception ex) { _logger.LogDebug(ex, "Stop of bus «{Bus}» failed: {Message}", busOut.Model.Name, ex.Message); }
                 busOut.Out.Dispose();
             }
             _openBuses.Clear();
         }
+        _logger.LogInformation("Engine stopped");
         StateChanged?.Invoke();
     }
 
@@ -181,6 +186,28 @@ public sealed class WasapiAudioEngine : IAudioEngine
             route.Enabled = enabled;
 
             if (IsRunning) ApplyRoutingUnlocked();
+        }
+    }
+
+    /// <summary>
+    /// Индивидуальная посылка входа в шину, дБ. Значение читается тапом на каждом
+    /// пакете, поэтому применение мгновенное: пересоздавать аудиопоток не нужно.
+    /// </summary>
+    public void SetRouteGain(string inputId, string busId, float gainDb)
+    {
+        lock (_gate)
+        {
+            var input = InputsInternal.FirstOrDefault(i => i.Id == inputId);
+            if (input == null) return;
+
+            if (!input.BusRouting.TryGetValue(busId, out var route))
+            {
+                route = new BusRouting();
+                input.BusRouting[busId] = route;
+            }
+
+            if (!float.IsFinite(gainDb)) gainDb = 0f;
+            route.GainDb = Math.Clamp(gainDb, BusTap.MinGainDb, BusTap.MaxGainDb);
         }
     }
 
@@ -523,10 +550,16 @@ public sealed class WasapiAudioEngine : IAudioEngine
             var busOutput = new BusOutput { Model = bus, Dsp = dsp, Out = output, Active = true };
             _openBuses[bus.Id] = busOutput;
             bus.IsAvailable = true;
+            _logger.LogInformation("Bus «{Bus}» opened: device={Device}, «{DeviceName}», формат {Format}",
+                bus.Name, bus.DeviceId, device.FriendlyName, dsp.WaveFormat);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Bus '{bus.Name}' failed to open: {ex.Message}");
+            // HRESULT обязателен в записи: по тексту исключения нельзя понять,
+            // это запрет эксклюзивного режима, занятость устройства или отказ
+            // драйвера — а разбираться приходится уже пользователю.
+            _logger.LogError(ex, "Bus «{Bus}» (device={Device}) failed to open, HRESULT=0x{HResult:X8}: {Message}",
+                bus.Name, bus.DeviceId, ex.HResult, ex.Message);
             bus.IsAvailable = false;
         }
     }
@@ -553,13 +586,17 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
                 try
                 {
-                    var tap = new BusTap(source.OpenCursor(), input, _soloState);
+                    // Тап получает живой объект маршрута: посылка GainDb читается
+                    // из него на каждом пакете, поэтому правка уровня в UI слышна
+                    // без пересоздания тапа (SM-A02).
+                    var tap = new BusTap(source.OpenCursor(), input, pair.Value, _soloState);
                     busOut.Dsp.AddInput(tap);
                     _taps[key] = tap;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Route {input.Name} -> {busOut.Model.Name} failed: {ex.Message}");
+                    _logger.LogError(ex, "Маршрут {Input} -> {Bus} не построен: {Message}",
+                        input.Name, busOut.Model.Name, ex.Message);
                 }
             }
         }
@@ -572,8 +609,20 @@ public sealed class WasapiAudioEngine : IAudioEngine
             _taps.Remove(key);
         }
 
+        if (stale.Count > 0)
+        {
+            // Сброс маршрутизации виден только здесь: без записи в журнал
+            // «пропал звук на стрипе» нечем объяснить.
+            _logger.LogInformation("Routing rebuilt: removed {Removed}, active now {Active}",
+                string.Join(", ", stale.Select(k => $"{NameOf(k.InputId)} -> {NameOf(k.BusId)}")),
+                _taps.Count);
+        }
+
         StopOrphanSourcesUnlocked();
     }
+
+    private string NameOf(string stripId) =>
+        InputsInternal.FirstOrDefault(i => i.Id == stripId)?.Name ?? stripId;
 
     private InputSource? GetOrCreateSourceUnlocked(InputChannelModel input)
     {
@@ -588,7 +637,8 @@ public sealed class WasapiAudioEngine : IAudioEngine
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Source '{input.Name}' failed: {ex.Message}");
+            _logger.LogError(ex, "Source «{Strip}» (device={Device}) failed, HRESULT=0x{HResult:X8}: {Message}",
+                input.Name, input.DeviceId, ex.HResult, ex.Message);
             source.Dispose();
             return null;
         }

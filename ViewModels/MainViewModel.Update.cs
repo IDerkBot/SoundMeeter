@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
 
@@ -37,7 +38,7 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             // Задача запускается fire-and-forget: исключение here уйдёт в unobserved.
-            System.Diagnostics.Debug.WriteLine($"Update check failed: {ex.Message}");
+            _logger.LogError(ex, "Тихая проверка обновлений не удалась: {Message}", ex.Message);
         }
     }
 

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SoundMeeter.Models;
 
 /// <summary>Тип MIDI-сообщения, к которому привязан параметр.</summary>
@@ -61,6 +63,22 @@ public static class MidiParameters
         All.Where(d => d.ForBus).ToList();
 }
 
+/// <summary>Режим обработки кнопочной MIDI-привязки.</summary>
+public enum MidiButtonMode
+{
+    /// <summary>Обычная кнопка: переключение параметра по фронту нажатия.</summary>
+    Toggle = 0,
+
+    /// <summary>PTT по удержанию: пока нажато — параметр активен, на отпускание — возврат.</summary>
+    Hold = 1,
+
+    /// <summary>
+    /// Кнопка с фиксацией (latching): контроллер шлёт не нажатие, а состояние
+    /// «включено/выключено», поэтому параметр ставится ровно в это состояние.
+    /// </summary>
+    Latch = 2
+}
+
 /// <summary>
 /// Привязка MIDI-сообщения к параметру стрипа.
 /// TargetType: "Input" или "Bus"; StripId — стабильный Id стрипа.
@@ -74,8 +92,26 @@ public class MidiBinding
     public int Control { get; set; }
     public MidiMessageKind MessageKind { get; set; } = MidiMessageKind.ControlChange;
 
-    /// <summary>true — кнопка работает как PTT: пока нажата — активно, на отпускание — возврат.</summary>
-    public bool IsMomentary { get; set; }
+    /// <summary>Режим кнопки: переключение, удержание (PTT) или кнопка с фиксацией.</summary>
+    public MidiButtonMode Mode { get; set; } = MidiButtonMode.Toggle;
+
+    /// <summary>
+    /// true — обратная полярность CC: 0 = нажато, 127 = отпущено.
+    /// Так шлют, например, кнопки с фиксацией на некоторых MIDI-микшерах.
+    /// </summary>
+    public bool IsInverted { get; set; }
+
+    /// <summary>
+    /// Устаревшее поле из настроек прошлых версий (hold-режим).
+    /// Читается при загрузке и переносится в <see cref="Mode"/>; не сохраняется.
+    /// </summary>
+    [JsonPropertyName("IsMomentary")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? LegacyMomentary
+    {
+        get => null;
+        set { if (value == true) Mode = MidiButtonMode.Hold; }
+    }
 }
 
 /// <summary>Настройки MIDI-микшера: устройство ввода и список привязок.</summary>
@@ -97,7 +133,8 @@ public class MidiSettings
             Channel = b.Channel,
             Control = b.Control,
             MessageKind = b.MessageKind,
-            IsMomentary = b.IsMomentary
+            Mode = b.Mode,
+            IsInverted = b.IsInverted
         }).ToList()
     };
 }

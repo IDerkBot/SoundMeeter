@@ -1,5 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using SoundMeeter.Models;
+using SoundMeeter.Services.Logging;
 using System.IO;
 using System.Text.Json;
 
@@ -8,6 +10,7 @@ namespace SoundMeeter.Services
     public class InstalledAppsService : IInstalledAppsService
     {
         private readonly SystemAppsFilterConfig _filterConfig;
+        private readonly ILogger _logger = AppLog.For<InstalledAppsService>();
 
         public InstalledAppsService()
         {
@@ -30,12 +33,16 @@ namespace SoundMeeter.Services
                 if (File.Exists(filePath))
                 {
                     var json = File.ReadAllText(filePath);
-                    return JsonSerializer.Deserialize<SystemAppsFilterConfig>(json) ?? new SystemAppsFilterConfig();
+                    var config = JsonSerializer.Deserialize<SystemAppsFilterConfig>(json) ?? new SystemAppsFilterConfig();
+                    _logger.LogInformation("Загружен фильтр системных приложений: {File}", filePath);
+                    return config;
                 }
+
+                _logger.LogWarning("Файл фильтра системных приложений не найден: {File}", filePath);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Не удалось загрузить фильтр: {ex.Message}");
+                _logger.LogError(ex, "Не удалось загрузить фильтр системных приложений: {Message}", ex.Message);
             }
 
             // Если файл не найден — возвращаем пустой конфиг (ничего не фильтруется)

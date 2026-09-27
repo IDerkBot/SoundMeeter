@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SoundMeeter.Models;
 using SoundMeeter.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
@@ -126,7 +127,7 @@ public partial class MainViewModel : ObservableObject
 
         Buses.Clear();
         foreach (var model in _engine.Buses)
-            Buses.Add(new OutputBusViewModel(_engine, model, MarkDirty));
+            Buses.Add(new OutputBusViewModel(_engine, model, MarkDirty, OnBusTitleChanged));
 
         HasVirtualCable = _engine.Buses.Any(b =>
             b.Name.Contains("CABLE", StringComparison.OrdinalIgnoreCase) ||
@@ -141,5 +142,15 @@ public partial class MainViewModel : ObservableObject
     {
         IsRunning = _engine.IsRunning;
         Status = IsRunning ? "Engine: running" : "Engine: stopped";
+    }
+
+    /// <summary>
+    /// Канал выхода переименован — обновляем подпись этой шины в попапах
+    /// OUT/VIRT всех входных стрипов.
+    /// </summary>
+    private void OnBusTitleChanged(OutputBusModel bus)
+    {
+        foreach (var input in Inputs)
+            input.UpdateBusChannelName(bus.Id, bus.ChannelName);
     }
 }

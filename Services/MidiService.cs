@@ -1,10 +1,13 @@
+using Microsoft.Extensions.Logging;
 using NAudio.Midi;
 using SoundMeeter.Models;
+using SoundMeeter.Services.Logging;
 
 namespace SoundMeeter.Services;
 
 public sealed class MidiService : IMidiService
 {
+    private readonly ILogger _logger = AppLog.For<MidiService>();
     private MidiIn? _midiIn;
 
     public IReadOnlyList<MidiInputDevice> Devices { get; }
@@ -46,16 +49,24 @@ public sealed class MidiService : IMidiService
 
         // Открываем именно сохранённое устройство. Если его нет в системе —
         // не подхватываем первое попавшееся, а просто остаёмся закрытыми.
-        if (Devices.FirstOrDefault(d => d.Name == deviceName) is not { } device) return;
+        if (Devices.FirstOrDefault(d => d.Name == deviceName) is not { } device)
+        {
+            _logger.LogWarning("MIDI-устройство «{Device}» не найдено среди {Count} подключённых",
+                deviceName, Devices.Count);
+            return;
+        }
 
         try
         {
             _midiIn = new MidiIn(device.Index);
             _midiIn.MessageReceived += OnMessageReceived;
             _midiIn.Start();
+            _logger.LogInformation("MIDI открыт: {Device} (index {Index})", device.Name, device.Index);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Не удалось открыть MIDI-устройство «{Device}»: {Message}",
+                device.Name, ex.Message);
             Close();
         }
     }
@@ -69,8 +80,9 @@ public sealed class MidiService : IMidiService
             _midiIn.Stop();
             _midiIn.Close();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Ошибка закрытия MIDI: {Message}", ex.Message);
         }
         _midiIn.Dispose();
         _midiIn = null;
@@ -81,11 +93,18 @@ public sealed class MidiService : IMidiService
         try
         {
             var info = Parse(e.RawMessage);
-            if (info != null) MessageReceived?.Invoke(info.Value);
+            if (info == null) return;
+
+            // MIDI-сообщения — единственное место, где видно, что контроллер
+            // действительно прислал событие: без записи «кнопка не реагирует»
+            // нечем объяснить, кроме догадок.
+            _logger.LogDebug("MIDI {Kind} ch={Channel} cc={Control} value={Value}",
+                info.Value.Kind, info.Value.Channel, info.Value.Control, info.Value.Value);
+            MessageReceived?.Invoke(info.Value);
         }
-        catch
+        catch (Exception ex)
         {
-            // Игнорируем «мусорные» сообщения.
+            _logger.LogWarning(ex, "Некорректное MIDI-сообщение 0x{Raw:X8}: {Message}", e.RawMessage, ex.Message);
         }
     }
 

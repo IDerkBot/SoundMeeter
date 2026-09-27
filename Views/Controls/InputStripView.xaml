@@ -5,7 +5,6 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="420"
     d:DesignWidth="160"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -163,7 +162,7 @@
 
                 <Popup
                     x:Name="OutPopup"
-                    Width="240"
+                    Width="272"
                     AllowsTransparency="True"
                     Placement="Bottom"
                     PlacementTarget="{Binding ElementName=OutBtn}"
@@ -189,7 +188,7 @@
 
                 <Popup
                     x:Name="VirtPopup"
-                    Width="240"
+                    Width="272"
                     AllowsTransparency="True"
                     Placement="Bottom"
                     PlacementTarget="{Binding ElementName=VirtBtn}"
@@ -215,7 +214,7 @@
 
                 <Popup
                     x:Name="DenPopup"
-                    Width="240"
+                    Width="272"
                     AllowsTransparency="True"
                     Placement="Bottom"
                     PlacementTarget="{Binding ElementName=DenBtn}"

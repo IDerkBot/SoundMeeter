@@ -10,13 +10,19 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current). -->
-    <Version>1.0.1</Version>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <!-- SM-A03: централизованное логирование (ILogger + ротируемый файловый провайдер). -->
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
     <PackageReference Include="NAudio" Version="3.1.0" />
+    <!-- Нужен ради нативной rnnoise.dll (runtimes/win-x64/native). Обращаемся к ней
+         напрямую через RnNoiseInterop: managed-обёртка RNNoise.NET.Denoiser скрывает
+         своё кольцо буфера, из-за чего «сухой» и «денойзерный» сигналы расходятся
+         по времени, и не отдаёт вероятность речи (VAD). -->
     <PackageReference Include="YellowDogMan.RRNoise.NET" Version="0.1.9" />
   </ItemGroup>
 

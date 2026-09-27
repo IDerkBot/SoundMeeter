@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
+using SoundMeeter.Services.Logging;
 
 namespace SoundMeeter.ViewModels;
 
@@ -12,6 +14,7 @@ namespace SoundMeeter.ViewModels;
 public partial class UpdateViewModel : ObservableObject
 {
     private readonly IUpdateService _updates;
+    private readonly ILogger _logger = AppLog.For<UpdateViewModel>();
     private CancellationTokenSource? _cancellation;
 
     public UpdateViewModel(IUpdateService updates, UpdateInfo update)
@@ -21,6 +24,12 @@ public partial class UpdateViewModel : ObservableObject
     }
 
     public UpdateInfo Update { get; }
+
+    /// <summary>
+    /// Показ плана обновления и запрос согласия. Задаётся окном (диалог — UI),
+    /// чтобы логика применения не зависела от WPF. Возврат false отменяет установку.
+    /// </summary>
+    public Func<UpdatePlan, string, bool>? ConfirmPlan { get; set; }
 
     public string CurrentVersion => _updates.CurrentVersion.ToString();
 
@@ -73,8 +82,34 @@ public partial class UpdateViewModel : ObservableObject
             Status = "Распаковка…";
             var payload = _updates.Extract(zip, Update.TagName);
 
+            // Сверка целостности до подмены: повреждённый архив не должен
+            // привести к удалению файлов установленной сборки (SM-A06).
+            Status = "Проверка архива…";
+            UpdatePlan plan;
+            try
+            {
+                plan = _updates.PlanUpdate(payload, Update);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Архив обновления {Tag} не прошёл проверку целостности", Update.TagName);
+                Status = "Обновление отклонено: " + ex.Message;
+                IsBusy = false;
+                return;
+            }
+
+            // Пользователь видит, что именно будет удалено, и может отказаться.
+            var report = _updates.FormatPlanReport(plan);
+            if (ConfirmPlan is { } confirm && !confirm(plan, report))
+            {
+                _logger.LogInformation("Установка обновления {Tag} отменена пользователем", Update.TagName);
+                Status = "Установка отменена.";
+                IsBusy = false;
+                return;
+            }
+
             Status = "Подмена файлов и перезапуск…";
-            _updates.ApplyAndRestart(payload, Update);
+            _updates.ApplyAndRestart(plan);
 
             Progress = 100;
             Status = "Обновление устанавливается. Приложение будет закрыто.";
@@ -87,6 +122,7 @@ public partial class UpdateViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Установка обновления не удалась: {Message}", ex.Message);
             Status = "Не удалось установить обновление: " + ex.Message;
             IsBusy = false;
         }
