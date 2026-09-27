@@ -168,11 +168,12 @@
         <Setter Property="Foreground" Value="#DDD" />
         <Setter Property="Background" Value="#3A3A3D" />
         <Setter Property="BorderBrush" Value="#555" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="2,2" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="Height" Value="22" />
-        <Setter Property="FontSize" Value="9" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontStretch" Value="UltraExpanded" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -189,15 +190,15 @@
                             <Setter TargetName="Bd" Property="Background" Value="#4A4A4E" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="#007ACC" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="#4FA3FF" />
+                            <Setter TargetName="Bd" Property="Background" Value="#fc4747" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#d90404" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsChecked" Value="True" />
                                 <Condition Property="IsMouseOver" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Bd" Property="Background" Value="#1B81D6" />
+                            <Setter TargetName="Bd" Property="Background" Value="#e7362f" />
                         </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
@@ -260,8 +261,10 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="Padding" Value="8,6" />
-        <!--  Подсказка (watermark) берётся из Tag, чтобы каждый экран
-              мог задать свою подсказку, не копируя шаблон.  -->
+        <!--
+            Подсказка (watermark) берётся из Tag, чтобы каждый экран
+            мог задать свою подсказку, не копируя шаблон.
+        -->
         <Setter Property="Tag" Value="🔍 Поиск по названию, издателю..." />
         <Setter Property="Template">
             <Setter.Value>
@@ -325,11 +328,11 @@
                 </CheckBox>
             </DockPanel>
 
-            <!-- Посылка в этот выход: тот же параметр GainDb, что хранится
-                 в settings.json. Показывается только у включённого маршрута. -->
-            <DockPanel
-                Margin="20,1,2,0"
-                Visibility="{Binding ShowGain, Converter={StaticResource BoolToVisibility}}">
+            <!--
+                Посылка в этот выход: тот же параметр GainDb, что хранится
+                в settings.json. Показывается только у включённого маршрута.
+            -->
+            <DockPanel Margin="20,1,2,0" Visibility="{Binding ShowGain, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock
                     Width="34"
                     VerticalAlignment="Center"
@@ -351,9 +354,11 @@
         </StackPanel>
     </DataTemplate>
 
-    <!--  Поверхность имени стрипа и поле правки подключены к коду- behind
-          через EventSetter: внутри общего DataTemplate нельзя указать
-          имя обработчика из XAML.  -->
+    <!--
+        Поверхность имени стрипа и поле правки подключены к коду- behind
+        через EventSetter: внутри общего DataTemplate нельзя указать
+        имя обработчика из XAML.
+    -->
     <Style x:Key="StripTitleSurface" TargetType="Grid">
         <EventSetter Event="MouseRightButtonUp" Handler="OnStripTitleRightClick" />
     </Style>
