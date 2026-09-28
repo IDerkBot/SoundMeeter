@@ -36,4 +36,12 @@
     </None>
   </ItemGroup>
 
+  <!-- Панель док-панели OBS: вшиваем в сборку, чтобы док работал сразу после
+       запуска (и после автообновления portable-сборки) без файлов на диске. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\obs-dock\index.html" LogicalName="obs-dock.index.html" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.css" LogicalName="obs-dock.dock.css" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.js" LogicalName="obs-dock.dock.js" />
+  </ItemGroup>
+
 </Project>

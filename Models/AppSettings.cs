@@ -33,4 +33,7 @@ public class AppSettings
 
     /// <summary>MIDI-микшер: устройство ввода и привязки контроллеров к стрипам.</summary>
     public MidiSettings Midi { get; set; } = new();
+
+    /// <summary>Док-панель в OBS: порт сервера, автостарт и список каналов.</summary>
+    public ObsDockSettings ObsDock { get; set; } = new();
 }

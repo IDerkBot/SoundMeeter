@@ -120,6 +120,9 @@ namespace SoundMeeter.Services
                     AppName = r.AppName, IconPath = r.IconPath
                 }).ToList();
                 settings.HiddenDeviceIds = Settings.HiddenDeviceIds.ToList();
+                // Снимок движка про док ничего не знает, ровно как про маршруты
+                // приложений: переносим актуальные значения из Settings.
+                settings.ObsDock = CloneObsDock(Settings.ObsDock);
                 settings.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
                 settings.LogLevel = AppLog.Level.ToString();
 
@@ -131,6 +134,25 @@ namespace SoundMeeter.Services
         }
 
         public Task SaveAsync(AppSettings settings) => Task.Run(() => SaveSync(settings, explicitSave: false));
+
+        /// <summary>
+        /// Глубокая копия настроек дока. Снимок движка идёт на диск из фонового
+        /// таймера, а список каналов пользователь правит в окне — без копии
+        /// сохранился бы снимок того состояния, которое было при последнем
+        /// нажатии «Save».
+        /// </summary>
+        private static ObsDockSettings CloneObsDock(ObsDockSettings? source)
+        {
+            if (source == null) return new ObsDockSettings();
+            return new ObsDockSettings
+            {
+                Enabled = source.Enabled,
+                Port = source.Port,
+                ShowAllInputs = source.ShowAllInputs,
+                ShowAllOutputs = source.ShowAllOutputs,
+                Channels = source.Channels.Select(c => c.Clone()).ToList()
+            };
+        }
 
         public async Task<AppSettings?> LoadAsync()
         {

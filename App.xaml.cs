@@ -34,6 +34,8 @@ namespace SoundMeeter
             services.AddSingleton<IInstalledAppsService, InstalledAppsService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
             services.AddSingleton<IUpdateService, UpdateService>();
+            // Док-панель OBS: локальный сервер, отдающий страницу панели.
+            services.AddSingleton<IObsDockServer, ObsDockServer>();
 
             // Singleton: OnStartup восстанавливает пресет через этот же экземпляр,
             // что и окно (transient давал окну второй экземпляр с пустыми стрипами).

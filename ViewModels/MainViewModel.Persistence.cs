@@ -40,6 +40,10 @@ public partial class MainViewModel
 
         // Открываем MIDI-устройство, сохранённое в пресете.
         _midi.Open(_engine.Midi.DeviceName);
+
+        // Сервер док-панели поднимаем после восстановления стрипов: к моменту
+        // первого подключения панели набор каналов уже настоящий.
+        if (DockSettings.Enabled) StartDock();
     }
 
     /// <summary>

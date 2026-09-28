@@ -27,6 +27,28 @@ namespace SoundMeeter.Views.Controls
             window.ShowDialog();
         }
 
+        /// <summary>Настройки док-панели в OBS: каналы, порт, установка дока.</summary>
+        private void OnObsDockClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not MainViewModel main) return;
+
+            var owner = Window.GetWindow(this);
+            if (owner is null) return;
+
+            // Окно одно: второй экземпляр с теми же настройками только путает.
+            if (owner.OwnedWindows.OfType<ObsDockSettingsWindow>().FirstOrDefault() is { } existing)
+            {
+                if (existing.IsVisible)
+                {
+                    existing.Activate();
+                    return;
+                }
+                existing.Close();
+            }
+
+            new ObsDockSettingsWindow(new ObsDockSettingsViewModel(main)) { Owner = owner }.Show();
+        }
+
         /// <summary>Окно просмотра журнала и копирования диагностики.</summary>
         private void OnLogsClick(object sender, RoutedEventArgs e)
         {

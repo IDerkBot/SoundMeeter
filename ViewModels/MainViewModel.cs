@@ -40,7 +40,8 @@ public partial class MainViewModel : ObservableObject
         IInstalledAppsService installedAppsService,
         ISettingsService settingsService,
         IDispatcherService dispatcherService,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IObsDockServer obsDock)
     {
         _audioService = audioService;
         _installedAppsService = installedAppsService;
@@ -50,9 +51,11 @@ public partial class MainViewModel : ObservableObject
         _engine = engine;
         _settings = settings;
         _midi = midi;
+        _dock = obsDock;
         _engine.ChannelsChanged += OnChannelsChanged;
         _engine.StateChanged += OnStateChanged;
         _midi.MessageReceived += OnMidiMessageReceived;
+        SubscribeDock();
 
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
         _audioService.AppsChanged += async (s, e) => await RefreshAppsAsync();
@@ -104,6 +107,8 @@ public partial class MainViewModel : ObservableObject
     {
         _saveTimer.Dispose();
         _meterTimer.Stop();
+        _dock.Stop();
+        _dock.CommandReceived -= OnDockCommand;
         _engine.Stop();
         _engine.ChannelsChanged -= OnChannelsChanged;
         _engine.StateChanged -= OnStateChanged;
@@ -117,6 +122,10 @@ public partial class MainViewModel : ObservableObject
             vm.UpdatePeak(vm.Model.PeakLevel);
         foreach (var vm in Buses)
             vm.UpdatePeak(vm.Model.PeakLevel);
+
+        // Тот же тик отдаёт панели дока свежие метры: снимок собирается на UI-потоке,
+        // поэтому гонок с командами дока не возникает.
+        PublishDockState();
     }
 
     private void OnChannelsChanged()
