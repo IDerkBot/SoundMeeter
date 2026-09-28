@@ -42,9 +42,7 @@
 
         <!--  Сервер: включение, порт, состояние  -->
         <StackPanel Grid.Row="0">
-            <CheckBox
-                Content="{DynamicResource Sm.Obs.Serve}"
-                IsChecked="{Binding Enabled}" />
+            <CheckBox Content="{DynamicResource Sm.Obs.Serve}" IsChecked="{Binding Enabled}" />
 
             <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
                 <TextBlock
@@ -163,7 +161,10 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel Grid.Column="0" Margin="0,0,6,0">
-                <TextBlock DockPanel.Dock="Top" Style="{StaticResource GroupLabel}" Text="{DynamicResource Sm.Mixer.Inputs}" />
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Style="{StaticResource GroupLabel}"
+                    Text="{DynamicResource Sm.Mixer.Inputs}" />
                 <ListBox
                     Background="#2B2B2B"
                     BorderBrush="#3F3F46"
@@ -183,7 +184,10 @@
             </DockPanel>
 
             <DockPanel Grid.Column="1" Margin="6,0,0,0">
-                <TextBlock DockPanel.Dock="Top" Style="{StaticResource GroupLabel}" Text="{DynamicResource Sm.Mixer.Outputs}" />
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Style="{StaticResource GroupLabel}"
+                    Text="{DynamicResource Sm.Mixer.Outputs}" />
                 <ListBox
                     Background="#2B2B2B"
                     BorderBrush="#3F3F46"
@@ -204,13 +208,18 @@
         </Grid>
 
         <!--  Кнопки  -->
-        <StackPanel Grid.Row="4" Margin="0,12,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel
+            Grid.Row="4"
+            Margin="0,12,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
             <Button
                 Command="{Binding ApplyCommand}"
                 Content="{DynamicResource Sm.Common.Apply}"
                 IsDefault="True" />
             <Button
                 Margin="8,0,0,0"
+                Click="OnCloseClick"
                 Content="{DynamicResource Sm.Common.Close}"
                 IsCancel="True" />
         </StackPanel>
