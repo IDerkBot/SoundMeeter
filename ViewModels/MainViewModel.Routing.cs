@@ -125,19 +125,24 @@ public partial class MainViewModel
         {
             strip.AssignedApps.Clear();
             strip.ConfiguredApps.Clear();
-            if (strip.IsMicrophone || string.IsNullOrEmpty(strip.Model.DeviceId)) continue;
+
+            // Приложения играют в render-устройство, а стрип снимает свой источник.
+            // У половинки виртуального кабеля это разные endpoint'ы, поэтому сверяемся
+            // с тем, куда реально уходит звук, а не с DeviceId стрипа.
+            var appDeviceId = strip.AppSourceDeviceId;
+            if (string.IsNullOrEmpty(appDeviceId)) continue;
 
             foreach (var app in RunningApps.Where(a => a.App.HasExplicitRoute &&
-                         string.Equals(a.CurrentDeviceId, strip.Model.DeviceId, StringComparison.OrdinalIgnoreCase)))
+                         string.Equals(a.CurrentDeviceId, appDeviceId, StringComparison.OrdinalIgnoreCase)))
                 strip.AssignedApps.Add(app);
 
             foreach (var rule in rules.Where(r =>
-                         string.Equals(r.DeviceId, strip.Model.DeviceId, StringComparison.OrdinalIgnoreCase)))
+                         string.Equals(r.DeviceId, appDeviceId, StringComparison.OrdinalIgnoreCase)))
             {
                 if (strip.AssignedApps.Any(a => string.Equals(a.ExecutablePath, rule.ExecutablePath,
                         StringComparison.OrdinalIgnoreCase))) continue;
                 strip.ConfiguredApps.Add(new ConfiguredAppViewModel(rule.AppName, rule.ExecutablePath, rule.IconPath,
-                    strip.Model.DeviceId));
+                    appDeviceId));
             }
         }
     }
@@ -187,48 +192,13 @@ public partial class MainViewModel
             if (!_engine.Inputs.Any(i => i.Id == stripId))
                 return (false, "Стрип был удалён. Повторите перенос.");
 
-            // Куда уйдёт звук: на render-устройство, которое снимает стрип.
-            var targetDeviceId = strip.Model.DeviceId;
-            string? note = null;
-            var routeHintStripId = stripId;
-            if (!strip.HasAppSource)
-            {
-                var carrier = ResolveAppCarrierDevice(app);
-                if (carrier == null)
-                    return (false, "Не удалось определить устройство вывода приложения. " +
-                                   "Задайте стрипу источник вручную (клик по имени источника).");
-
-                // Устройство снимается только одним стрипом: если его уже держит другой
-                // стрип, звук приложения физически находится именно в его канале.
-                var owner = _engine.Inputs.FirstOrDefault(i =>
-                    i.Id != stripId && DeviceEquals(i.DeviceId, carrier));
-                if (owner != null)
-                {
-                    targetDeviceId = carrier;
-                    routeHintStripId = owner.Id;
-                    note = $"Устройство «{DeviceName(carrier)}» уже снимается стрипом «{StripTitle(owner)}» — " +
-                           "приложение попало в его канал";
-                }
-                else
-                {
-                    var previous = strip.Model.Name;
-                    _engine.SetInputSource(stripId, carrier);
-                    var attached = _engine.Inputs.FirstOrDefault(i => i.Id == stripId);
-                    if (attached == null || !DeviceEquals(attached.DeviceId, carrier))
-                        return (false, $"Не удалось закрепить стрип за устройством «{DeviceName(carrier)}».");
-
-                    // Loopback этого же устройства в его же выход = петля обратной связи.
-                    var loopBus = _engine.Buses.FirstOrDefault(b =>
-                        DeviceEquals(b.DeviceId, carrier) &&
-                        attached.BusRouting.GetValueOrDefault(b.Id)?.Enabled == true);
-                    if (loopBus != null) _engine.SetRoute(stripId, loopBus.Id, false);
-
-                    targetDeviceId = carrier;
-                    note = $"Стрип «{StripTitle(attached)}» переведён на loopback «{DeviceName(carrier)}»" +
-                           (string.IsNullOrWhiteSpace(previous) ? "" : $" (был {previous})") +
-                           (loopBus == null ? "" : $"; маршрут в «{loopBus.Name}» отключён во избежание петли");
-                }
-            }
+            // Куда уходит звук — решает выбранный стрип, и больше ничего не меняем.
+            // Приложение играет в то render-устройство, которое этот канал снимает
+            // (у входа виртуального кабеля это его связанный выход), а привязка
+            // стрипов друг к другу остаётся прежней: канал не переводится на чужое
+            // устройство, а значит и не отбирает его у соседнего канала.
+            if (strip.AppSourceDeviceId is not { } targetDeviceId)
+                return (false, strip.AppRejectReason());
 
             // Сохраняем цель до обращения к Windows, чтобы фоновый опрос не вернул старое правило.
             if (!string.IsNullOrWhiteSpace(path))
@@ -257,15 +227,13 @@ public partial class MainViewModel
 
             await RefreshAppsCoreAsync();
 
-            var liveStrip = Inputs.FirstOrDefault(i => i.Id == routeHintStripId);
+            var liveStrip = Inputs.FirstOrDefault(i => i.Id == stripId);
             var hint = liveStrip == null
                 ? ""
                 : $". Включите OUT/VIRT на стрипе «{liveStrip.Title}», чтобы направить канал";
             Status = errors.Count > 0
                 ? "Правило сохранено; перенаправление пока не выполнено"
-                : note == null
-                    ? $"{name} → {Inputs.FirstOrDefault(i => i.Id == stripId)?.Title ?? DeviceName(targetDeviceId)}"
-                    : $"{note}. {name} → {Inputs.FirstOrDefault(i => i.Id == stripId)?.Title ?? DeviceName(targetDeviceId)}{hint}";
+                : $"{name} → {liveStrip?.Title ?? DeviceName(targetDeviceId)}{hint}";
             return (errors.Count == 0, string.Join(Environment.NewLine, errors.Distinct()));
         }
         finally { _appRoutingGate.Release(); }
@@ -274,39 +242,10 @@ public partial class MainViewModel
     private static bool DeviceEquals(string? a, string? b) =>
         !string.IsNullOrWhiteSpace(a) && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 
-    private static string StripTitle(InputChannelModel model) =>
-        string.IsNullOrWhiteSpace(model.ChannelName) ? model.Name : model.ChannelName;
-
     private string DeviceName(string? deviceId) =>
         _engine.Catalog.FirstOrDefault(d => DeviceEquals(d.DeviceId, deviceId))?.Name
         ?? _allAudioDevices.FirstOrDefault(d => DeviceEquals(d.Id, deviceId))?.Name
         ?? deviceId ?? "";
-
-    /// <summary>true — известное нам устройство вывода (loopback, а не микрофон).</summary>
-    private bool IsRenderDevice(string? deviceId) =>
-        !string.IsNullOrWhiteSpace(deviceId) &&
-        (_engine.Catalog.Any(d => !d.IsMicrophone && DeviceEquals(d.DeviceId, deviceId)) ||
-         _allAudioDevices.Any(d => DeviceEquals(d.Id, deviceId)));
-
-    /// <summary>
-    /// Render-устройство, через которое звук приложения попадёт в стрип: то, куда
-    /// приложение играет сейчас, иначе (приложение не запущено) — вывод по умолчанию.
-    /// </summary>
-    private string? ResolveAppCarrierDevice(object app)
-    {
-        switch (app)
-        {
-            case AppViewModel running when IsRenderDevice(running.CurrentDeviceId):
-                return running.CurrentDeviceId;
-            case ConfiguredAppViewModel { DeviceId: var id } when IsRenderDevice(id):
-                return id;
-        }
-
-        var byDefault = _allAudioDevices.FirstOrDefault(d => d.IsDefault)?.Id;
-        if (IsRenderDevice(byDefault)) return byDefault;
-
-        return _engine.Catalog.FirstOrDefault(d => !d.IsMicrophone)?.DeviceId;
-    }
 
     public async Task<(bool Success, string Error)> RemoveStripAppAsync(object app)
     {

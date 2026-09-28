@@ -132,15 +132,13 @@ public partial class MainViewModel : ObservableObject
     {
         Inputs.Clear();
         foreach (var model in _engine.Inputs)
-            Inputs.Add(new InputChannelViewModel(model, _engine, _engine.Buses, MarkDirty));
+            Inputs.Add(new InputChannelViewModel(model, _engine, _engine.Buses, _engine.Catalog, MarkDirty));
 
         Buses.Clear();
         foreach (var model in _engine.Buses)
             Buses.Add(new OutputBusViewModel(_engine, model, MarkDirty, OnBusTitleChanged));
 
-        HasVirtualCable = _engine.Buses.Any(b =>
-            b.Name.Contains("CABLE", StringComparison.OrdinalIgnoreCase) ||
-            b.Name.Contains("VB-Audio", StringComparison.OrdinalIgnoreCase));
+        HasVirtualCable = _engine.Catalog.Any(d => d.IsVirtualCable);
 
         Status = $"{_engine.Inputs.Count} inputs / {_engine.Buses.Count} buses";
         RefreshStripApps();

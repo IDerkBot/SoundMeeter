@@ -15,9 +15,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!--  Высота не ограничена: панель забирает всё пустое место стрипа  -->
     <Border
         MinHeight="30"
-        MaxHeight="120"
         Background="#1a1a1a"
         CornerRadius="6">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -101,6 +101,7 @@
                                     <Button
                                         Width="22"
                                         Height="22"
+                                        Padding="0"
                                         Background="Transparent"
                                         BorderThickness="0"
                                         Click="RemoveStripApp_Click"

@@ -24,6 +24,14 @@ public class InputChannelModel
     public float PeakLevel { get; set; }
 
     /// <summary>
+    /// Render-устройство, в которое уходят приложения этого стрипа, если связку
+    /// кабеля угадать не удалось (имя задаёт пользователь, а Windows признака пары
+    /// не отдаёт). Пусто — цель выводится автоматически: связанный выход кабеля
+    /// либо собственное устройство loopback-стрипа.
+    /// </summary>
+    public string AppTargetDeviceId { get; set; } = "";
+
+    /// <summary>
     /// Денойзер (RNNoise, CPU). Включение = "Noise Remover".
     /// </summary>
     public bool DenoiserEnabled { get; set; }

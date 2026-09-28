@@ -52,7 +52,9 @@ namespace SoundMeeter.Views
                     {
                         _items.Add(new DeviceItem("●", $"MIC  {device.Name}", device.DeviceId, DeviceKind.Microphone));
                     }
-                    else if (allowLoopback)
+                    // Выход виртуального кабеля источником входа не бывает: в него
+                    // играют приложения, а звук приходит в стрип входа того же кабеля.
+                    else if (allowLoopback && !device.IsVirtualCable)
                     {
                         _items.Add(new DeviceItem("◄", $"SPK  {device.Name}  (loopback)", device.DeviceId, DeviceKind.Speaker));
                     }

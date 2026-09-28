@@ -15,9 +15,13 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!--
+        Строчный план: заголовок, имя источника, метры (их высота фиксирована
+        дизайном) и выбор выхода — всё по содержимому, а панель приложений
+        забирает оставшуюся высоту стрипа.
+    -->
     <Border
         Width="138"
-        MinHeight="200"
         Margin="0,0,10,6"
         Padding="6"
         AllowDrop="True"
@@ -43,8 +47,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <!--  Имя канала: сверху стрипа, над именем устройства (ПКМ — переименовать).  -->
@@ -223,7 +228,24 @@
                 </Popup>
             </Grid>
 
-            <controls:StripAppsView Grid.Row="3" />
+            <!--
+                Куда уходят приложения канала: над блоком приложений, а не внутри
+                него — список прокручивается, а этот выбор нужен постоянно. Показывается
+                только у входа виртуального кабеля: его выход движок обычно определяет
+                сам, но имя кабеля задаёт пользователь, поэтому нужен и ручной выбор.
+            -->
+            <Button
+                Grid.Row="3"
+                Margin="0,4,0,2"
+                Padding="2,3"
+                Click="OnAppTargetClick"
+                Content="{Binding AppTargetText}"
+                FontSize="9"
+                Style="{StaticResource RouteBtn}"
+                ToolTip="В это устройство уходят приложения канала, а стрип снимает вход кабеля. Обычно это выход того же кабеля."
+                Visibility="{Binding CanChooseAppTarget, Converter={StaticResource BoolToVisibility}}" />
+
+            <controls:StripAppsView Grid.Row="4" />
         </Grid>
     </Border>
 </UserControl>

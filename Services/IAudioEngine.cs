@@ -54,6 +54,12 @@ public interface IAudioEngine : IDisposable
     /// <summary>Назначает источнику входного стрипа устройство (null — отключить).</summary>
     void SetInputSource(string inputId, string? deviceId);
 
+    /// <summary>
+    /// Задаёт вручную, в какое устройство уходят приложения стрипа (null — вернуть
+    /// автоматическое определение). Нужно там, где связку кабеля угадать нельзя.
+    /// </summary>
+    void SetInputAppTarget(string inputId, string? deviceId);
+
     /// <summary>Назначает выходной шине устройство воспроизведения (null — отключить).</summary>
     void SetBusSource(string busId, string? deviceId);
 
@@ -72,4 +78,12 @@ public interface IAudioEngine : IDisposable
 
 /// <summary>Устройство в каталоге. IsMicrophone=true — устройство захвата (микрофон);
 /// false — устройство воспроизведения (для входов как loopback, для шин как вывод).</summary>
-public sealed record DeviceInfo(string DeviceId, string Name, bool IsMicrophone);
+public sealed record DeviceInfo(string DeviceId, string Name, bool IsMicrophone)
+{
+    /// <summary>Устройство — половина виртуального кабеля (VB-Cable, VAC, StreamerCable).</summary>
+    public bool IsVirtualCable { get; init; }
+
+    /// <summary>Вторая половина того же кабеля: для входа кабеля — его выход, и наоборот.
+    /// null — парная половинка не найдена (кабель установлен только с одной стороны).</summary>
+    public string? CablePeerId { get; init; }
+}

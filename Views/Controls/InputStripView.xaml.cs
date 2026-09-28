@@ -54,6 +54,25 @@ namespace SoundMeeter.Views.Controls
                 main.Engine.SetInputSource(vm.Model.Id, window.SelectedDeviceId);
         }
 
+        /// <summary>
+        /// Выбор устройства, в которое уходят приложения канала. Нужен там, где
+        /// связку кабеля угадать нельзя: имя кабеля задаёт пользователь, а Windows
+        /// признака второй половинки не отдаёт.
+        /// </summary>
+        private void OnAppTargetClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not InputChannelViewModel vm) return;
+            if (MixerUi.FindMainViewModel(this) is not { } main) return;
+
+            var window = new DevicePickerWindow(main.Engine.Catalog, forInput: false)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            window.SelectCurrent(vm.AppSourceDeviceId);
+            if (window.ShowDialog() == true)
+                main.Engine.SetInputAppTarget(vm.Id, window.SelectedDeviceId);
+        }
+
         private void OnOutClick(object sender, RoutedEventArgs e) => OutPopup.IsOpen = !OutPopup.IsOpen;
 
         private void OnVirtClick(object sender, RoutedEventArgs e) => VirtPopup.IsOpen = !VirtPopup.IsOpen;
@@ -88,9 +107,17 @@ namespace SoundMeeter.Views.Controls
 
             strip.IsDropTarget = false;
             var app = MixerUi.GetDraggedApp(e.Data);
-            if (app == null || !strip.CanAcceptApps) return;
+            if (app == null) return;
             e.Effects = DragDropEffects.Move;
             if (MixerUi.FindMainViewModel(this) is not { } main) return;
+
+            // Стрип без render-источника приложений не берём и его назначение не
+            // меняем: показываем, куда можно, вместо молчаливого игнорирования.
+            if (!strip.CanAcceptApps)
+            {
+                MixerUi.ShowRoutingError(this, strip.AppRejectReason());
+                return;
+            }
 
             try
             {

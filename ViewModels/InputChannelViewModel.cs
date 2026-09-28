@@ -21,18 +21,60 @@ public partial class InputChannelViewModel : ObservableObject
     public bool IsMicrophone => Model.IsMicrophone;
 
     /// <summary>
-    /// Стрип принимает перенос приложений. Если стрип ещё не снимает render-устройство
-    /// (микрофон или пустой источник), он при этом автоматически цепляется к текущему
-    /// выходу приложения через loopback.
+    /// Стрип принимает перенос приложений, только если у него есть render-устройство,
+    /// которое снимает микшер: loopback-источник или вход виртуального кабеля.
+    /// У микрофона и неназначенного входа принимать нечего — их назначение задаёт
+    /// пользователь, и молча подменять его чужим устройством нельзя.
     /// </summary>
-    public bool CanAcceptApps => !string.IsNullOrWhiteSpace(Id);
+    public bool CanAcceptApps => AppSourceDeviceId != null;
 
-    /// <summary>true — стрип уже снимает render-устройство, то есть это канал приложений.</summary>
-    public bool HasAppSource => !IsMicrophone && Model.IsAvailable && !string.IsNullOrWhiteSpace(Model.DeviceId);
+    /// <summary>
+    /// Render-устройство, в которое уходят приложения стрипа. У стрипа на входе
+    /// виртуального кабеля это связанный выход того же кабеля (звук приходит в
+    /// вход, а уходит в выход) либо явно выбранный пользователем, у loopback-
+    /// стрипа — его собственное устройство, у микрофона — null.
+    /// </summary>
+    public string? AppSourceDeviceId { get; }
 
-    public string AppDropHint => HasAppSource
-        ? "Перетащите приложение сюда"
-        : "Перетащите приложение — источником станет его текущий выход";
+    /// <summary>true — стрип снимает вход виртуального кабеля. Связку кабеля
+    /// движок обычно определяет сам, но имена кабелей задаёт пользователь, поэтому
+    /// для них оставлен ручной выбор.</summary>
+    public bool IsCableCapture { get; }
+
+    /// <summary>true — для этого стрипа имеет смысл указать выход вручную.</summary>
+    public bool CanChooseAppTarget => IsCableCapture;
+
+    /// <summary>Куда уходят приложения (или приглашение выбрать, если цели нет).</summary>
+    public string AppTargetText =>
+        CanChooseAppTarget
+            ? $"Приложения → {(AppSourceDeviceId != null ? AppTargetName : "выбрать…")} ▾"
+            : "";
+
+    /// <summary>Имя устройства, куда уходят приложения, для подписи в списке.</summary>
+    public string AppTargetName { get; }
+
+    public string AppDropHint => CanAcceptApps
+        ? IsCableCapture
+            ? "Перетащите приложение — оно уйдёт в выход кабеля"
+            : "Перетащите приложение сюда"
+        : IsCableCapture
+            ? "Связанный выход не найден — выберите его ниже"
+            : IsMicrophone
+                ? "Микрофон приложений не принимает"
+                : "Источник не назначен";
+
+    /// <summary>
+    /// Объяснение отказа в переносе: приложение уходит в устройство, которое
+    /// снимает стрип, а у этого стрипа такого устройства нет.
+    /// </summary>
+    public string AppRejectReason() => IsCableCapture
+        ? $"По имени «{Model.Name}» не удалось определить связанный выход кабеля. " +
+          "Укажите его кнопкой «Приложения → …» — это выход того же кабеля " +
+          "(у входа «L1In.…» это «L1Out.…»)."
+        : IsMicrophone
+            ? $"«{Title}» — микрофон: он снимает звук с устройства захвата, а не приложения. " +
+              "Перетащите приложение на канал (стрип с loopback-источником) или на вход виртуального кабеля."
+            : $"У «{Title}» не назначен источник. Выберите его (клик по имени источника) и перетащите приложение снова.";
 
     [ObservableProperty]
     private string _name;
@@ -114,13 +156,23 @@ public partial class InputChannelViewModel : ObservableObject
     /// <summary>Постоянно назначенные (persistent) приложения этого стрипа (канала).</summary>
     public ObservableCollection<ConfiguredAppViewModel> ConfiguredApps { get; } = new();
 
-    public InputChannelViewModel(InputChannelModel model, IAudioEngine engine, IReadOnlyList<OutputBusModel> buses, Action markDirty)
+    public InputChannelViewModel(
+        InputChannelModel model,
+        IAudioEngine engine,
+        IReadOnlyList<OutputBusModel> buses,
+        IReadOnlyList<DeviceInfo> catalog,
+        Action markDirty)
     {
         Model = model;
         _engine = engine;
         _markDirty = markDirty;
 
+        AppSourceDeviceId = ResolveAppSourceDeviceId(model, catalog);
+        IsCableCapture = IsCableCaptureDevice(model, catalog);
+        AppTargetName = NameOfDevice(catalog, AppSourceDeviceId);
+
         _name = model.Name;
+
         _channelName = model.ChannelName;
         _volumeDb = model.VolumeDb;
         _isMuted = model.IsMuted;
@@ -146,7 +198,7 @@ public partial class InputChannelViewModel : ObservableObject
                 OnOptionToggled,
                 OnOptionGainChanged,
                 OnOptionHidden);
-            if (IsVirtualCable(bus.Name)) VirtualOutputs.Add(option);
+            if (CablePairing.IsVirtualCableName(bus.Name)) VirtualOutputs.Add(option);
             else HardwareOutputs.Add(option);
         }
 
@@ -279,12 +331,43 @@ public partial class InputChannelViewModel : ObservableObject
         OnPropertyChanged(nameof(HasVirtual));
     }
 
-    private static bool IsVirtualCable(string busName)
+    /// <summary>
+    /// Куда направить приложения, перенесённые на этот стрип. Половинки виртуального
+    /// кабеля связны движком: вход кабеля снимаем мы, а играть приложения должны
+    /// в его выход — иначе приложения уйдут в реальные колонки мимо кабеля.
+    /// </summary>
+    private static string? ResolveAppSourceDeviceId(
+        InputChannelModel model,
+        IReadOnlyList<DeviceInfo> catalog) =>
+        CablePairing.GetAppRenderDeviceId(
+            FindDevice(model, catalog), model.IsMicrophone, model.AppTargetDeviceId);
+
+    /// <summary>true — устройство стрипа это вход виртуального кабеля: связку кабеля
+    /// движок обычно определяет сам, но имена кабелей задаёт пользователь, поэтому
+    /// для них оставлен ручной выбор.</summary>
+    private static bool IsCableCaptureDevice(InputChannelModel model, IReadOnlyList<DeviceInfo> catalog) =>
+        CablePairing.IsCableCapture(FindDevice(model, catalog));
+
+    /// <summary>Имя устройства, куда уходят приложения, для подписи в списке.
+    /// Хвост в скобках (имя драйвера) убираем — в панели стрипа текст обрезается,
+    /// а «(Virtual Audio Cable)» пользователю ничего не говорит.</summary>
+    private static string NameOfDevice(IReadOnlyList<DeviceInfo> catalog, string? deviceId)
     {
-        return busName.Contains("cable", StringComparison.OrdinalIgnoreCase) ||
-               busName.Contains("vb-audio", StringComparison.OrdinalIgnoreCase) ||
-               busName.Contains("virtual", StringComparison.OrdinalIgnoreCase);
+        if (deviceId == null) return "";
+
+        var name = catalog.FirstOrDefault(d => string.Equals(d.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase))?.Name
+                   ?? deviceId;
+
+        int paren = name.IndexOf(" (", StringComparison.Ordinal);
+        return paren > 0 ? name[..paren] : name;
     }
+
+    /// <summary>Запись каталога для источника стрипа; null, если источник не назначен
+    /// или устройства больше нет в системе.</summary>
+    private static DeviceInfo? FindDevice(InputChannelModel model, IReadOnlyList<DeviceInfo> catalog) =>
+        string.IsNullOrWhiteSpace(model.DeviceId)
+            ? null
+            : catalog.FirstOrDefault(d => string.Equals(d.DeviceId, model.DeviceId, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Обновляет пик для VU-метра (вызывается из UI-таймера). Экспоненциальный спад.

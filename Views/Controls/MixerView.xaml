@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:panels="clr-namespace:SoundMeeter.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="400"
@@ -16,10 +17,27 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!--
+        Группы INPUTS/OUTPUTS — сетки, а не StackPanel: иначе лента стрипов
+        прижимается к верху и не добирает высоту окна (прокрутка только
+        горизонтальная, высоту viewport отдаёт целиком).
+    -->
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-        <StackPanel Orientation="Horizontal">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel
+                    Grid.Row="0"
+                    Orientation="Horizontal">
                     <TextBlock
                         VerticalAlignment="Center"
                         Style="{StaticResource GroupHeader}"
@@ -34,10 +52,10 @@
                         FontSize="14"
                         ToolTip="Add input strip" />
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding Inputs}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Inputs}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
+                            <panels:HorizontalFillPanel />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -46,15 +64,22 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </StackPanel>
+            </Grid>
 
             <Border
+                Grid.Column="1"
                 Width="1"
                 Margin="4,20,10,0"
                 Background="#3F3F46" />
 
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel
+                    Grid.Row="0"
+                    Orientation="Horizontal">
                     <TextBlock Style="{StaticResource GroupHeader}" Text="OUTPUTS" />
                     <Button
                         Width="20"
@@ -66,10 +91,10 @@
                         FontSize="14"
                         ToolTip="Add output strip" />
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding Buses}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Buses}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
+                            <panels:HorizontalFillPanel />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -78,7 +103,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </StackPanel>
-        </StackPanel>
+            </Grid>
+        </Grid>
     </ScrollViewer>
 </UserControl>

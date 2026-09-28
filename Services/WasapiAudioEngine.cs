@@ -60,17 +60,24 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
             using var enumerator = new MMDeviceEnumerator();
 
+            var devices = new List<DeviceInfo>();
+
             // Каталог устройств захвата (микрофоны)
             foreach (var device in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
             {
-                _catalog.Add(new DeviceInfo(device.ID, device.FriendlyName, true));
+                devices.Add(new DeviceInfo(device.ID, device.FriendlyName, true));
             }
 
             // Каталог устройств воспроизведения (для loopback-входов и выходных шин)
             foreach (var device in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
             {
-                _catalog.Add(new DeviceInfo(device.ID, device.FriendlyName, false));
+                devices.Add(new DeviceInfo(device.ID, device.FriendlyName, false));
             }
+
+            // Связываем половинки виртуальных кабелей: приложения уходят в его выход,
+            // а звук приходит в стрип входа. Без этой связи нельзя понять, куда
+            // перенаправлять приложение, снятые с входа кабеля.
+            _catalog.AddRange(CablePairing.Link(devices));
 
             // Проверяем доступность существующих стрипов
             var catalogIds = new HashSet<string>(_catalog.Select(d => d.DeviceId));
@@ -86,6 +93,20 @@ public sealed class WasapiAudioEngine : IAudioEngine
             // Автоматически берём в работу устройства, у которых ещё нет стрипа
             // (микрофоны → входы, устройства воспроизведения → выходные шины).
             AdoptDevicesUnlocked();
+
+            // Стрип «SPK CABLE-x Output» при уже снятом входе того же кабеля —
+            // дубликат: приложения роутятся прямо в выход кабеля. Убираем.
+            DropRedundantCableLoopbacksUnlocked();
+
+            // Ручной выбор цели приложений мог устареть: устройство отключили или
+            // сменилось направление. Тогда возвращаем автоматическое определение.
+            foreach (var input in InputsInternal)
+            {
+                if (string.IsNullOrEmpty(input.AppTargetDeviceId)) continue;
+
+                var target = _catalog.FirstOrDefault(d => SameDevice(d.DeviceId, input.AppTargetDeviceId));
+                if (target == null || target.IsMicrophone) input.AppTargetDeviceId = "";
+            }
         }
 
         ChannelsChanged?.Invoke();
@@ -127,6 +148,55 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
         EnsureRoutingTableUnlocked();
     }
+
+    /// <summary>
+    /// Убирает входные стрипы, снимающие loopback'ом выход виртуального кабеля,
+    /// если половинка того же кабеля со стороны захвата уже снята своим стрипом.
+    /// Такой стрип только дублирует канал: приложения играют прямо в выход кабеля,
+    /// а маршрут «выход кабеля → выход кабеля» к тому же даёт петлю обратной связи.
+    /// </summary>
+    private void DropRedundantCableLoopbacksUnlocked()
+    {
+        foreach (var input in InputsInternal.ToList())
+        {
+            if (input.IsMicrophone || string.IsNullOrEmpty(input.DeviceId)) continue;
+
+            var cable = _catalog.FirstOrDefault(d => !d.IsMicrophone && d.IsVirtualCable &&
+                                                     SameDevice(d.DeviceId, input.DeviceId));
+            if (cable?.CablePeerId is not { } peerId) continue;
+
+            bool peerCaptured = InputsInternal.Any(other =>
+                !ReferenceEquals(other, input) && SameDevice(other.DeviceId, peerId));
+            if (!peerCaptured) continue;
+
+            DetachInputUnlocked(input);
+            InputsInternal.Remove(input);
+
+            _logger.LogInformation(
+                "Вход «{Strip}» (loopback выхода кабеля «{Cable}») удалён: приложения " +
+                "направляются в связанный выход кабеля, звук приходит в стрип его входа",
+                input.Name, cable.Name);
+        }
+
+        _soloState.AnyInputSolo = InputsInternal.Any(i => i.IsSolo);
+        EnsureRoutingTableUnlocked();
+    }
+
+    /// <summary>Отключает источник и все тапы стрипа (сам стрип остаётся в списке).</summary>
+    private void DetachInputUnlocked(InputChannelModel input)
+    {
+        if (_sources.Remove(input.Id, out var source)) source.Dispose();
+
+        foreach (var key in _taps.Keys.Where(k => k.InputId == input.Id).ToList())
+        {
+            if (_openBuses.TryGetValue(key.BusId, out var busOut))
+                busOut.Dsp.RemoveInput(_taps[key]);
+            _taps.Remove(key);
+        }
+    }
+
+    private static bool SameDevice(string? a, string? b) =>
+        !string.IsNullOrWhiteSpace(a) && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 
     public void Start()
     {
@@ -334,6 +404,17 @@ public sealed class WasapiAudioEngine : IAudioEngine
             var device = _catalog.FirstOrDefault(d => d.DeviceId == deviceId);
             if (deviceId != null && device == null) return; // устройство не в каталоге
 
+            // Выход виртуального кабеля источником входа не становится: приложения
+            // направляются прямо в него, а звук кабеля приходит в стрип его входа.
+            // Loopback этого выхода дал бы второй канал того же самого звука.
+            if (device is { IsVirtualCable: true, IsMicrophone: false })
+            {
+                _logger.LogInformation(
+                    "Выход кабеля «{Device}» нельзя назначить входу: приложения роутятся " +
+                    "в него напрямую, звук снимается стрипом входа кабеля", device.Name);
+                return;
+            }
+
             // Одно устройство — на один стрип. Иначе два стрипа на одном источнике
             // дают дублирование сигнала (глубокий клиппинг → «шум»).
             if (deviceId != null && deviceId != input.DeviceId)
@@ -369,6 +450,33 @@ public sealed class WasapiAudioEngine : IAudioEngine
                     ApplyRoutingUnlocked();
             }
         }
+        ChannelsChanged?.Invoke();
+    }
+
+    public void SetInputAppTarget(string inputId, string? deviceId)
+    {
+        lock (_gate)
+        {
+            var input = InputsInternal.FirstOrDefault(i => i.Id == inputId);
+            if (input == null) return;
+
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                input.AppTargetDeviceId = "";
+            }
+            else
+            {
+                // Приложения играют только в устройства воспроизведения: микрофон
+                // целью быть не может — звук оттуда не придёт.
+                var device = _catalog.FirstOrDefault(d => d.DeviceId == deviceId);
+                if (device == null || device.IsMicrophone) return;
+
+                input.AppTargetDeviceId = deviceId;
+            }
+        }
+
+        // Аудиопоток не меняется — меняется только список приложений стрипа,
+        // поэтому пересобираем представления каналов, а не маршруты.
         ChannelsChanged?.Invoke();
     }
 
@@ -713,6 +821,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
         ChannelName = source.ChannelName,
         IsMicrophone = source.IsMicrophone,
         DeviceId = source.DeviceId,
+        AppTargetDeviceId = source.AppTargetDeviceId,
         VolumeDb = source.VolumeDb,
         IsMuted = source.IsMuted,
         IsMono = source.IsMono,

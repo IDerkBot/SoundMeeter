@@ -134,18 +134,39 @@ public partial class LogViewModel : ObservableObject
     private string DescribeDevices()
     {
         var lines = new List<string>();
-        foreach (var device in _engine.Catalog.OrderBy(d => d.IsMicrophone).ThenBy(d => d.Name))
+        var catalog = _engine.Catalog.ToList();
+        var names = catalog.ToDictionary(d => d.DeviceId, d => d.Name);
+        foreach (var device in catalog.OrderBy(d => d.IsMicrophone).ThenBy(d => d.Name))
         {
-            lines.Add($"{(device.IsMicrophone ? "capture" : "render ")}  {device.Name}  [{device.DeviceId}]");
+            // Для половины кабеля важно видеть и пару: по ней приложения
+            // направляются в выход, а снимается вход.
+            var cable = device.IsVirtualCable
+                ? device.CablePeerId != null && names.TryGetValue(device.CablePeerId, out var peer)
+                    ? $"  cable-peer={peer}"
+                    : "  cable-peer=(none)"
+                : "";
+
+            lines.Add($"{(device.IsMicrophone ? "capture" : "render ")}  {device.Name}  " +
+                      $"[{device.DeviceId}]{cable}");
         }
 
         lines.Add(string.Empty);
         lines.Add("--- стрипы ---");
         foreach (var input in _engine.Inputs)
         {
+            // apps-> — реальная цель переноса приложений на стрип; у входа
+            // виртуального кабеля это его выход, а не сам стрип.
+            var appTarget = CablePairing.GetAppRenderDeviceId(
+                catalog.FirstOrDefault(d => d.DeviceId == input.DeviceId),
+                input.IsMicrophone,
+                input.AppTargetDeviceId);
+            var apps = appTarget == null
+                ? ""
+                : $" apps->[{appTarget}]{(names.TryGetValue(appTarget, out var n) ? " " + n : "")}";
+
             lines.Add($"INPUT  {StripTitle(input)}  device={input.DeviceId} " +
                       $"vol={input.VolumeDb:0.0} dB mute={input.IsMuted} mono={input.IsMono} " +
-                      $"solo={input.IsSolo} denoise={input.DenoiserEnabled}");
+                      $"solo={input.IsSolo} denoise={input.DenoiserEnabled}{apps}");
         }
         foreach (var bus in _engine.Buses)
         {
