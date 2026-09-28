@@ -364,6 +364,38 @@ public sealed class WasapiAudioEngine : IAudioEngine
         ChannelsChanged?.Invoke();
     }
 
+    public void MoveInput(int fromIndex, int toIndex)
+    {
+        lock (_gate)
+        {
+            if (!IsValidMove(fromIndex, toIndex, InputsInternal.Count)) return;
+            Move(InputsInternal, fromIndex, toIndex);
+        }
+        // Каналы те же самые, меняется только их порядок в UI, поэтому представления
+        // пересобираются, а аудиопоток остаётся нетронутым.
+        ChannelsChanged?.Invoke();
+    }
+
+    public void MoveBus(int fromIndex, int toIndex)
+    {
+        lock (_gate)
+        {
+            if (!IsValidMove(fromIndex, toIndex, BusesInternal.Count)) return;
+            Move(BusesInternal, fromIndex, toIndex);
+        }
+        ChannelsChanged?.Invoke();
+    }
+
+    private static bool IsValidMove(int fromIndex, int toIndex, int count) =>
+        fromIndex >= 0 && fromIndex < count && toIndex >= 0 && toIndex < count && fromIndex != toIndex;
+
+    private static void Move<T>(List<T> list, int fromIndex, int toIndex)
+    {
+        var item = list[fromIndex];
+        list.RemoveAt(fromIndex);
+        list.Insert(toIndex, item);
+    }
+
     public void RemoveBus(string busId)
     {
         lock (_gate)

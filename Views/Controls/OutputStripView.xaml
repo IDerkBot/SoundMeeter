@@ -24,8 +24,13 @@
         CornerRadius="3"
         Opacity="{Binding IsAvailable, Converter={StaticResource BoolToOpacity}}">
         <StackPanel>
-            <!--  Имя канала: сверху стрипа, над именем устройства (ПКМ — переименовать).  -->
-            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
+            <!--  Имя канала: сверху стрипа, над именем устройства. ПКМ — переименовать, ЛКМ с протяжкой — перетащить.  -->
+            <Border
+                Background="Transparent"
+                PreviewMouseLeftButtonDown="OnStripDragStart"
+                PreviewMouseMove="OnStripDragMove">
+                <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
+            </Border>
 
             <DockPanel Margin="0,0,0,4" LastChildFill="True">
                 <Button

@@ -1,7 +1,9 @@
+using SoundMeeter.Controls;
 using SoundMeeter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SoundMeeter.Views.Controls
 {
@@ -75,6 +77,52 @@ namespace SoundMeeter.Views.Controls
 
         private void OnOutClick(object sender, RoutedEventArgs e) => OutPopup.IsOpen = !OutPopup.IsOpen;
 
+        #region Перетаскивание стрипа
+
+        private HorizontalFillPanel? StripPanel => FindPanel(this);
+
+        /// <summary>Лента стрипов, которой принадлежит этот стрип.</summary>
+        private static HorizontalFillPanel? FindPanel(DependencyObject? start)
+        {
+            for (var current = start; current != null; current = VisualTreeHelper.GetParent(current))
+            {
+                if (current is HorizontalFillPanel panel) return panel;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// ЛКМ по имени канала: начинаем возможное перетаскивание. Само перетаскивание
+        /// стартует только после того, как указатель прошёл системный порог — иначе
+        /// простой щелчок по имени тянул бы за собой полосы.
+        /// </summary>
+        private void OnStripDragStart(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is not InputChannelViewModel strip) return;
+            if (strip.IsRenaming) return;
+
+            StripPanel?.BeginDrag(e.GetPosition(this));
+        }
+
+        private void OnStripDragMove(object sender, MouseEventArgs e)
+        {
+            if (DataContext is not InputChannelViewModel strip) return;
+            if (e.LeftButton != MouseButtonState.Pressed) return;
+
+            var panel = StripPanel;
+            if (panel is null || !panel.AllowReorder) return;
+            if (!panel.DragThresholdReached(e.GetPosition(this))) return;
+
+            // В данных лежит Id модели канала, а не его позиция: список мог
+            // измениться (устройство подключили) прямо во время перетаскивания,
+            // и панель найдёт источник по Id сама.
+            var data = new DataObject(HorizontalFillPanel.StripDragFormat, strip.Model.Id);
+            DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+        }
+
+        #endregion
+
         private void OnVirtClick(object sender, RoutedEventArgs e) => VirtPopup.IsOpen = !VirtPopup.IsOpen;
 
         /// <summary>ПКМ по DEN — открыть/закрыть попап настроек денойзера (ЛКМ — включение).</summary>
@@ -87,7 +135,13 @@ namespace SoundMeeter.Views.Controls
         private void Device_DragEnter(object sender, DragEventArgs e)
         {
             var strip = DataContext as InputChannelViewModel;
-            bool accepted = strip?.CanAcceptApps == true && MixerUi.GetDraggedApp(e.Data) != null &&
+
+            // Перетаскивание самого стрипа — не наше дело: его ловит лента
+            // (HorizontalFillPanel). Здесь обязательно оставляем событие
+            // необработанным, иначе панель до перетаскивания не доберётся.
+            if (MixerUi.GetDraggedApp(e.Data) == null) return;
+
+            bool accepted = strip?.CanAcceptApps == true &&
                             (e.AllowedEffects & DragDropEffects.Move) != 0;
             if (strip != null) strip.IsDropTarget = accepted;
             e.Effects = accepted ? DragDropEffects.Move : DragDropEffects.None;
@@ -101,13 +155,15 @@ namespace SoundMeeter.Views.Controls
 
         private async void Device_Drop(object sender, DragEventArgs e)
         {
-            e.Handled = true;
-            e.Effects = DragDropEffects.None;
             if (DataContext is not InputChannelViewModel strip) return;
 
             strip.IsDropTarget = false;
+
+            // Не приложение — значит перетаскивают стрип, это ловит лента.
             var app = MixerUi.GetDraggedApp(e.Data);
             if (app == null) return;
+
+            e.Handled = true;
             e.Effects = DragDropEffects.Move;
             if (MixerUi.FindMainViewModel(this) is not { } main) return;
 

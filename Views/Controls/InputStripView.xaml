@@ -53,11 +53,19 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!--  Имя канала: сверху стрипа, над именем устройства (ПКМ — переименовать).  -->
-            <ContentControl
+            <!--
+                Имя канала: сверху стрипа, над именем устройства. ПКМ — переименовать,
+                ЛКМ с протяжкой — перетащить стрип на другое место (SM-C06).
+            -->
+            <Border
                 Grid.Row="0"
-                Content="{Binding}"
-                ContentTemplate="{StaticResource StripTitleTemplate}" />
+                Background="Transparent"
+                PreviewMouseLeftButtonDown="OnStripDragStart"
+                PreviewMouseMove="OnStripDragMove">
+                <ContentControl
+                    Content="{Binding}"
+                    ContentTemplate="{StaticResource StripTitleTemplate}" />
+            </Border>
 
             <DockPanel
                 Grid.Row="1"

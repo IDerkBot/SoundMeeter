@@ -51,6 +51,16 @@ public interface IAudioEngine : IDisposable
 
     void RemoveBus(string busId);
 
+    /// <summary>
+    /// Меняет порядок входных стрипов (перетаскивание в UI). Сами стрипы и их
+    /// привязки не трогаются: MIDI-биндинки и панель OBS ссылаются на Id канала,
+    /// поэтому перестановка не должна ничего пересоздавать.
+    /// </summary>
+    void MoveInput(int fromIndex, int toIndex);
+
+    /// <summary>Меняет порядок выходных стрипов (перетаскивание в UI).</summary>
+    void MoveBus(int fromIndex, int toIndex);
+
     /// <summary>Назначает источнику входного стрипа устройство (null — отключить).</summary>
     void SetInputSource(string inputId, string? deviceId);
 

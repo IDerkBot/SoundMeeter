@@ -52,10 +52,13 @@
                         FontSize="14"
                         ToolTip="Add input strip" />
                 </StackPanel>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Inputs}">
+                <ItemsControl
+                    x:Name="InputsList"
+                    Grid.Row="1"
+                    ItemsSource="{Binding Inputs}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <panels:HorizontalFillPanel />
+                            <panels:HorizontalFillPanel AllowReorder="True" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -91,10 +94,13 @@
                         FontSize="14"
                         ToolTip="Add output strip" />
                 </StackPanel>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Buses}">
+                <ItemsControl
+                    x:Name="BusesList"
+                    Grid.Row="1"
+                    ItemsSource="{Binding Buses}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <panels:HorizontalFillPanel />
+                            <panels:HorizontalFillPanel AllowReorder="True" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>

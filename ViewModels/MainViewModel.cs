@@ -87,6 +87,16 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void RemoveBus(string busId) => _engine.RemoveBus(busId);
 
+    /// <summary>
+    /// Перестановка входных стрипов перетаскиванием. Порядок — часть сохранения
+    /// (снимок пишет полосы в том порядке, в каком они в движке), а сами стрипы
+    /// не пересоздаются, поэтому MIDI-привязки по Id канала остаются при своих.
+    /// </summary>
+    public void MoveInput(int fromIndex, int toIndex) => _engine.MoveInput(fromIndex, toIndex);
+
+    /// <summary>Перестановка выходных стрипов перетаскиванием.</summary>
+    public void MoveBus(int fromIndex, int toIndex) => _engine.MoveBus(fromIndex, toIndex);
+
     [RelayCommand]
     public void ToggleRun()
     {

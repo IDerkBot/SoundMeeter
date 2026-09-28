@@ -1,7 +1,9 @@
+using SoundMeeter.Controls;
 using SoundMeeter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SoundMeeter.Views.Controls
 {
@@ -52,5 +54,43 @@ namespace SoundMeeter.Views.Controls
             if (window.ShowDialog() == true)
                 main.Engine.SetBusSource(vm.Model.Id, window.SelectedDeviceId);
         }
+
+        #region Перетаскивание стрипа
+
+        /// <summary>
+        /// ЛКМ с протяжкой по имени канала — перетаскивание стрипа (SM-C06).
+        /// Список берётся у ленты, которая и показывает линию вставки.
+        /// </summary>
+        private void OnStripDragStart(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is not OutputBusViewModel vm || vm.IsRenaming) return;
+
+            FindStripPanel(this)?.BeginDrag(e.GetPosition(this));
+        }
+
+        private void OnStripDragMove(object sender, MouseEventArgs e)
+        {
+            if (DataContext is not OutputBusViewModel vm) return;
+            if (e.LeftButton != MouseButtonState.Pressed) return;
+
+            var panel = FindStripPanel(this);
+            if (panel is null || !panel.AllowReorder) return;
+            if (!panel.DragThresholdReached(e.GetPosition(this))) return;
+
+            var data = new DataObject(HorizontalFillPanel.StripDragFormat, vm.Model.Id);
+            DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+        }
+
+        private static HorizontalFillPanel? FindStripPanel(DependencyObject? start)
+        {
+            for (var current = start; current != null; current = VisualTreeHelper.GetParent(current))
+            {
+                if (current is HorizontalFillPanel panel) return panel;
+            }
+
+            return null;
+        }
+
+        #endregion
     }
 }

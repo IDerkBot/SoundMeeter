@@ -390,13 +390,15 @@
     </DataTemplate>
 
     <!--
-        Поверхность имени стрипа и поле правки подключены к коду- behind
-        через EventSetter: внутри общего DataTemplate нельзя указать
+        Поверхность имени стрипа и поле правки подключены к code-
+        behind через EventSetter: внутри общего DataTemplate нельзя указать
         имя обработчика из XAML.
     -->
     <Style x:Key="StripTitleSurface" TargetType="Grid">
+        <Setter Property="Cursor" Value="SizeAll" />
         <EventSetter Event="MouseRightButtonUp" Handler="OnStripTitleRightClick" />
     </Style>
+
 
     <Style x:Key="StripTitleRenameBox" TargetType="TextBox">
         <EventSetter Event="KeyDown" Handler="OnRenameKeyDown" />
