@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panels="clr-namespace:SoundMeeter.Controls"
     d:DesignWidth="160"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -183,6 +184,7 @@
                                 Margin="0,0,0,4"
                                 FontSize="10"
                                 FontWeight="Bold"
+                                Foreground="White"
                                 Text="Hardware outputs (для прослушивания)" />
                             <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding HardwareOutputs}" />
@@ -245,7 +247,39 @@
                 ToolTip="В это устройство уходят приложения канала, а стрип снимает вход кабеля. Обычно это выход того же кабеля."
                 Visibility="{Binding CanChooseAppTarget, Converter={StaticResource BoolToVisibility}}" />
 
-            <controls:StripAppsView Grid.Row="4" />
+            <controls:StripAppsView Grid.Row="4" Visibility="{Binding ShowAppList, Converter={StaticResource BoolToVisibility}}" />
+
+            <!--
+                На стрипе микрофона вместо списка приложений — входное усиление:
+                приложения в микрофон не уходят (список был бы всегда пустым), а
+                тихий сигнал микрофона без подъёма вверх не вытянуть.
+            -->
+            <StackPanel
+                Grid.Row="4"
+                Margin="0,8,0,0"
+                VerticalAlignment="Center"
+                Visibility="{Binding ShowGainKnob, Converter={StaticResource BoolToVisibility}}">
+                <panels:GainKnob
+                    Width="86"
+                    Height="86"
+                    HorizontalAlignment="Center"
+                    Maximum="60"
+                    ToolTip="Входное усиление канала, дБ. Применяется один раз до разветвления на шины. Тянуть мышью или колесом."
+                    Value="{Binding GainDb, Mode=TwoWay}" />
+                <TextBlock
+                    Margin="0,4,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="11"
+                    FontWeight="Bold"
+                    Foreground="#EEE"
+                    Text="{Binding GainDb, StringFormat={}{0:F1} dB}" />
+                <TextBlock
+                    Margin="0,2,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="9"
+                    Foreground="#808080"
+                    Text="входное усиление" />
+            </StackPanel>
         </Grid>
     </Border>
 </UserControl>

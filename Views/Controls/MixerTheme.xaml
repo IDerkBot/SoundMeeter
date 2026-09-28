@@ -356,6 +356,7 @@
                     IsChecked="{Binding IsEnabled, Mode=TwoWay}">
                     <TextBlock
                         FontSize="10"
+                        Foreground="White"
                         Text="{Binding Title}"
                         TextTrimming="CharacterEllipsis"
                         ToolTip="{Binding ToolTip}" />

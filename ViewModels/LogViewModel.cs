@@ -165,8 +165,8 @@ public partial class LogViewModel : ObservableObject
                 : $" apps->[{appTarget}]{(names.TryGetValue(appTarget, out var n) ? " " + n : "")}";
 
             lines.Add($"INPUT  {StripTitle(input)}  device={input.DeviceId} " +
-                      $"vol={input.VolumeDb:0.0} dB mute={input.IsMuted} mono={input.IsMono} " +
-                      $"solo={input.IsSolo} denoise={input.DenoiserEnabled}{apps}");
+                      $"vol={input.VolumeDb:0.0} dB gain={input.GainDb:0.0} dB mute={input.IsMuted} " +
+                      $"mono={input.IsMono} solo={input.IsSolo} denoise={input.DenoiserEnabled}{apps}");
         }
         foreach (var bus in _engine.Buses)
         {

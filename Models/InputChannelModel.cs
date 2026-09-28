@@ -17,6 +17,13 @@ public class InputChannelModel
     public bool IsMicrophone { get; set; }
     public string DeviceId { get; set; } = "";
     public float VolumeDb { get; set; }
+
+    /// <summary>
+    /// Входное усиление, дБ (0 = без усиления, только подъём). Применяется один раз
+    /// до разветвления на шины, поэтому не зависит от числа посылок. Нужен микрофонам:
+    /// их сигнал на десятки дБ тише линейного, и без подъёма канал не вытянуть.
+    /// </summary>
+    public float GainDb { get; set; }
     public bool IsMuted { get; set; }
     public bool IsMono { get; set; }
     public bool IsSolo { get; set; }

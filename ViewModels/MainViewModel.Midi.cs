@@ -287,6 +287,7 @@ public partial class MainViewModel
         switch (parameter)
         {
             case "VolumeDb": vm.VolumeDb = value; break;
+            case "GainDb": vm.GainDb = value; break;
             case "DenoiserNoiseRemover": vm.DenoiserNoiseRemover = value; break;
             case "DenoiserDryWet": vm.DenoiserDryWet = value; break;
             case "DenoiserFormantLowDb": vm.DenoiserFormantLowDb = value; break;

@@ -44,11 +44,14 @@ public partial class InputChannelViewModel : ObservableObject
     /// <summary>true — для этого стрипа имеет смысл указать выход вручную.</summary>
     public bool CanChooseAppTarget => IsCableCapture;
 
-    /// <summary>Куда уходят приложения (или приглашение выбрать, если цели нет).</summary>
-    public string AppTargetText =>
-        CanChooseAppTarget
-            ? $"Приложения → {(AppSourceDeviceId != null ? AppTargetName : "выбрать…")} ▾"
-            : "";
+    /// <summary>
+    /// Куда уходят приложения (или приглашение выбрать, если цели нет). Подпись
+    /// короткая: полоса стрипа 126 px, полное «Приложения → …» в неё не влезает,
+    /// смысл раскрыт во всплывающей подсказке.
+    /// </summary>
+    public string AppTargetText => CanChooseAppTarget
+        ? $"▸ {(AppSourceDeviceId != null ? AppTargetName : "выбрать…")} ▾"
+        : "";
 
     /// <summary>Имя устройства, куда уходят приложения, для подписи в списке.</summary>
     public string AppTargetName { get; }
@@ -114,6 +117,19 @@ public partial class InputChannelViewModel : ObservableObject
     [ObservableProperty]
     private float _volumeDb;
 
+    /// <summary>Входное усиление канала, дБ. Диапазон и шаг задаёт крутилка.</summary>
+    [ObservableProperty]
+    private float _gainDb;
+
+    /// <summary>true — на стрипе микрофона вместо списка приложений показываем
+    /// крутилку усиления: приложения в микрофон не уходят, а тянуть тихий сигнал
+    /// вверх без неё нечем.</summary>
+    public bool ShowGainKnob => IsMicrophone && !IsCableCapture;
+
+    /// <summary>true — стрип показывает список приложений канала.</summary>
+    public bool ShowAppList => !ShowGainKnob;
+
+
     [ObservableProperty]
     private bool _isMuted;
 
@@ -175,6 +191,8 @@ public partial class InputChannelViewModel : ObservableObject
 
         _channelName = model.ChannelName;
         _volumeDb = model.VolumeDb;
+        _gainDb = model.GainDb;
+
         _isMuted = model.IsMuted;
         _isMono = model.IsMono;
         _isSolo = model.IsSolo;
@@ -234,6 +252,18 @@ public partial class InputChannelViewModel : ObservableObject
         Model.VolumeDb = value;
         _markDirty();
     }
+
+    /// <summary>
+    /// Усиление читается источником на каждом пакете, поэтому меняется на лету:
+    /// пересоздавать аудиопоток не нужно (как и посылка, SM-A02).
+    /// </summary>
+    partial void OnGainDbChanged(float value)
+    {
+        Model.GainDb = float.IsFinite(value) ? Math.Clamp(value, 0f, 60f) : 0f;
+        if (Model.GainDb != value) GainDb = Model.GainDb;
+        _markDirty();
+    }
+
 
     partial void OnIsMutedChanged(bool value)
     {

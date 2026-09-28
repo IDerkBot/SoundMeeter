@@ -177,6 +177,11 @@ public sealed class InputSource
 
             if (outFrames <= 0) return;
 
+            // 3.5) Входное усиление канала. Стоит именно здесь, до денойзера и до
+            //      разветвления на шины: один раз на пакет, а не в каждой посылке,
+            //      и RNNoise получает сигнал рабочего уровня, а не тихий.
+            ApplyGain(outBuf, outFrames);
+
             // 4) Денойзер RNNoise (48кГц/стерео) — только если включён и доступен.
             //    Процессор держит фиксированную задержку в 10 мс и всегда
             //    возвращает ровно outFrames, поэтому буфер не раздувается.
@@ -192,6 +197,33 @@ public sealed class InputSource
             _logger.LogError(ex, "Ошибка обработки пакета на «{Strip}»: {Message}", _model.Name, ex.Message);
         }
     }
+
+    /// <summary>
+    /// Применяет входное усиление канала к готовому пакету. Пакет приходит
+    /// свободным от предыдущей обработки (ресемплер пишет в отдельный буфер), но
+    /// путь «без ресемплинга» отдаёт <see cref="_stereo"/> — тот же массив переиспользуется
+    /// следующим пакетом, поэтому лишнее умножение там безвредно.
+    /// </summary>
+    private void ApplyGain(float[] buffer, int frames)
+    {
+        float gain = DbToLinear(_model.GainDb);
+        if (gain == 1f) return;
+
+        int samples = frames * Channels;
+        if (samples > buffer.Length) samples = buffer.Length;
+
+        for (int i = 0; i < samples; i++)
+        {
+            float v = buffer[i] * gain;
+            // +60 дБ с тихого микрофона вполне может уйти в бесконечность при
+            // NaN в отсчётах: в кольцо такое писать нельзя, NaN распространяется
+            // по всей посылке и глушит канал целиком.
+            buffer[i] = float.IsFinite(v) ? Math.Clamp(v, -4f, 4f) : 0f;
+        }
+    }
+
+    private static float DbToLinear(float db) =>
+        !float.IsFinite(db) || db <= -60f ? 0f : (float)Math.Pow(10.0, db / 20.0);
 
     /// <summary>
     /// Приводит пакет к 48 кГц и возвращает число кадров в <see cref="_resampled"/>.

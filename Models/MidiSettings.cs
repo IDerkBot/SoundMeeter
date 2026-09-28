@@ -44,6 +44,7 @@ public static class MidiParameters
     public static readonly IReadOnlyList<MidiParameterDescriptor> All = new List<MidiParameterDescriptor>
     {
         new() { Key = "VolumeDb", Label = "Volume", ForInput = true, ForBus = true, Shape = MidiParamShape.Fader, Min = -60, Max = 12 },
+        new() { Key = "GainDb", Label = "Gain", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 60 },
         new() { Key = "IsMuted", Label = "Mute", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
         new() { Key = "IsMono", Label = "Mono", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
         new() { Key = "IsSolo", Label = "Solo", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },

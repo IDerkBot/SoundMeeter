@@ -823,6 +823,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
         DeviceId = source.DeviceId,
         AppTargetDeviceId = source.AppTargetDeviceId,
         VolumeDb = source.VolumeDb,
+        GainDb = source.GainDb,
         IsMuted = source.IsMuted,
         IsMono = source.IsMono,
         IsSolo = source.IsSolo,
