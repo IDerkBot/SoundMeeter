@@ -42,20 +42,13 @@
                                 MouseLeftButtonDown="App_MouseLeftButtonDown"
                                 PreviewMouseMove="App_PreviewMouseMove"
                                 ToolTip="{Binding Name}">
-                                <DockPanel>
-                                    <Button
-                                        Width="22"
-                                        Height="22"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Click="RemoveStripApp_Click"
-                                        Content="✕"
-                                        Cursor="Hand"
-                                        DockPanel.Dock="Right"
-                                        FontSize="10"
-                                        Foreground="#FF6B6B"
-                                        ToolTip="Сбросить на устройство по умолчанию" />
-                                    <StackPanel Orientation="Horizontal">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
                                         <Image
                                             Width="16"
                                             Height="16"
@@ -69,7 +62,20 @@
                                             Text="{Binding Name}"
                                             TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
-                                </DockPanel>
+                                    <Button
+                                        Grid.Column="1"
+                                        Width="22"
+                                        Height="22"
+                                        Padding="0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="RemoveStripApp_Click"
+                                        Content="✕"
+                                        Cursor="Hand"
+                                        FontSize="10"
+                                        Foreground="#FF6B6B"
+                                        ToolTip="Сбросить на устройство по умолчанию" />
+                                </Grid>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:icon="clr-namespace:StreamerTools.Style.Controls;assembly=StreamerTools.Style"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
     d:DesignHeight="34"
     d:DesignWidth="700"
@@ -18,33 +19,18 @@
 
     <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
         <Button
+            x:Name="SettingsBtn"
             Height="34"
             Margin="0,0,6,0"
-            Command="{Binding RefreshCommand}"
-            Content="Refresh devices" />
-        <Button
-            Height="34"
-            Margin="0,0,6,0"
-            Click="OnMidiClick"
-            Content="MIDI" />
-        <Button
-            Height="34"
-            Margin="0,0,6,0"
-            Click="OnObsDockClick"
-            Content="OBS"
-            ToolTip="Док-панель в OBS: VU-метр, фейдер и Mute/Solo прямо в OBS" />
-        <Button
-            Height="34"
-            Margin="0,0,6,0"
-            Click="OnCheckUpdatesClick"
-            Content="Updates"
-            ToolTip="Проверить обновления через GitHub Releases" />
-        <Button
-            Height="34"
-            Margin="0,0,6,0"
-            Click="OnLogsClick"
-            Content="Logs"
-            ToolTip="Журнал работы приложения, уровень детализации и копирование диагностики" />
+            Click="OnSettingsClick"
+            Content="Settings"
+            ToolTip="Обслуживание: устройства, MIDI, док в OBS, обновления, журнал">
+            <Button.Resources>
+                <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+                    <Setter Property="wpf:Button.LeftIcon" Value="Cog" />
+                </Style>
+            </Button.Resources>
+        </Button>
         <Button
             Height="34"
             Command="{Binding ToggleRunCommand}"
@@ -69,5 +55,94 @@
             VerticalAlignment="Center"
             Foreground="#7E9C7E"
             Text="{Binding UpdateStatus}" />
+
+        <Popup
+            x:Name="SettingsPopup"
+            Width="240"
+            AllowsTransparency="True"
+            Placement="Bottom"
+            PlacementTarget="{Binding ElementName=SettingsBtn}"
+            StaysOpen="False">
+            <Border
+                Padding="4"
+                Background="#2B2B2B"
+                BorderBrush="#555"
+                BorderThickness="1"
+                CornerRadius="3">
+                <StackPanel>
+                    <Button
+                        Click="OnMenuItemClick"
+                        Command="{Binding RefreshCommand}"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="Перечитать список аудиоустройств">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="Refresh" />
+                            <TextBlock VerticalAlignment="Center" Text="Refresh devices" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Click="OnMidiClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="Привязка MIDI-контроллеров к каналам и командам">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="Midi" />
+                            <TextBlock VerticalAlignment="Center" Text="MIDI" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Click="OnObsDockClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="Док-панель в OBS: VU-метр, фейдер и Mute/Solo прямо в OBS">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="Monitor" />
+                            <TextBlock VerticalAlignment="Center" Text="OBS dock" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Click="OnCheckUpdatesClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="Проверить обновления через GitHub Releases">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="CloudDownload" />
+                            <TextBlock VerticalAlignment="Center" Text="Check for updates" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Click="OnLogsClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="Журнал работы приложения, уровень детализации и копирование диагностики">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="Text" />
+                            <TextBlock VerticalAlignment="Center" Text="Logs" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Popup>
     </StackPanel>
 </UserControl>
