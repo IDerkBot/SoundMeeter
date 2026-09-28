@@ -19,6 +19,29 @@ const engineBadge = document.getElementById('engine');
 const list = document.getElementById('channels');
 const empty = document.getElementById('empty');
 
+/**
+ * Тексты панели (SM-C07). Словарь вставляет сервер SoundMeeter в HTML, поэтому
+ * панель в OBS всегда на том же языке, что и приложение. Ссылка на MUTE/SOLO/IN/OUT
+ * и подсказки фейдера — тоже: иначе на русском интерфейсе половина панели
+ * осталась бы английской.
+ *
+ * Словаря может не быть только при сборке, где встроенный ресурс панели битый
+ * (тогда сервер отдаёт аварийную заглушку) — тогда остаёмся с пустыми подписями,
+ * а не с выдуманным английским текстом.
+ */
+const T = window.SM_I18N || {};
+const t = (key) => T[key] || '';
+
+/** Проставляет статические подписи. Вызывается один раз после разбора страницы. */
+function applyStaticText() {
+    document.documentElement.lang = document.documentElement.lang || 'en';
+    dot.title = t('Connection');
+    engineBadge.textContent = t('EngineStopped');
+    // innerHTML, а не textContent: перевод может содержать <br> (подсказка
+    // «каналы не выбраны»). Строка пришла из собственных ресурсов приложения.
+    empty.innerHTML = t('NoChannels');
+}
+
 /** Рампа цвета сегмента метра: зелёный → жёлтый → оранжевый → красный.
  *  Дублирует SegmentedMeter.cs, чтобы метр выглядел так же, как в приложении. */
 const RAMP = [
@@ -117,7 +140,7 @@ function buildCard(ch, min, max) {
     name.className = 'name';
     const kind = document.createElement('span');
     kind.className = ch.k === 'out' ? 'kind out' : 'kind';
-    kind.textContent = ch.k === 'out' ? 'OUT' : 'IN';
+    kind.textContent = ch.k === 'out' ? t('Out') : t('In');
     const label = document.createElement('span');
     label.className = 'label';
     label.textContent = ch.n || ch.d || '—';
@@ -132,16 +155,16 @@ function buildCard(ch, min, max) {
     slider.min = String(min);
     slider.max = String(max);
     slider.step = '0.5';
-    slider.title = 'Volume (double-click = 0 dB)';
+    slider.title = t('VolumeTitle');
 
     const btns = document.createElement('div');
     btns.className = 'btns';
     const mute = document.createElement('button');
     mute.className = 'mute';
-    mute.textContent = 'MUTE';
+    mute.textContent = t('Mute');
     const solo = document.createElement('button');
     solo.className = 'solo';
-    solo.textContent = 'SOLO';
+    solo.textContent = t('Solo');
     btns.append(mute, solo);
 
     root.append(name, canvas, db, slider, btns);
@@ -303,5 +326,6 @@ window.addEventListener('resize', () => {
 });
 
 // Первое состояние: если WebSocket не поднимется, его заменит опрос.
+applyStaticText();
 connect();
 if (!lastState) startPolling();

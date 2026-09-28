@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Services;
 using SoundMeeter.Services.Logging;
 using SoundMeeter.ViewModels;
@@ -22,6 +22,11 @@ namespace SoundMeeter
             // устройств) снова останутся без следа — ровно та проблема, ради
             // которой логирование и заводилось (SM-A03).
             AppLog.Initialize(Microsoft.Extensions.Logging.LogLevel.Information);
+
+            // Язык — до всего, что создаёт окна: словарь строк нужен разметке уже
+            // при разборе первого XAML. Значение берём у системы и уточняем ниже,
+            // как только прочитаны настройки.
+            Loc.Install(this);
 
             var services = new ServiceCollection();
             services.AddSingleton<IAudioEngine, WasapiAudioEngine>();
@@ -51,6 +56,10 @@ namespace SoundMeeter
 
             // Уровень журнала — тоже настройка: подхватываем сохранённый.
             AppLog.SetLevel(AppLog.ParseLevel(settingsService.Settings.LogLevel));
+
+            // Язык интерфейса (SM-C07). Поле необязательное, поэтому у файлов,
+            // написанных прошлыми сборками, оно пустое — это «язык системы».
+            Loc.SetLanguage(settingsService.Settings.Language);
 
             var viewModel = ServiceProvider.GetRequiredService<MainViewModel>();
 

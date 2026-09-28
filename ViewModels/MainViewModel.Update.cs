@@ -31,7 +31,7 @@ public partial class MainViewModel
     {
         try
         {
-            UpdateStatus = $"SoundMeeter {_updateService.CurrentVersion}: проверка обновлений…";
+            UpdateStatus = Loc.Get("Sm.Update.Status.Checking", _updateService.CurrentVersion);
             var result = await _updateService.CheckAsync();
             await _dispatcherService.InvokeAsync(() => ApplyCheckResult(result));
         }
@@ -45,7 +45,7 @@ public partial class MainViewModel
     /// <summary>Ручная проверка по кнопке: сообщаем и про обновление, и про его отсутствие.</summary>
     public async Task CheckUpdatesAsync()
     {
-        UpdateStatus = $"SoundMeeter {_updateService.CurrentVersion}: проверка обновлений…";
+        UpdateStatus = Loc.Get("Sm.Update.Status.Checking", _updateService.CurrentVersion);
         var result = await _updateService.CheckAsync();
         await _dispatcherService.InvokeAsync(() => ApplyCheckResult(result));
     }
@@ -61,7 +61,7 @@ public partial class MainViewModel
             PendingUpdate = null;
             IsUpdateAvailable = false;
             UpdateBanner = "";
-            UpdateStatus = "Проверка обновлений не удалась: " + result.Message;
+            UpdateStatus = Loc.Get("Sm.Update.Status.CheckFailed", result.Message);
             return;
         }
 
@@ -70,15 +70,15 @@ public partial class MainViewModel
             PendingUpdate = null;
             IsUpdateAvailable = false;
             UpdateBanner = "";
-            UpdateStatus = $"SoundMeeter {_updateService.CurrentVersion}: обновлений нет";
+            UpdateStatus = Loc.Get("Sm.Update.Status.UpToDate", _updateService.CurrentVersion);
             return;
         }
 
         PendingUpdate = update;
         IsUpdateAvailable = true;
         UpdateBanner = update.CanInstall
-            ? $"SoundMeeter {update.Version} доступен (у вас {_updateService.CurrentVersion})."
-            : $"SoundMeeter {update.Version} доступен (у вас {_updateService.CurrentVersion}), но portable-архива в релизе нет.";
-        UpdateStatus = "Доступно обновление";
+            ? Loc.Get("Sm.Update.Banner.Installable", update.Version, _updateService.CurrentVersion)
+            : Loc.Get("Sm.Update.Banner.NoPortable", update.Version, _updateService.CurrentVersion);
+        UpdateStatus = Loc.Get("Sm.Update.Status.Available");
     }
 }

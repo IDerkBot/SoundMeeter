@@ -35,7 +35,7 @@ public partial class MainViewModel
             if (_settings.HasUnsupportedNewerSchema)
                 _logger.LogWarning("Настройки не применены: {Report}", _settings.LoadReport);
             else
-                _logger.LogInformation("Сохранённых настроек нет — создан минимальный набор стрипов");
+                _logger.LogInformation("{Report}", Loc.Get("Sm.Settings.NoPreset"));
         }
 
         // Открываем MIDI-устройство, сохранённое в пресете.

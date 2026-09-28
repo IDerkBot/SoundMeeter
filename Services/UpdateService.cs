@@ -87,13 +87,13 @@ namespace SoundMeeter.Services
                     {
                         _logger.LogInformation("Релизов в {Owner}/{Repo} пока нет", Owner, Repo);
                         return new UpdateCheckResult(true, false, null,
-                            $"{CurrentVersion} — релизов в {Owner}/{Repo} пока нет");
+                            Loc.Get("Sm.Update.Check.NoReleases", CurrentVersion, Owner, Repo));
                     }
 
                     // 403/429 — лимит запросов к API, к самому приложению отношения не имеет.
                     _logger.LogWarning("GitHub API вернул {Status}", (int)response.StatusCode);
                     return UpdateCheckResult.Failed(
-                        $"GitHub API вернул {(int)response.StatusCode} {response.ReasonPhrase}");
+                        Loc.Get("Sm.Update.Check.GitHubError", (int)response.StatusCode, response.ReasonPhrase));
                 }
 
                 var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace SoundMeeter.Services
                 if (dto?.TagName is null || !AppVersion.TryParse(dto.TagName, out var version))
                 {
                     _logger.LogWarning("Тег релиза не разобран: {Tag}", dto?.TagName);
-                    return UpdateCheckResult.Failed("не удалось разобрать тег релиза");
+                    return UpdateCheckResult.Failed(Loc.Get("Sm.Update.Check.TagUnparsed"));
                 }
 
                 var asset = SelectAsset(dto.Assets);
@@ -122,20 +122,20 @@ namespace SoundMeeter.Services
                     _logger.LogInformation("Установленная версия {Version} актуальна (последний релиз {Tag})",
                         CurrentVersion, dto.TagName);
                     return new UpdateCheckResult(true, false, null,
-                        $"{CurrentVersion} — установленная версия актуальна");
+                        Loc.Get("Sm.Update.Check.UpToDate", CurrentVersion));
                 }
 
                 _logger.LogInformation("Доступно обновление {Version} (установлено {Current}), ассет: {Asset}",
                     version, CurrentVersion, asset?.Name ?? "нет");
                 return new UpdateCheckResult(true, true, update,
                     asset == null
-                        ? $"Доступна версия {version}, но без portable-архива"
-                        : $"Доступна версия {version} ({asset.Name})");
+                        ? Loc.Get("Sm.Update.Check.AvailableNoPortable", version)
+                        : Loc.Get("Sm.Update.Check.AvailableWith", version, asset.Name));
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Проверка обновлений отменена");
-                return UpdateCheckResult.Failed("проверка отменена");
+                return UpdateCheckResult.Failed(Loc.Get("Sm.Update.Check.Cancelled"));
             }
             catch (Exception ex)
             {
@@ -216,7 +216,7 @@ namespace SoundMeeter.Services
                 // этой проверки: размер не совпал — файл неполный, применять нельзя.
                 if (expected > 0 && written != expected)
                     throw new InvalidDataException(
-                        $"Архив обновления недокачан: получено {written} из {expected} байт.");
+                        Loc.Get("Sm.Update.Check.Truncated", written, expected));
             }
 
             _logger.LogInformation("Архив скачан: {Target} ({Size} байт)", target, new FileInfo(target).Length);
@@ -247,15 +247,15 @@ namespace SoundMeeter.Services
         public string FormatPlanReport(UpdatePlan plan)
         {
             var sb = new System.Text.StringBuilder();
-            sb.Append("Проверка архива обновления ").AppendLine(plan.TagName);
+            sb.Append(Loc.Get("Sm.Update.Report.Header", plan.TagName));
             foreach (var note in plan.ValidationNotes)
                 sb.Append("  • ").AppendLine(note);
 
             sb.AppendLine();
             sb.AppendLine(UpdateApplier.FormatDeletionList(plan.FilesToDelete));
             sb.AppendLine();
-            sb.Append("Каталог: ").AppendLine(plan.InstallDirectory);
-            sb.Append("Ключи автозапуска и папка настроек %APPDATA%\\SoundMeeter не затрагиваются.");
+            sb.Append(Loc.Get("Sm.Update.Report.Directory")).AppendLine(plan.InstallDirectory);
+            sb.Append(Loc.Get("Sm.Update.Report.Kept"));
             return sb.ToString();
         }
 

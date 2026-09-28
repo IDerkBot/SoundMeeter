@@ -41,7 +41,7 @@
                     <TextBlock
                         VerticalAlignment="Center"
                         Style="{StaticResource GroupHeader}"
-                        Text="INPUTS" />
+                        Text="{DynamicResource Sm.Mixer.Inputs}" />
                     <Button
                         Width="20"
                         Height="20"
@@ -50,7 +50,7 @@
                         Command="{Binding AddInputCommand}"
                         Content="＋"
                         FontSize="14"
-                        ToolTip="Add input strip" />
+                        ToolTip="{DynamicResource Sm.Mixer.AddInputTip}" />
                 </StackPanel>
                 <ItemsControl
                     x:Name="InputsList"
@@ -83,7 +83,7 @@
                 <StackPanel
                     Grid.Row="0"
                     Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource GroupHeader}" Text="OUTPUTS" />
+                    <TextBlock Style="{StaticResource GroupHeader}" Text="{DynamicResource Sm.Mixer.Outputs}" />
                     <Button
                         Width="20"
                         Height="20"
@@ -92,7 +92,7 @@
                         Command="{Binding AddBusCommand}"
                         Content="＋"
                         FontSize="14"
-                        ToolTip="Add output strip" />
+                        ToolTip="{DynamicResource Sm.Mixer.AddOutputTip}" />
                 </StackPanel>
                 <ItemsControl
                     x:Name="BusesList"

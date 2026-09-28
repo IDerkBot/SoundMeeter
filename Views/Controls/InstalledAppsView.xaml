@@ -28,7 +28,7 @@
                     FontSize="18"
                     FontWeight="SemiBold"
                     Foreground="White"
-                    Text="Установленные приложения" />
+                    Text="{DynamicResource Sm.Apps.Installed}" />
 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                     <TextBox
@@ -40,7 +40,7 @@
                     <Button
                         HorizontalAlignment="Right"
                         Command="{Binding LoadInstalledAppsCommand}"
-                        Content="Обновить"
+                        Content="{DynamicResource Sm.Apps.Refresh}"
                         IsEnabled="{Binding IsLoadingInstalledApps, Converter={StaticResource InverseBoolConverter}}" />
                 </StackPanel>
             </DockPanel>
@@ -52,7 +52,7 @@
                 VerticalAlignment="Top"
                 FontSize="14"
                 Foreground="#808080"
-                Text="Загрузка списка приложений..."
+                Text="{DynamicResource Sm.Apps.Loading}"
                 Visibility="{Binding IsLoadingInstalledApps, Converter={StaticResource BoolToVisibility}}" />
 
             <ScrollViewer

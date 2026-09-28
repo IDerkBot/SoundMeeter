@@ -9,10 +9,43 @@ using System.Windows.Threading;
 namespace SoundMeeter.ViewModels;
 
 /// <summary>
+/// Пункт переключателя языка в меню настроек (SM-C07). Название языка
+/// намеренно остаётся на нём самом: «Русский» в английском интерфейсе —
+/// это название языка, а не надпись, которую надо переводить.
+/// </summary>
+public sealed partial class LanguageOptionViewModel : LocalizedViewModel
+{
+    public LanguageOptionViewModel(MainViewModel owner, string code)
+    {
+        Owner = owner;
+        Code = code;
+    }
+
+    public MainViewModel Owner { get; }
+
+    /// <summary>Код языка: <see cref="Loc.FollowSystem"/>, <see cref="Loc.English"/> или <see cref="Loc.Russian"/>.</summary>
+    public string Code { get; }
+
+    /// <summary>Отмечен ли язык текущим.</summary>
+    [ObservableProperty]
+    private bool _isSelected;
+
+    public string Name => Code switch
+    {
+        Loc.Russian => Loc.Get("Sm.Language.Russian"),
+        Loc.English => Loc.Get("Sm.Language.English"),
+        _ => Loc.Get("Sm.Language.FollowSystem"),
+    };
+
+    [RelayCommand]
+    private void Select() => Owner.SelectLanguage(Code);
+}
+
+/// <summary>
 /// Главная VM: жизненный цикл и управление микшером.
 /// MIDI, маршрутизация приложений и сохранение вынесены в тематические partial-файлы.
 /// </summary>
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : LocalizedViewModel
 {
     private readonly IAudioEngine _engine;
     private readonly DispatcherTimer _meterTimer;
@@ -70,7 +103,54 @@ public partial class MainViewModel : ObservableObject
         _meterTimer.Start();
 
         _saveTimer = new System.Threading.Timer(_ => SavePool(), null, 5000, 2000);
+
+        BuildLanguages();
     }
+
+    /// <summary>
+    /// Переключатель языка в меню настроек. Отметка «текущий» обновляется и сразу
+    /// после смены языка, и при возврате к «языку системы».
+    /// </summary>
+    public ObservableCollection<LanguageOptionViewModel> Languages { get; } = new();
+
+    private void BuildLanguages()
+    {
+        foreach (var code in Loc.SupportedLanguages)
+            Languages.Add(new LanguageOptionViewModel(this, code)
+            {
+                IsSelected = string.Equals(code, Loc.RequestedLanguage, StringComparison.Ordinal),
+            });
+    }
+
+    /// <summary>
+    /// Смена языка интерфейса. Применяется сразу (SM-C07): <see cref="Loc.SetLanguage"/>
+    /// перезаливает словарь строк и поднимает уведомление, по которому перечитываются
+    /// и уже открытые окна. Выбор сохраняется в settings.json.
+    /// </summary>
+    public void SelectLanguage(string? code)
+    {
+        var normalized = Loc.SupportedLanguages.Contains(code) ? code! : Loc.FollowSystem;
+        if (string.Equals(normalized, Loc.RequestedLanguage, StringComparison.Ordinal)) return;
+
+        Loc.SetLanguage(normalized);
+        MarkLanguageSelection();
+
+        // Язык пишется только через SettingsService: снимок движка его не знает.
+        _settings.Settings.Language = normalized;
+        _settings.Save();
+    }
+
+    private void MarkLanguageSelection()
+    {
+        foreach (var option in Languages)
+            option.IsSelected = string.Equals(option.Code, Loc.RequestedLanguage, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Подпись кнопки старт/стоп. Раньше её давал конвертер, но конвертер не
+    /// перечитывается при смене языка — строки из ресурсов обязаны жить в VM.
+    /// </summary>
+    public string StartStopText => IsRunning ? Loc.Get("Sm.Toolbar.Stop") : Loc.Get("Sm.Toolbar.Start");
 
     [RelayCommand]
     public void Refresh() => _engine.RefreshDevices();
@@ -103,6 +183,8 @@ public partial class MainViewModel : ObservableObject
         if (_engine.IsRunning) _engine.Stop();
         else _engine.Start();
     }
+
+    partial void OnIsRunningChanged(bool value) => OnPropertyChanged(nameof(StartStopText));
 
     /// <summary>
     /// Доступ к движку (для назначения источника через пикер).
@@ -140,6 +222,11 @@ public partial class MainViewModel : ObservableObject
 
     private void OnChannelsChanged()
     {
+        // Стрипы подписаны на Loc.LanguageChanged, а пересоздаются здесь на каждом
+        // осмотре каталога: без Dispose они остались бы в списке подписчиков.
+        foreach (var input in Inputs) input.Dispose();
+        foreach (var bus in Buses) bus.Dispose();
+
         Inputs.Clear();
         foreach (var model in _engine.Inputs)
             Inputs.Add(new InputChannelViewModel(model, _engine, _engine.Buses, _engine.Catalog, MarkDirty));
@@ -150,7 +237,7 @@ public partial class MainViewModel : ObservableObject
 
         HasVirtualCable = _engine.Catalog.Any(d => d.IsVirtualCable);
 
-        Status = $"{_engine.Inputs.Count} inputs / {_engine.Buses.Count} buses";
+        Status = Loc.Get("Sm.Toolbar.StripCounts", _engine.Inputs.Count, _engine.Buses.Count);
         RefreshStripApps();
         MarkDirty();
     }
@@ -158,7 +245,26 @@ public partial class MainViewModel : ObservableObject
     private void OnStateChanged()
     {
         IsRunning = _engine.IsRunning;
-        Status = IsRunning ? "Engine: running" : "Engine: stopped";
+        Status = IsRunning
+            ? Loc.Get("Sm.Toolbar.EngineRunning")
+            : Loc.Get("Sm.Toolbar.EngineStopped");
+    }
+
+    /// <summary>
+    /// Смена языка: пересчитываем строку состояния и отметку в переключателе.
+    /// Остальные строки обновляет базовый класс — уведомлением по всем свойствам.
+    /// </summary>
+    protected override void OnLanguageChangedCore()
+    {
+        OnPropertyChanged(nameof(StartStopText));
+        MarkLanguageSelection();
+    }
+
+    protected override void DisposeCore()
+    {
+        foreach (var input in Inputs) input.Dispose();
+        foreach (var bus in Buses) bus.Dispose();
+        foreach (var option in Languages) option.Dispose();
     }
 
     /// <summary>

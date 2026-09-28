@@ -9,7 +9,6 @@
     mc:Ignorable="d">
 
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-    <converters:BoolToStartStopConverter x:Key="BoolToStartStop" />
     <converters:BoolToOpacityConverter x:Key="BoolToOpacity" />
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
@@ -299,7 +298,7 @@
             Подсказка (watermark) берётся из Tag, чтобы каждый экран
             мог задать свою подсказку, не копируя шаблон.
         -->
-        <Setter Property="Tag" Value="🔍 Поиск по названию, издателю..." />
+        <Setter Property="Tag" Value="{DynamicResource Sm.Apps.SearchHint}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -349,7 +348,7 @@
                     DockPanel.Dock="Right"
                     FontSize="10"
                     Foreground="#888"
-                    ToolTip="Скрыть это устройство со всех стрипов" />
+                    ToolTip="{DynamicResource Sm.OutputOption.HideTip}" />
                 <CheckBox
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
@@ -383,7 +382,7 @@
                     Minimum="{Binding MinGainDb}"
                     SmallChange="0.5"
                     Style="{StaticResource DenSlider}"
-                    ToolTip="Посылка стрипа в этот выход, дБ (применяется сразу)"
+                    ToolTip="{DynamicResource Sm.OutputOption.GainTip}"
                     Value="{Binding GainDb, Mode=TwoWay}" />
             </DockPanel>
         </StackPanel>

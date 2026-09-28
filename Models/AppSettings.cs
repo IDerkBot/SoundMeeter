@@ -1,4 +1,4 @@
-﻿namespace SoundMeeter.Models;
+namespace SoundMeeter.Models;
 
 /// <summary>
 /// Снимок настроек для сохранения/восстановления.
@@ -15,6 +15,13 @@ public class AppSettings
 
     /// <summary>Уровень детализации журнала (Trace/Debug/Information/Warning/Error).</summary>
     public string LogLevel { get; set; } = "Information";
+
+    /// <summary>
+    /// Язык интерфейса: пустая строка — «как в системе», иначе "en"/"ru" (SM-C07).
+    /// Поле необязательное: в settings.json, написанном прошлыми сборками, его нет,
+    /// и это равносильно «язык системы», поэтому миграция схемы его не трогает.
+    /// </summary>
+    public string Language { get; set; } = "";
 
     public List<DeviceRouteRule> PersistentRoutes { get; set; } = new();
     public bool EngineWasRunning { get; set; }

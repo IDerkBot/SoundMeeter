@@ -26,7 +26,7 @@
                 Margin="0,0,0,4"
                 FontSize="10"
                 FontWeight="Bold"
-                Text="Denoiser (RNNoise)" />
+                Text="{DynamicResource Sm.Denoiser.Title}" />
             <StackPanel>
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
@@ -36,7 +36,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Noise Remover" />
+                        Text="{DynamicResource Sm.Denoiser.NoiseRemover}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"
@@ -56,7 +56,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Dry / Wet Balance" />
+                        Text="{DynamicResource Sm.Denoiser.DryWet}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"
@@ -76,7 +76,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Formant Low" />
+                        Text="{DynamicResource Sm.Denoiser.FormantLow}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"
@@ -96,7 +96,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Formant Medium" />
+                        Text="{DynamicResource Sm.Denoiser.FormantMid}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"
@@ -116,7 +116,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Formant High" />
+                        Text="{DynamicResource Sm.Denoiser.FormantHigh}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"
@@ -136,7 +136,7 @@
                     <TextBlock
                         Grid.Column="0"
                         FontSize="10"
-                        Text="Formant Group" />
+                        Text="{DynamicResource Sm.Denoiser.FormantGroup}" />
                     <TextBlock
                         Grid.Column="1"
                         FontSize="10"

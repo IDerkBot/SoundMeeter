@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Services;
 using SoundMeeter.Services.Logging;
@@ -15,7 +15,7 @@ namespace SoundMeeter.ViewModels;
 /// список устройств»: по отдельности ни один из кусков ничего не объясняет,
 /// а вместе их достаточно, чтобы понять состояние машины без разработчика.
 /// </summary>
-public partial class LogViewModel : ObservableObject
+public partial class LogViewModel : LocalizedViewModel
 {
     private readonly IAudioEngine _engine;
 
@@ -67,7 +67,7 @@ public partial class LogViewModel : ObservableObject
         AppLog.SetLevel(AppLog.ParseLevel(value));
         Settings.Settings.LogLevel = value;
         Settings.Save();
-        Status = $"Уровень журнала: {AppLog.Level}";
+        Status = Loc.Get("Sm.Log.Status.LevelSet", AppLog.Level);
         Refresh();
     }
 
@@ -85,9 +85,9 @@ public partial class LogViewModel : ObservableObject
         {
             var path = string.IsNullOrWhiteSpace(SelectedFile) ? AppLog.CurrentFilePath : SelectedFile;
             Content = string.IsNullOrEmpty(path) || !File.Exists(path)
-                ? "Журнал ещё не создан."
+                ? Loc.Get("Sm.Log.NotCreated")
                 : AppLog.ReadLog(path);
-            Status = $"{Path.GetFileName(path)} — {Content.Length} символов";
+            Status = Loc.Get("Sm.Log.Status.Size", Path.GetFileName(path), Content.Length);
         }
         finally
         {
@@ -102,11 +102,11 @@ public partial class LogViewModel : ObservableObject
         try
         {
             Clipboard.SetText(text);
-            Status = "Диагностика скопирована в буфер обмена";
+            Status = Loc.Get("Sm.Log.Status.Copied");
         }
         catch (Exception ex)
         {
-            Status = "Не удалось скопировать диагностику: " + ex.Message;
+            Status = Loc.Get("Sm.Log.Status.CopyFailed", ex.Message);
         }
     }
 
@@ -122,7 +122,7 @@ public partial class LogViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Status = "Не удалось открыть папку журналов: " + ex.Message;
+            Status = Loc.Get("Sm.Log.Status.FolderFailed", ex.Message);
         }
     }
 

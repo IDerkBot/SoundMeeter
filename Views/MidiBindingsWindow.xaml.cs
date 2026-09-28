@@ -1,3 +1,4 @@
+using SoundMeeter.Services;
 using SoundMeeter.ViewModels;
 using System.Windows;
 
@@ -11,6 +12,11 @@ namespace SoundMeeter.Views
         public MidiBindingsWindow(MainViewModel viewModel)
         {
             InitializeComponent();
+
+            // Окно создаётся уже после выбора языка, но не наследует Language от
+            // родителя (у него своё визуальное дерево) — задаём явно.
+            Language = Loc.XmlLanguage;
+
             DataContext = new MidiBindingsViewModel(viewModel);
             Closed += (_, _) =>
             {

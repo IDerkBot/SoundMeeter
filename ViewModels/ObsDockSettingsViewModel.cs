@@ -8,7 +8,7 @@ using System.Windows;
 namespace SoundMeeter.ViewModels;
 
 /// <summary>Канал микшера в списке выбора для дока.</summary>
-public sealed partial class ObsDockChannelItemViewModel : ObservableObject
+public sealed partial class ObsDockChannelItemViewModel : LocalizedViewModel
 {
     public ObsDockChannelItemViewModel(string id, string kind, string title, string deviceName, string deviceId,
         bool isAvailable)
@@ -52,7 +52,7 @@ public sealed partial class ObsDockChannelItemViewModel : ObservableObject
 /// каналы в него отдавать и как добавить сам док в OBS (правкой его user.ini).
 /// Изменения применяются кнопкой Apply и сразу сохраняются в settings.json.
 /// </summary>
-public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDisposable
+public sealed partial class ObsDockSettingsViewModel : LocalizedViewModel
 {
     private readonly MainViewModel _main;
 
@@ -118,21 +118,23 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
     public bool IsServerRunning => _main.IsDockRunning;
 
     /// <summary>Текст кнопки: сервер можно и поднять, и погасить прямо из окна.</summary>
-    public string ServerToggleText => _main.IsDockRunning ? "Stop server" : "Start server";
+    public string ServerToggleText => _main.IsDockRunning
+        ? Loc.Get("Sm.Obs.StopServer")
+        : Loc.Get("Sm.Obs.StartServer");
 
     /// <summary>Док уже прописан в конфигурации OBS.</summary>
     public string ObsDockStateText => ObsDockInstaller.IsObsRunning()
-        ? "OBS is running — close it before adding or removing the dock"
+        ? Loc.Get("Sm.Obs.State.ObsRunning")
         : _main.IsDockInstalledInObs
-            ? "Dock is registered in OBS (restart OBS to see it)"
-            : "Dock is not registered in OBS";
+            ? Loc.Get("Sm.Obs.State.Registered")
+            : Loc.Get("Sm.Obs.State.NotRegistered");
 
     [RelayCommand]
     private void Apply()
     {
         if (!TryReadPort(out int port))
         {
-            SetObsStatus($"Port {PortText} is not valid: use a number from 1024 to 65535.", false);
+            SetObsStatus(Loc.Get("Sm.Obs.Status.InvalidPort", PortText), false);
             return;
         }
 
@@ -142,7 +144,7 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
 
         SetObsStatus(_main.DockError.Length > 0
             ? _main.DockError
-            : $"Saved. The panel will show {_main.GetDockChannelPreview().Count} channel(s) at {DockUrl}.",
+            : Loc.Get("Sm.Obs.Status.Saved", _main.GetDockChannelPreview().Count, DockUrl),
             _main.DockError.Length == 0);
     }
 
@@ -155,7 +157,7 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
         }
         else if (!TryReadPort(out int port))
         {
-            SetObsStatus($"Port {PortText} is not valid: use a number from 1024 to 65535.", false);
+            SetObsStatus(Loc.Get("Sm.Obs.Status.InvalidPort", PortText), false);
             return;
         }
         else
@@ -177,11 +179,11 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
         try
         {
             Clipboard.SetText(DockUrl);
-            SetObsStatus("URL copied. In OBS: View → Docks → Browser Dock → paste the URL.", true);
+            SetObsStatus(Loc.Get("Sm.Obs.Status.UrlCopied"), true);
         }
         catch (Exception ex)
         {
-            SetObsStatus($"Failed to copy URL: {ex.Message}", false);
+            SetObsStatus(Loc.Get("Sm.Obs.Status.CopyFailed", ex.Message), false);
         }
     }
 
@@ -190,7 +192,7 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
     {
         if (!TryReadPort(out int port))
         {
-            SetObsStatus($"Port {PortText} is not valid: use a number from 1024 to 65535.", false);
+            SetObsStatus(Loc.Get("Sm.Obs.Status.InvalidPort", PortText), false);
             return;
         }
 
@@ -282,10 +284,21 @@ public sealed partial class ObsDockSettingsViewModel : ObservableObject, IDispos
     private void RefreshStatus()
     {
         int clients = _main.DockClients;
-        string server = _main.IsDockRunning ? $"server on port {_main.DockServer.Port}" : "server stopped";
-        string panels = clients == 0 ? "no panels connected" : $"{clients} panel(s) connected";
+        string server = _main.IsDockRunning
+            ? Loc.Get("Sm.Obs.Status.ServerOn", _main.DockServer.Port)
+            : Loc.Get("Sm.Obs.Status.ServerOff");
+        string panels = clients == 0
+            ? Loc.Get("Sm.Obs.Status.NoPanels")
+            : Loc.Get("Sm.Obs.Status.PanelsCount", clients);
         Status = _main.DockError.Length > 0 ? _main.DockError : $"{server}, {panels}";
     }
 
-    public void Dispose() => _main.DockStatusChanged -= RefreshStatus;
+    protected override void OnLanguageChangedCore()
+    {
+        OnPropertyChanged(nameof(ServerToggleText));
+        OnPropertyChanged(nameof(ObsDockStateText));
+        RefreshStatus();
+    }
+
+    protected override void DisposeCore() => _main.DockStatusChanged -= RefreshStatus;
 }

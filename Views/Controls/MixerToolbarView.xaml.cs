@@ -1,3 +1,4 @@
+using SoundMeeter.Services;
 using SoundMeeter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -94,7 +95,7 @@ namespace SoundMeeter.Views.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Window.GetWindow(this), ex.Message, "Проверка обновлений",
+                MessageBox.Show(Window.GetWindow(this), ex.Message, Loc.Get("Sm.Toolbar.CheckUpdatesFailed"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }

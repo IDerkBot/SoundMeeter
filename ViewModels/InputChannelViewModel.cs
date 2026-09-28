@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ namespace SoundMeeter.ViewModels;
 /// Входной стрип (микрофон/loopback): громкость, мут, моно, соло, VU-метр
 /// и два списка выходов — аппаратные (OUT, для прослушивания) и виртуальные (VIRT).
 /// </summary>
-public partial class InputChannelViewModel : ObservableObject
+public partial class InputChannelViewModel : LocalizedViewModel
 {
     private readonly IAudioEngine _engine;
     private readonly Action _markDirty;
@@ -50,7 +50,7 @@ public partial class InputChannelViewModel : ObservableObject
     /// смысл раскрыт во всплывающей подсказке.
     /// </summary>
     public string AppTargetText => CanChooseAppTarget
-        ? $"▸ {(AppSourceDeviceId != null ? AppTargetName : "выбрать…")} ▾"
+        ? $"▸ {(AppSourceDeviceId != null ? AppTargetName : Loc.Get("Sm.Strip.AppTargetChoose"))} ▾"
         : "";
 
     /// <summary>Имя устройства, куда уходят приложения, для подписи в списке.</summary>
@@ -58,26 +58,23 @@ public partial class InputChannelViewModel : ObservableObject
 
     public string AppDropHint => CanAcceptApps
         ? IsCableCapture
-            ? "Перетащите приложение — оно уйдёт в выход кабеля"
-            : "Перетащите приложение сюда"
+            ? Loc.Get("Sm.Strip.DropHint.Cable")
+            : Loc.Get("Sm.Strip.DropHint.Any")
         : IsCableCapture
-            ? "Связанный выход не найден — выберите его ниже"
+            ? Loc.Get("Sm.Strip.DropHint.CableNoPeer")
             : IsMicrophone
-                ? "Микрофон приложений не принимает"
-                : "Источник не назначен";
+                ? Loc.Get("Sm.Strip.DropHint.Microphone")
+                : Loc.Get("Sm.Strip.DropHint.NoSource");
 
     /// <summary>
     /// Объяснение отказа в переносе: приложение уходит в устройство, которое
     /// снимает стрип, а у этого стрипа такого устройства нет.
     /// </summary>
     public string AppRejectReason() => IsCableCapture
-        ? $"По имени «{Model.Name}» не удалось определить связанный выход кабеля. " +
-          "Укажите его кнопкой «Приложения → …» — это выход того же кабеля " +
-          "(у входа «L1In.…» это «L1Out.…»)."
+        ? Loc.Get("Sm.Strip.Reject.Cable", Model.Name)
         : IsMicrophone
-            ? $"«{Title}» — микрофон: он снимает звук с устройства захвата, а не приложения. " +
-              "Перетащите приложение на канал (стрип с loopback-источником) или на вход виртуального кабеля."
-            : $"У «{Title}» не назначен источник. Выберите его (клик по имени источника) и перетащите приложение снова.";
+            ? Loc.Get("Sm.Strip.Reject.Microphone", Title)
+            : Loc.Get("Sm.Strip.Reject.NoSource", Title);
 
     [ObservableProperty]
     private string _name;

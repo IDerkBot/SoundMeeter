@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+using SoundMeeter.Services;
+using System.Windows.Controls;
 
 namespace SoundMeeter.Views
 {
@@ -12,6 +13,7 @@ namespace SoundMeeter.Views
         public MainView()
         {
             InitializeComponent();
+            Language = Loc.XmlLanguage;
         }
     }
 }

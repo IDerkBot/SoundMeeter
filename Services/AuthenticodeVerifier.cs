@@ -63,11 +63,11 @@ internal static class AuthenticodeVerifier
         }
         catch (CryptographicException)
         {
-            return (SignatureState.Unsigned, "", "подпись отсутствует");
+            return (SignatureState.Unsigned, "", Loc.Get("Sm.Signature.UnsignedNone"));
         }
         catch (Exception ex)
         {
-            return (SignatureState.Unsigned, "", "подпись не читается: " + ex.Message);
+            return (SignatureState.Unsigned, "", Loc.Get("Sm.Signature.UnsignedUnreadable", ex.Message));
         }
 
         try
@@ -78,16 +78,18 @@ internal static class AuthenticodeVerifier
             chain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
 
             if (chain.Build(signer))
-                return (SignatureState.Valid, signer.Subject, "цепочка доверия построена");
+                return (SignatureState.Valid, signer.Subject, Loc.Get("Sm.Signature.Trusted"));
 
+            // Статусы цепочки — перечисление .NET, его строки одинаковы в обоих
+            // языках и служат точным диагностическим признаком, поэтому берём как есть.
             var problems = chain.ChainStatus.Length == 0
-                ? "причина не указана"
+                ? Loc.Get("Sm.Signature.UntrustedRoot")
                 : string.Join("; ", chain.ChainStatus.Select(s => s.Status.ToString()));
             return (SignatureState.Invalid, signer.Subject, problems);
         }
         catch (Exception ex)
         {
-            return (SignatureState.Invalid, "", "проверка цепочки не удалась: " + ex.Message);
+            return (SignatureState.Invalid, "", Loc.Get("Sm.Signature.CheckFailed", ex.Message));
         }
     }
 }

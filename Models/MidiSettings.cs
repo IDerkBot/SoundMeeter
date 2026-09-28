@@ -30,7 +30,16 @@ public enum MidiParamShape
 public sealed class MidiParameterDescriptor
 {
     public string Key { get; init; } = "";
-    public string Label { get; init; } = "";
+
+    /// <summary>Ключ подписи в <c>Resources/Strings.resx</c> (SM-C07).</summary>
+    public string LabelKey { get; init; } = "";
+
+    /// <summary>
+    /// Подпись параметра на текущем языке. Считается, а не хранится: смена языка
+    /// не должна требовать пересоздания дескрипторов (они статические).
+    /// </summary>
+    public string Label => Services.Loc.Get(LabelKey);
+
     public bool ForInput { get; init; }
     public bool ForBus { get; init; }
     public MidiParamShape Shape { get; init; }
@@ -43,18 +52,18 @@ public static class MidiParameters
 {
     public static readonly IReadOnlyList<MidiParameterDescriptor> All = new List<MidiParameterDescriptor>
     {
-        new() { Key = "VolumeDb", Label = "Volume", ForInput = true, ForBus = true, Shape = MidiParamShape.Fader, Min = -60, Max = 12 },
-        new() { Key = "GainDb", Label = "Gain", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 60 },
-        new() { Key = "IsMuted", Label = "Mute", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
-        new() { Key = "IsMono", Label = "Mono", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
-        new() { Key = "IsSolo", Label = "Solo", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
-        new() { Key = "DenoiserEnabled", Label = "Denoiser", ForInput = true, Shape = MidiParamShape.Button },
-        new() { Key = "DenoiserNoiseRemover", Label = "DEN Noise", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
-        new() { Key = "DenoiserDryWet", Label = "DEN Dry/Wet", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
-        new() { Key = "DenoiserFormantLowDb", Label = "DEN Form. Low", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
-        new() { Key = "DenoiserFormantMidDb", Label = "DEN Form. Mid", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
-        new() { Key = "DenoiserFormantHighDb", Label = "DEN Form. High", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
-        new() { Key = "DenoiserFormantGroupDb", Label = "DEN Form. Gain", ForInput = true, Shape = MidiParamShape.Knob, Min = -12, Max = 12 }
+        new() { Key = "VolumeDb", LabelKey = "Sm.Midi.Param.VolumeDb", ForInput = true, ForBus = true, Shape = MidiParamShape.Fader, Min = -60, Max = 12 },
+        new() { Key = "GainDb", LabelKey = "Sm.Midi.Param.GainDb", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 60 },
+        new() { Key = "IsMuted", LabelKey = "Sm.Midi.Param.IsMuted", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
+        new() { Key = "IsMono", LabelKey = "Sm.Midi.Param.IsMono", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
+        new() { Key = "IsSolo", LabelKey = "Sm.Midi.Param.IsSolo", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
+        new() { Key = "DenoiserEnabled", LabelKey = "Sm.Midi.Param.DenoiserEnabled", ForInput = true, Shape = MidiParamShape.Button },
+        new() { Key = "DenoiserNoiseRemover", LabelKey = "Sm.Midi.Param.DenoiserNoiseRemover", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
+        new() { Key = "DenoiserDryWet", LabelKey = "Sm.Midi.Param.DenoiserDryWet", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
+        new() { Key = "DenoiserFormantLowDb", LabelKey = "Sm.Midi.Param.DenoiserFormantLowDb", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
+        new() { Key = "DenoiserFormantMidDb", LabelKey = "Sm.Midi.Param.DenoiserFormantMidDb", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
+        new() { Key = "DenoiserFormantHighDb", LabelKey = "Sm.Midi.Param.DenoiserFormantHighDb", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },
+        new() { Key = "DenoiserFormantGroupDb", LabelKey = "Sm.Midi.Param.DenoiserFormantGroupDb", ForInput = true, Shape = MidiParamShape.Knob, Min = -12, Max = 12 }
     };
 
     public static IReadOnlyList<MidiParameterDescriptor> ForInput() =>

@@ -27,12 +27,12 @@
                     FontSize="18"
                     FontWeight="SemiBold"
                     Foreground="White"
-                    Text="Приложения с аудио" />
+                    Text="{DynamicResource Sm.Apps.WithAudio}" />
 
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding RefreshDataCommand}"
-                    Content="Обновить"
+                    Content="{DynamicResource Sm.Apps.Refresh}"
                     DockPanel.Dock="Top" />
             </Grid>
 

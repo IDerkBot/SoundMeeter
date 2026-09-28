@@ -61,7 +61,7 @@ namespace SoundMeeter.Services
             string updateRoot, UpdateInfo update)
         {
             if (string.IsNullOrWhiteSpace(payloadDirectory) || !Directory.Exists(payloadDirectory))
-                throw new InvalidOperationException("Распакованный архив обновления не найден.");
+                throw new InvalidOperationException(Loc.Get("Sm.Update.Plan.PayloadMissing"));
 
             var notes = new List<string>();
 
@@ -75,7 +75,7 @@ namespace SoundMeeter.Services
 
             if (mainExe == null)
                 throw new InvalidOperationException(
-                    $"В архиве релиза {update.TagName} нет {MainExecutableName} — обновление не похоже на сборку SoundMeeter.");
+                    Loc.Get("Sm.Update.Plan.NoExe", update.TagName, MainExecutableName));
 
             VerifyPortableExecutable(mainExe, notes);
 
@@ -84,11 +84,10 @@ namespace SoundMeeter.Services
                 .FirstOrDefault();
             if (mainAssembly == null)
                 throw new InvalidOperationException(
-                    $"В архиве релиза {update.TagName} нет {MainAssemblyName} — обновление неполное.");
+                    Loc.Get("Sm.Update.Plan.NoAssembly", update.TagName, MainAssemblyName));
             if (new FileInfo(mainAssembly).Length < MinimumFileSize)
-                throw new InvalidOperationException(
-                    $"{MainAssemblyName} в архиве релиза {update.TagName} подозрительно мал " +
-                    $"({new FileInfo(mainAssembly).Length} байт) — обновление отклонено.");
+                throw new InvalidOperationException(Loc.Get("Sm.Update.Plan.AssemblyTooSmall",
+                    MainAssemblyName, update.TagName, new FileInfo(mainAssembly).Length));
 
             // 3) Подпись Authenticode. Сборки не подписаны, поэтому её отсутствие —
             //    предупреждение; невалидная подпись — уже повод остановиться.
@@ -96,12 +95,12 @@ namespace SoundMeeter.Services
 
             var payloadFiles = Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories).ToList();
             var newTotalBytes = payloadFiles.Sum(f => SafeLength(f));
-            notes.Add($"Файлов в сборке: {payloadFiles.Count}, суммарно {FormatBytes(newTotalBytes)}");
+            notes.Add(Loc.Get("Sm.Update.Plan.FilesTotal", payloadFiles.Count, FormatBytes(newTotalBytes)));
 
             var stale = CollectFilesToDelete(payloadDirectory, installDirectory);
             notes.Add(stale.Count == 0
-                ? "Устаревших файлов в каталоге установки нет"
-                : $"Будет удалено файлов: {stale.Count}");
+                ? Loc.Get("Sm.Update.Plan.NoStale")
+                : Loc.Get("Sm.Update.Plan.StaleCount", stale.Count));
 
             Logger.LogInformation("План обновления {Tag}: {Notes}", update.TagName, string.Join("; ", notes));
             Logger.LogInformation("Каталог установки: {Install}, запускаемый файл: {Exe}", installDirectory, executablePath);
@@ -127,16 +126,15 @@ namespace SoundMeeter.Services
             var info = new FileInfo(path);
             if (info.Length < MinimumFileSize)
                 throw new InvalidOperationException(
-                    $"{Path.GetFileName(path)} в архиве релиза подозрительно мал ({info.Length} байт) — " +
-                    "это не исполняемый файл Windows.");
+                    Loc.Get("Sm.Update.Plan.ExeTooSmall", Path.GetFileName(path), info.Length));
 
             using var stream = File.OpenRead(path);
             var header = new byte[2];
             if (stream.Read(header, 0, 2) != 2 || header[0] != (byte)'M' || header[1] != (byte)'Z')
                 throw new InvalidOperationException(
-                    $"{Path.GetFileName(path)} не является исполняемым файлом Windows (нет сигнатуры MZ).");
+                    Loc.Get("Sm.Update.Plan.NotAnExe", Path.GetFileName(path)));
 
-            notes.Add($"{Path.GetFileName(path)}: PE-заголовок в порядке, {FormatBytes(info.Length)}");
+            notes.Add(Loc.Get("Sm.Update.Plan.PeOk", Path.GetFileName(path), FormatBytes(info.Length)));
         }
 
         private static void VerifySignature(string executable, UpdateInfo update, List<string> notes)
@@ -145,16 +143,15 @@ namespace SoundMeeter.Services
             switch (state)
             {
                 case SignatureState.Valid:
-                    notes.Add($"Подпись Authenticode действительна: {subject}");
+                    notes.Add(Loc.Get("Sm.Update.Plan.SignatureValid", subject));
                     Logger.LogInformation("Подпись Authenticode {Exe} действительна: {Subject}", executable, subject);
                     break;
                 case SignatureState.Invalid:
                     Logger.LogError("Подпись Authenticode {Exe} не проходит проверку: {Detail}", executable, detail);
                     throw new InvalidOperationException(
-                        $"Подпись Authenticode файла {Path.GetFileName(executable)} недействительна " +
-                        $"({detail}) — обновление отклонено.");
+                        Loc.Get("Sm.Update.Plan.SignatureInvalid", Path.GetFileName(executable), detail));
                 default:
-                    notes.Add($"{Path.GetFileName(executable)} не подписан (сборки SoundMeeter без сертификата)");
+                    notes.Add(Loc.Get("Sm.Update.Plan.Unsigned", Path.GetFileName(executable)));
                     Logger.LogWarning(
                         "{Exe}: {Detail}; целостность подтверждена только структурой архива. Тег: {Tag}",
                         executable, detail, update.TagName);
@@ -227,7 +224,13 @@ namespace SoundMeeter.Services
 
         internal static string FormatBytes(long bytes)
         {
-            string[] units = { "Б", "КБ", "МБ", "ГБ" };
+            string[] units =
+            {
+                Loc.Get("Sm.Unit.Bytes"),
+                Loc.Get("Sm.Unit.Kilobytes"),
+                Loc.Get("Sm.Unit.Megabytes"),
+                Loc.Get("Sm.Unit.Gigabytes"),
+            };
             double value = bytes;
             var unit = 0;
             while (value >= 1024 && unit < units.Length - 1)
@@ -304,6 +307,9 @@ namespace SoundMeeter.Services
         /// <summary>
         /// Шаблон фонового скрипта. Плейсхолдеры вместо интерполяции C#: в теле
         /// полно фигурных скобок PowerShell, которые конфликтуют с интерполяцией.
+        /// Тексты, которые скрипт показывает пользователю в MessageBox, не
+        /// захардкожены: они подставляются из ресурсов в <see cref="BuildScript"/>,
+        /// иначе после смены языка ошибка обновления осталась бы на старом.
         /// </summary>
         private const string ApplyScriptTemplate = @"
 # Сгенерировано SoundMeeter. Не редактировать: файл удаляется после запуска.
@@ -319,12 +325,16 @@ $dst = '@DST@'
 $exe = '@EXE@'
 $trash = '@TRASH@'
 $stale = @STALE@
+$caption = '@CAPTION@'
+$msgAppDidNotExit = '@MSGAPPEXIT@'
+$msgCopyFailed = '@MSGCOPYFAILED@'
+$msgLaunchFailed = '@MSGLAUNCHFAILED@'
 
 function Fail([string]$message) {
     $message | Out-File -LiteralPath $log -Append -Encoding utf8
     try {
         Add-Type -AssemblyName PresentationFramework
-        [System.Windows.MessageBox]::Show($message, 'SoundMeeter: обновление') | Out-Null
+        [System.Windows.MessageBox]::Show($message, $caption) | Out-Null
     } catch { }
     exit 1
 }
@@ -343,7 +353,7 @@ for ($i = 0; $i -lt 600; $i++) {
     Start-Sleep -Milliseconds 500
 }
 if (Get-Process -Id $appPid -ErrorAction SilentlyContinue) {
-    Fail 'Приложение не завершилось за 5 минут — обновление отменено.'
+    Fail $msgAppDidNotExit
 }
 Start-Sleep -Milliseconds 700
 
@@ -357,7 +367,7 @@ for ($i = 0; $i -lt 20; $i++) {
     Start-Sleep -Milliseconds 700
 }
 if (-not $copied) {
-    Fail ('Не удалось заменить файлы в ' + $dst + '. Закройте программы, использующие файлы SoundMeeter, и повторите обновление.')
+    Fail ($msgCopyFailed -f $dst)
 }
 Note 'copy done'
 
@@ -387,7 +397,7 @@ Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue
 try {
     Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe)
 } catch {
-    Fail ('Файлы обновлены, но запустить приложение не удалось. Откройте SoundMeeter.exe вручную: ' + $exe)
+    Fail ($msgLaunchFailed -f $exe)
 }
 ";
 
@@ -398,14 +408,21 @@ try {
                 : "@(" + string.Join(", ", plan.FilesToDelete.Select(p => "'" + Escape(p) + "'")) + ")";
 
             return ApplyScriptTemplate
-                .Replace("@LOG@", Escape(scriptPath) + ".log")
+                .Replace("@LOG@", Escape(scriptPath))
                 .Replace("@PID@", processId.ToString(CultureInfo.InvariantCulture))
                 .Replace("@SRC@", Escape(plan.PayloadDirectory))
                 .Replace("@DST@", Escape(plan.InstallDirectory))
                 .Replace("@EXE@", Escape(plan.ExecutablePath))
                 .Replace("@TRASH@", Escape(trashPath))
-                .Replace("@STALE@", stale);
+                .Replace("@STALE@", stale)
+                // Скрипт переживает перезапуск приложения, поэтому тексты в нём
+                // фиксируются на момент запуска обновления.
+                .Replace("@CAPTION@", Escape(Loc.Get("Sm.Update.Script.Caption")))
+                .Replace("@MSGAPPEXIT@", Escape(Loc.Get("Sm.Update.Script.AppDidNotExit")))
+                .Replace("@MSGCOPYFAILED@", Escape(Loc.Get("Sm.Update.Script.CopyFailed", "{0}")))
+                .Replace("@MSGLAUNCHFAILED@", Escape(Loc.Get("Sm.Update.Script.LaunchFailed", "{0}")));
         }
+
 
         private static string Escape(string value) => value.Replace("'", "''");
 
@@ -414,17 +431,19 @@ try {
         /// </summary>
         public static string FormatDeletionList(IReadOnlyList<string> files)
         {
-            if (files.Count == 0) return "Устаревших файлов в каталоге установки не найдено.";
+            if (files.Count == 0) return Loc.Get("Sm.Update.Plan.DeletionNone");
 
             var sb = new StringBuilder();
-            sb.Append(files.Count == 1 ? "Будет удалён 1 файл:" : $"Будет удалено файлов: {files.Count}");
+            sb.Append(files.Count == 1
+                ? Loc.Get("Sm.Update.Plan.DeletionOne")
+                : Loc.Get("Sm.Update.Plan.DeletionMany", files.Count));
 
             int shown = 0;
             foreach (var file in files)
             {
                 if (shown == 50)
                 {
-                    sb.Append($"\n… и ещё {files.Count - shown} файлов (полный список в журнале)");
+                    sb.Append("\n").Append(Loc.Get("Sm.Update.Plan.DeletionMore", files.Count - shown));
                     break;
                 }
                 sb.Append("\n  • ").Append(file);

@@ -14,6 +14,7 @@ namespace SoundMeeter.Views
         public LogWindow()
         {
             InitializeComponent();
+            Language = Loc.XmlLanguage;
 
             var engine = App.ServiceProvider.GetRequiredService<IAudioEngine>();
             var settings = App.ServiceProvider.GetRequiredService<SettingsService>();

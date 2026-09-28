@@ -39,10 +39,11 @@ namespace SoundMeeter.Views
         public DevicePickerWindow(IReadOnlyList<DeviceInfo> catalog, bool forInput, bool allowLoopback = false)
         {
             InitializeComponent();
+            Language = Loc.XmlLanguage;
 
-            Title = forInput ? "Choose input source" : "Choose output device";
+            Title = Loc.Get(forInput ? "Sm.Picker.ChooseInput" : "Sm.Picker.ChooseOutput");
 
-            _none = new DeviceItem("×", "(none)", string.Empty, DeviceKind.All);
+            _none = new DeviceItem("×", Loc.Get("Sm.Picker.None"), string.Empty, DeviceKind.All);
             _items.Add(_none);
             foreach (var device in catalog)
             {
@@ -50,13 +51,16 @@ namespace SoundMeeter.Views
                 {
                     if (device.IsMicrophone)
                     {
-                        _items.Add(new DeviceItem("●", $"MIC  {device.Name}", device.DeviceId, DeviceKind.Microphone));
+                        _items.Add(new DeviceItem("●", Loc.Get("Sm.Picker.TagMic", device.Name),
+                            device.DeviceId, DeviceKind.Microphone));
                     }
                     // Выход виртуального кабеля источником входа не бывает: в него
                     // играют приложения, а звук приходит в стрип входа того же кабеля.
                     else if (allowLoopback && !device.IsVirtualCable)
                     {
-                        _items.Add(new DeviceItem("◄", $"SPK  {device.Name}  (loopback)", device.DeviceId, DeviceKind.Speaker));
+                        _items.Add(new DeviceItem("◄",
+                            Loc.Get("Sm.Picker.TagSpk", device.Name, Loc.Get("Sm.Picker.Loopback")),
+                            device.DeviceId, DeviceKind.Speaker));
                     }
                 }
                 else
@@ -70,9 +74,9 @@ namespace SoundMeeter.Views
 
             KindBox.ItemsSource = new[]
             {
-                new KindOption("ALL", DeviceKind.All),
-                new KindOption("MIC", DeviceKind.Microphone),
-                new KindOption("SPK", DeviceKind.Speaker),
+                new KindOption(Loc.Get("Sm.Picker.KindAll"), DeviceKind.All),
+                new KindOption(Loc.Get("Sm.Picker.KindMic"), DeviceKind.Microphone),
+                new KindOption(Loc.Get("Sm.Picker.KindSpk"), DeviceKind.Speaker),
             };
             KindBox.SelectedIndex = 0;
             //  Для выхода все устройства — колонки, фильтр по типу не нужен.  */

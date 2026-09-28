@@ -11,7 +11,7 @@ namespace SoundMeeter.ViewModels;
 /// Состояние диалога обновления: показ changelog, скачивание с прогрессом,
 /// распаковка и передача подмены файлов фоновому скрипту.
 /// </summary>
-public partial class UpdateViewModel : ObservableObject
+public partial class UpdateViewModel : LocalizedViewModel
 {
     private readonly IUpdateService _updates;
     private readonly ILogger _logger = AppLog.For<UpdateViewModel>();
@@ -42,7 +42,7 @@ public partial class UpdateViewModel : ObservableObject
         : "";
 
     public string ReleaseNotes => string.IsNullOrWhiteSpace(Update.ReleaseNotes)
-        ? "Релиз без описания."
+        ? Loc.Get("Sm.Update.Status.NoNotes")
         : Update.ReleaseNotes;
 
     public string AssetName => Update.Asset is { } asset ? $"{asset.Name} ({asset.HumanSize})" : "";
@@ -69,7 +69,7 @@ public partial class UpdateViewModel : ObservableObject
 
         IsBusy = true;
         Progress = 0;
-        Status = $"Загрузка {asset.Name}…";
+        Status = Loc.Get("Sm.Update.Status.Downloading", asset.Name);
         _cancellation = new CancellationTokenSource();
 
         try
@@ -79,12 +79,12 @@ public partial class UpdateViewModel : ObservableObject
             var progress = new Progress<double>(p => Progress = p * 100);
             var zip = await _updates.DownloadAsync(asset, progress, _cancellation.Token);
 
-            Status = "Распаковка…";
+            Status = Loc.Get("Sm.Update.Status.Extracting");
             var payload = _updates.Extract(zip, Update.TagName);
 
             // Сверка целостности до подмены: повреждённый архив не должен
             // привести к удалению файлов установленной сборки (SM-A06).
-            Status = "Проверка архива…";
+            Status = Loc.Get("Sm.Update.Status.Verifying");
             UpdatePlan plan;
             try
             {
@@ -93,7 +93,7 @@ public partial class UpdateViewModel : ObservableObject
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Архив обновления {Tag} не прошёл проверку целостности", Update.TagName);
-                Status = "Обновление отклонено: " + ex.Message;
+                Status = Loc.Get("Sm.Update.Status.Rejected", ex.Message);
                 IsBusy = false;
                 return;
             }
@@ -103,27 +103,27 @@ public partial class UpdateViewModel : ObservableObject
             if (ConfirmPlan is { } confirm && !confirm(plan, report))
             {
                 _logger.LogInformation("Установка обновления {Tag} отменена пользователем", Update.TagName);
-                Status = "Установка отменена.";
+                Status = Loc.Get("Sm.Update.Status.Cancelled");
                 IsBusy = false;
                 return;
             }
 
-            Status = "Подмена файлов и перезапуск…";
+            Status = Loc.Get("Sm.Update.Status.Applying");
             _updates.ApplyAndRestart(plan);
 
             Progress = 100;
-            Status = "Обновление устанавливается. Приложение будет закрыто.";
+            Status = Loc.Get("Sm.Update.Status.Restarting");
             InstallCompleted?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
         {
-            Status = "Загрузка отменена.";
+            Status = Loc.Get("Sm.Update.Status.DownloadCancelled");
             IsBusy = false;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Установка обновления не удалась: {Message}", ex.Message);
-            Status = "Не удалось установить обновление: " + ex.Message;
+            Status = Loc.Get("Sm.Update.Status.Failed", ex.Message);
             IsBusy = false;
         }
         finally

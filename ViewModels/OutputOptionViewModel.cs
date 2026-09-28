@@ -9,7 +9,7 @@ namespace SoundMeeter.ViewModels;
 /// индивидуальная посылка на этот выход в дБ.
 /// Переключение и правка уровня сразу применяются в движке.
 /// </summary>
-public partial class OutputOptionViewModel : ObservableObject
+public partial class OutputOptionViewModel : LocalizedViewModel
 {
     private readonly Action<OutputOptionViewModel> _onChanged;
     private readonly Action<OutputOptionViewModel, float> _onGainChanged;

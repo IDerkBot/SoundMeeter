@@ -31,7 +31,7 @@
             Margin="0,0,0,8"
             FontSize="12"
             Foreground="#CCC"
-            Text="Choose audio device. None removes the assignment." />
+            Text="{DynamicResource Sm.Picker.Hint}" />
 
         <!--  Поиск по названию + фильтр по типу устройства (MIC/SPK)  -->
         <Grid Grid.Row="1" Margin="0,0,0,8">
@@ -43,7 +43,7 @@
             <TextBox
                 x:Name="SearchBox"
                 Grid.Column="0"
-                Tag="🔍 Search device name..."
+                Tag="{DynamicResource Sm.Picker.SearchHint}"
                 TextChanged="OnSearchChanged" />
 
             <ComboBox
@@ -54,7 +54,7 @@
                 VerticalAlignment="Stretch"
                 DisplayMemberPath="Label"
                 SelectionChanged="OnKindChanged"
-                ToolTip="Show only microphones or only speakers" />
+                ToolTip="{DynamicResource Sm.Picker.KindTip}" />
         </Grid>
 
         <Grid Grid.Row="2">
@@ -94,7 +94,7 @@
                 FontSize="12"
                 Foreground="#808080"
                 IsHitTestVisible="False"
-                Text="Nothing found"
+                Text="{DynamicResource Sm.Picker.Empty}"
                 Visibility="Collapsed" />
         </Grid>
 
@@ -106,12 +106,12 @@
             <Button
                 Margin="0,0,8,0"
                 Padding="18,5"
-                Content="Cancel"
+                Content="{DynamicResource Sm.Common.Cancel}"
                 IsCancel="True" />
             <Button
                 x:Name="OkButton"
                 Padding="18,5"
-                Content="OK"
+                Content="{DynamicResource Sm.Common.Ok}"
                 IsDefault="True"
                 Click="OnOkClick" />
         </StackPanel>

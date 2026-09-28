@@ -65,7 +65,7 @@ namespace SoundMeeter.Views.Controls
         }
 
         public static void ShowRoutingError(DependencyObject owner, string error) => MessageBox.Show(
-            Window.GetWindow(owner), error, "Перенаправление звука", MessageBoxButton.OK, MessageBoxImage.Error);
+            Window.GetWindow(owner), error, Loc.Get("Sm.Routing.DialogCaption"), MessageBoxButton.OK, MessageBoxImage.Error);
 
         /// <summary>Окно установки релиза (тот же сервис, что и у тихой проверки обновлений).</summary>
         public static void ShowUpdateWindow(DependencyObject owner, UpdateInfo update)

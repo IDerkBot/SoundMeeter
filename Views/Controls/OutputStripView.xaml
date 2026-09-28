@@ -46,7 +46,7 @@
                     FontSize="12"
                     FontWeight="Bold"
                     Foreground="#AAA"
-                    ToolTip="Remove strip" />
+                    ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
                 <Button
                     Padding="0"
                     HorizontalAlignment="Center"
@@ -57,7 +57,7 @@
                     FontSize="11"
                     FontWeight="Bold"
                     Foreground="White"
-                    ToolTip="Choose output device" />
+                    ToolTip="{DynamicResource Sm.Strip.ChooseOutputTip}" />
             </DockPanel>
 
             <ContentControl Content="{Binding}" ContentTemplate="{StaticResource MeterAndFader}" />
@@ -72,22 +72,22 @@
             <UniformGrid Columns="3">
                 <ToggleButton
                     Margin="0,0,2,0"
-                    Content="M"
+                    Content="{DynamicResource Sm.Strip.MonoShort}"
                     IsChecked="{Binding IsMono}"
                     Style="{StaticResource LedToggle}"
-                    ToolTip="Mono" />
+                    ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
                 <ToggleButton
                     Margin="1,0"
-                    Content="S"
+                    Content="{DynamicResource Sm.Strip.SoloShort}"
                     IsChecked="{Binding IsSolo}"
                     Style="{StaticResource LedToggle}"
-                    ToolTip="Solo" />
+                    ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
                 <ToggleButton
                     Margin="2,0,0,0"
-                    Content="MUTE"
+                    Content="{DynamicResource Sm.Strip.Mute}"
                     IsChecked="{Binding IsMuted}"
                     Style="{StaticResource LedToggle}"
-                    ToolTip="Mute" />
+                    ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
             </UniformGrid>
         </StackPanel>
     </Border>

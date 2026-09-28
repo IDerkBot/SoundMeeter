@@ -74,7 +74,7 @@
                                         Cursor="Hand"
                                         FontSize="10"
                                         Foreground="#FF6B6B"
-                                        ToolTip="Сбросить на устройство по умолчанию" />
+                                        ToolTip="{DynamicResource Sm.StripApps.ResetTip}" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -110,7 +110,7 @@
                                         DockPanel.Dock="Right"
                                         FontSize="10"
                                         Foreground="#FF6B6B"
-                                        ToolTip="Удалить правило" />
+                                        ToolTip="{DynamicResource Sm.StripApps.RemoveRuleTip}" />
                                     <StackPanel Orientation="Horizontal">
                                         <Image
                                             Width="16"
@@ -127,7 +127,7 @@
                                             <TextBlock
                                                 FontSize="9"
                                                 Foreground="#666666"
-                                                Text="Ожидает аудиосессии / применения"
+                                                Text="{DynamicResource Sm.StripApps.Pending}"
                                                 TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>

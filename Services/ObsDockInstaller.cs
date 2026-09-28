@@ -72,8 +72,7 @@ public sealed class ObsDockInstaller
     {
         if (IsObsRunning())
         {
-            return ObsDockInstallResult.Fail(
-                "OBS сейчас запущен и перезапишет user.ini при выходе. Закройте OBS и повторите.");
+            return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.ObsRunning"));
         }
         return action();
     }
@@ -120,7 +119,7 @@ public static class ObsDockConfig
         {
             var docks = ReadDocks(userIniPath);
             if (docks is null)
-                return ObsDockInstallResult.Fail($"Не удалось разобрать {DocksKey} в {userIniPath}. Файл не тронут.");
+                return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.ParseFailed", DocksKey, userIniPath));
 
             var existing = docks.FirstOrDefault(IsSoundMeeter);
             if (existing is not null)
@@ -143,7 +142,7 @@ public static class ObsDockConfig
         catch (Exception ex)
         {
             Logger.LogError(ex, "Не удалось добавить док в user.ini: {Message}", ex.Message);
-            return ObsDockInstallResult.Fail($"Не удалось изменить {userIniPath}: {ex.Message}");
+            return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.WriteFailed", userIniPath, ex.Message));
         }
     }
 
@@ -154,18 +153,18 @@ public static class ObsDockConfig
         {
             var docks = ReadDocks(userIniPath);
             if (docks is null)
-                return ObsDockInstallResult.Fail($"Не удалось разобрать {DocksKey} в {userIniPath}. Файл не тронут.");
+                return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.ParseFailed", DocksKey, userIniPath));
 
             int removed = docks.RemoveAll(IsSoundMeeter);
             if (removed == 0)
-                return ObsDockInstallResult.Ok("Док SoundMeeter в конфигурации OBS не найден — удалять нечего.", userIniPath);
+                return ObsDockInstallResult.Ok(Loc.Get("Sm.Obs.NothingToRemove"), userIniPath);
 
             return WriteDocks(userIniPath, docks);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Не удалось убрать док из user.ini: {Message}", ex.Message);
-            return ObsDockInstallResult.Fail($"Не удалось изменить {userIniPath}: {ex.Message}");
+            return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.WriteFailed", userIniPath, ex.Message));
         }
     }
 
@@ -209,7 +208,7 @@ public static class ObsDockConfig
     private static ObsDockInstallResult WriteDocks(string userIniPath, List<Dictionary<string, string>> docks)
     {
         if (!File.Exists(userIniPath))
-            return ObsDockInstallResult.Fail($"Не найден {userIniPath}. Запустите OBS хотя бы раз, чтобы он создал конфигурацию.");
+            return ObsDockInstallResult.Fail(Loc.Get("Sm.Obs.ConfigMissing", userIniPath));
 
         BackupOnce(userIniPath);
 
@@ -218,9 +217,7 @@ public static class ObsDockConfig
         File.WriteAllText(userIniPath, updated, new UTF8Encoding(false));
 
         Logger.LogInformation("Док OBS: записано {Count} записей в {Key}", docks.Count, DocksKey);
-        return ObsDockInstallResult.Ok(
-            "Док добавлен в OBS. Перезапустите OBS — панель появится в меню View → Docks → SoundMeeter.",
-            userIniPath);
+        return ObsDockInstallResult.Ok(Loc.Get("Sm.Obs.Installed"), userIniPath);
     }
 
     /// <summary>Резервная копия делается один раз: до первой правки этого сеанса OBS.</summary>

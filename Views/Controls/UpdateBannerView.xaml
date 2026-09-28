@@ -27,14 +27,14 @@
                 Margin="0,0,8,0"
                 VerticalAlignment="Center"
                 Click="OnUpdateInstallClick"
-                Content="Update" />
+                Content="{DynamicResource Sm.Toolbar.CheckUpdates}" />
             <TextBlock VerticalAlignment="Center" Text="{Binding UpdateBanner}" />
             <Button
                 Margin="8,0,0,0"
                 VerticalAlignment="Center"
                 Command="{Binding DismissUpdateCommand}"
                 Content="✕"
-                ToolTip="Скрыть до следующей проверки" />
+                ToolTip="{DynamicResource Sm.Update.Banner.DismissTip}" />
         </DockPanel>
     </Border>
 </UserControl>

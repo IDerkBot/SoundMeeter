@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using SoundMeeter.AudioPolicy;
 using SoundMeeter.Models;
@@ -252,8 +252,8 @@ namespace SoundMeeter.Services
                     }
 
                     LastError = hr == AppRouter.ProcessNoAudio
-                        ? $"Windows не применила маршрут для PID {processId} (0x{hr:X8}). Проверьте аудиосессию приложения и выбранное устройство."
-                        : $"Ошибка COM: HRESULT 0x{hr:X8}";
+                        ? Loc.Get("Sm.Routing.NotApplied", processId, hr)
+                        : Loc.Get("Sm.Routing.ComFailed", hr);
                     _logger.LogWarning("Маршрутизация PID {Pid} не выполнена, HRESULT=0x{HResult:X8}", processId, hr);
                     return (false, LastError);
                 }

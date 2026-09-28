@@ -48,8 +48,7 @@ public static class SettingsMigrator
 
         if (settings.SchemaVersion > CurrentSchemaVersion)
         {
-            message = $"settings.json записан версией схемы {settings.SchemaVersion}, " +
-                      $"а сборка понимает только {CurrentSchemaVersion} — настройки не применены";
+            message = Services.Loc.Get("Sm.Settings.NewerSchema", settings.SchemaVersion, CurrentSchemaVersion);
             return MigrationOutcome.UnsupportedNewerVersion;
         }
 
@@ -62,7 +61,7 @@ public static class SettingsMigrator
 
         if (from != CurrentSchemaVersion)
         {
-            message = $"схема настроек мигрирована {from} → {CurrentSchemaVersion}";
+            message = Services.Loc.Get("Sm.Settings.Migrated", from, CurrentSchemaVersion);
             logger.LogInformation("{Message}", message);
         }
         else

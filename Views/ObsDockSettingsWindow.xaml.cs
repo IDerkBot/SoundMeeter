@@ -1,3 +1,4 @@
+using SoundMeeter.Services;
 using SoundMeeter.ViewModels;
 using System.Windows;
 
@@ -12,6 +13,7 @@ namespace SoundMeeter.Views
         public ObsDockSettingsWindow(ObsDockSettingsViewModel viewModel)
         {
             InitializeComponent();
+            Language = Loc.XmlLanguage;
             DataContext = viewModel;
             Closed += (_, _) => viewModel.Dispose();
         }

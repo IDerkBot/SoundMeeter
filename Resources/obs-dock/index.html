@@ -5,16 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SoundMeeter</title>
 <link rel="stylesheet" href="dock.css">
+<!--
+    Тексты панели приходят из приложения: сервер вставляет сюда
+    <script>window.SM_I18N = {...}</script> с текущим языком интерфейса.
+    Пока словаря нет, страница обязана оставаться в состоянии "ничего не показано",
+    иначе пользователь увидит английский текст на русском интерфейсе.
+-->
 </head>
 <body>
 <div class="dock">
     <div class="head">
-        <span class="dot" id="dot" title="Connection"></span>
+        <span class="dot" id="dot"></span>
         <span class="title">SoundMeeter</span>
-        <span class="engine" id="engine" hidden>engine stopped</span>
+        <span class="engine" id="engine" hidden></span>
     </div>
     <div class="channels" id="channels"></div>
-    <div class="empty" id="empty">No channels selected.<br>Choose them in SoundMeeter → OBS dock.</div>
+    <div class="empty" id="empty"></div>
 </div>
 <script src="dock.js"></script>
 </body>

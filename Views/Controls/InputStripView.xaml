@@ -84,7 +84,7 @@
                     FontSize="12"
                     FontWeight="Bold"
                     Foreground="#AAA"
-                    ToolTip="Remove strip" />
+                    ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
                 <Button
                     Padding="0"
                     HorizontalAlignment="Center"
@@ -95,7 +95,7 @@
                     FontSize="11"
                     FontWeight="Bold"
                     Foreground="White"
-                    ToolTip="Choose input source" />
+                    ToolTip="{DynamicResource Sm.Strip.ChooseInputTip}" />
             </DockPanel>
 
             <Grid Grid.Row="2">
@@ -137,7 +137,7 @@
                         Content="{Binding OutButtonText}"
                         IsEnabled="{Binding HasHardware}"
                         Style="{StaticResource RouteBtn}"
-                        ToolTip="Hardware outputs (для прослушивания)" />
+                        ToolTip="{DynamicResource Sm.Strip.HardwareOutputsTip}" />
                     <Button
                         x:Name="VirtBtn"
                         Margin="2"
@@ -145,33 +145,33 @@
                         Content="{Binding VirtButtonText}"
                         IsEnabled="{Binding HasVirtual}"
                         Style="{StaticResource RouteBtn}"
-                        ToolTip="Virtual outputs (VB-Cable / VAC)" />
+                        ToolTip="{DynamicResource Sm.Strip.VirtualOutputsTip}" />
                     <ToggleButton
                         Margin="2"
-                        Content="MONO"
+                        Content="{DynamicResource Sm.Strip.Mono}"
                         IsChecked="{Binding IsMono}"
                         Style="{StaticResource LedToggle}"
-                        ToolTip="Mono" />
+                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
                     <ToggleButton
                         Margin="2"
-                        Content="SOLO"
+                        Content="{DynamicResource Sm.Strip.Solo}"
                         IsChecked="{Binding IsSolo}"
                         Style="{StaticResource LedToggle}"
-                        ToolTip="Solo" />
+                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
                     <ToggleButton
                         Margin="2"
-                        Content="MUTE"
+                        Content="{DynamicResource Sm.Strip.Mute}"
                         IsChecked="{Binding IsMuted}"
                         Style="{StaticResource LedToggle}"
-                        ToolTip="Mute" />
+                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
                     <ToggleButton
                         x:Name="DenBtn"
                         Margin="2"
-                        Content="DEN"
+                        Content="{DynamicResource Sm.Strip.Denoiser}"
                         IsChecked="{Binding DenoiserEnabled}"
                         MouseRightButtonUp="OnDenRightClick"
                         Style="{StaticResource LedToggle}"
-                        ToolTip="Denoiser (RNNoise): настройки — ПКМ" />
+                        ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
                 </UniformGrid>
 
                 <Popup
@@ -193,7 +193,7 @@
                                 FontSize="10"
                                 FontWeight="Bold"
                                 Foreground="White"
-                                Text="Hardware outputs (для прослушивания)" />
+                                Text="{DynamicResource Sm.Strip.HardwareOutputs}" />
                             <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding HardwareOutputs}" />
                             </ScrollViewer>
@@ -219,7 +219,7 @@
                                 Margin="0,0,0,4"
                                 FontSize="10"
                                 FontWeight="Bold"
-                                Text="Virtual outputs (VB-Cable / VAC)" />
+                                Text="{DynamicResource Sm.Strip.VirtualOutputs}" />
                             <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding VirtualOutputs}" />
                             </ScrollViewer>
@@ -252,7 +252,7 @@
                 Content="{Binding AppTargetText}"
                 FontSize="9"
                 Style="{StaticResource RouteBtn}"
-                ToolTip="В это устройство уходят приложения канала, а стрип снимает вход кабеля. Обычно это выход того же кабеля."
+                ToolTip="{DynamicResource Sm.Strip.AppTargetTip}"
                 Visibility="{Binding CanChooseAppTarget, Converter={StaticResource BoolToVisibility}}" />
 
             <controls:StripAppsView Grid.Row="4" Visibility="{Binding ShowAppList, Converter={StaticResource BoolToVisibility}}" />
@@ -272,7 +272,7 @@
                     Height="86"
                     HorizontalAlignment="Center"
                     Maximum="60"
-                    ToolTip="Входное усиление канала, дБ. Применяется один раз до разветвления на шины. Тянуть мышью или колесом."
+                    ToolTip="{DynamicResource Sm.Strip.GainTip}"
                     Value="{Binding GainDb, Mode=TwoWay}" />
                 <TextBlock
                     Margin="0,4,0,0"
@@ -286,7 +286,7 @@
                     HorizontalAlignment="Center"
                     FontSize="9"
                     Foreground="#808080"
-                    Text="входное усиление" />
+                    Text="{DynamicResource Sm.Strip.GainLabel}" />
             </StackPanel>
         </Grid>
     </Border>

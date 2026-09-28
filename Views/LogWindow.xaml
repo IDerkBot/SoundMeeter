@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Журнал SoundMeeter"
+    Title="{DynamicResource Sm.Log.Title}"
     Width="900"
     Height="600"
     MinWidth="520"
@@ -29,39 +29,39 @@
                 Margin="0,0,8,0"
                 VerticalAlignment="Center"
                 FontSize="11"
-                Text="Уровень:" />
+                Text="{DynamicResource Sm.Log.Level}" />
             <ComboBox
                 Width="110"
                 VerticalAlignment="Center"
                 ItemsSource="{Binding LogLevels}"
                 SelectedItem="{Binding SelectedLogLevel, Mode=TwoWay}"
-                ToolTip="Детализация журнала. Применяется сразу, сохраняется в настройках" />
+                ToolTip="{DynamicResource Sm.Log.LevelTip}" />
             <TextBlock
                 Margin="16,0,8,0"
                 VerticalAlignment="Center"
                 FontSize="11"
-                Text="Файл:" />
+                Text="{DynamicResource Sm.Log.File}" />
             <ComboBox
                 Width="230"
                 VerticalAlignment="Center"
                 DisplayMemberPath="{Binding}"
                 ItemsSource="{Binding Files}"
                 SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
-                ToolTip="Файлы журнала: текущий и архивные" />
+                ToolTip="{DynamicResource Sm.Log.FileTip}" />
             <Button
                 Margin="8,0,0,0"
                 Command="{Binding RefreshCommand}"
-                Content="Обновить" />
+                Content="{DynamicResource Sm.Common.Refresh}" />
             <Button
                 Margin="6,0,0,0"
                 Command="{Binding OpenLogFolderCommand}"
-                Content="Папка журналов"
-                ToolTip="Открыть каталог с файлами журнала в проводнике" />
+                Content="{DynamicResource Sm.Log.Folder}"
+                ToolTip="{DynamicResource Sm.Log.FolderTip}" />
             <Button
                 Margin="6,0,0,0"
                 Command="{Binding CopyDiagnosticsCommand}"
-                Content="Скопировать диагностику"
-                ToolTip="Журнал + версия + список устройств и стрипов в буфер обмена" />
+                Content="{DynamicResource Sm.Log.CopyDiagnostics}"
+                ToolTip="{DynamicResource Sm.Log.CopyDiagnosticsTip}" />
         </StackPanel>
 
         <StatusBar

@@ -82,9 +82,7 @@ public sealed class ObsDockServer : IObsDockServer
             catch (SocketException ex)
             {
                 _port = 0;
-                throw new IOException(
-                    $"Не удалось занять порт {port} для док-панели OBS: {ex.SocketErrorCode}. " +
-                    "Выберите другой порт в настройках дока.", ex);
+                throw new IOException(Loc.Get("Sm.Obs.PortBusy", port, ex.SocketErrorCode), ex);
             }
 
             var token = _cts.Token;
@@ -229,7 +227,7 @@ public sealed class ObsDockServer : IObsDockServer
         switch (path)
         {
             case "/" or "/index.html":
-                return (200, "text/html; charset=utf-8", ObsDockAssets.Get(ObsDockAssets.IndexHtml));
+                return (200, "text/html; charset=utf-8", BuildIndexHtml());
             case "/dock.css":
                 return (200, "text/css; charset=utf-8", ObsDockAssets.Get(ObsDockAssets.DockCss));
             case "/dock.js":
@@ -241,6 +239,23 @@ public sealed class ObsDockServer : IObsDockServer
             default:
                 return (404, "text/plain; charset=utf-8", "not found"u8.ToArray());
         }
+    }
+
+    /// <summary>
+    /// HTML панели с подставленным словарём языка. Сам файл остаётся встроенным
+    /// ресурсом и не зависит от локализации — перевод приходит одним блоком,
+    /// собранным из Resources/Strings.resx (SM-C07).
+    /// </summary>
+    private static byte[] BuildIndexHtml()
+    {
+        var template = Encoding.UTF8.GetString(ObsDockAssets.Get(ObsDockAssets.IndexHtml));
+        if (template.Length == 0) return ObsDockAssets.Get(ObsDockAssets.IndexHtml);
+
+        int at = template.IndexOf("</head>", StringComparison.Ordinal);
+        if (at < 0) return ObsDockAssets.Get(ObsDockAssets.IndexHtml);
+
+        return Encoding.UTF8.GetBytes(
+            template[..at] + ObsDockAssets.BuildScriptBlock() + template[at..]);
     }
 
     private async Task<DockClient?> StartWebSocketAsync(TcpClient tcp, NetworkStream stream,

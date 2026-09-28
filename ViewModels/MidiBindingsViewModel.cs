@@ -6,22 +6,40 @@ using System.Collections.ObjectModel;
 
 namespace SoundMeeter.ViewModels;
 
-/// <summary>Пункт выпадающего списка режима кнопки.</summary>
-public sealed record MidiButtonModeOption(MidiButtonMode Value, string Name);
+/// <summary>
+/// Пункт выпадающего списка режима кнопки. Название берётся из ресурсов по ключу,
+/// поэтому переключение языка обновляет и его (список пересоздаётся заново).
+/// </summary>
+public sealed class MidiButtonModeOption
+{
+    public MidiButtonModeOption(MidiButtonMode value, string nameKey)
+    {
+        Value = value;
+        NameKey = nameKey;
+    }
+
+    public MidiButtonMode Value { get; }
+
+    public string NameKey { get; }
+
+    public string Name => Loc.Get(NameKey);
+
+    public override string ToString() => Name;
+}
 
 /// <summary>
 /// Ячейка параметра стрипа для MIDI-окна: метка, текущая привязка, Learn/Clear.
 /// </summary>
-public partial class MidiParamCell : ObservableObject
+public partial class MidiParamCell : LocalizedViewModel
 {
     private bool _refreshing;
 
-    private static readonly IReadOnlyList<MidiButtonModeOption> AllModes = new[]
-    {
-        new MidiButtonModeOption(MidiButtonMode.Toggle, "Toggle"),
-        new MidiButtonModeOption(MidiButtonMode.Hold, "Hold (PTT)"),
-        new MidiButtonModeOption(MidiButtonMode.Latch, "Latch")
-    };
+    private static readonly MidiButtonModeOption ToggleMode =
+        new(MidiButtonMode.Toggle, "Sm.Midi.Mode.Toggle");
+    private static readonly MidiButtonModeOption HoldMode =
+        new(MidiButtonMode.Hold, "Sm.Midi.Mode.Hold");
+    private static readonly MidiButtonModeOption LatchMode =
+        new(MidiButtonMode.Latch, "Sm.Midi.Mode.Latch");
 
     public required MidiParameterDescriptor Descriptor { get; init; }
     public required MidiBindingsViewModel Owner { get; init; }
@@ -31,8 +49,12 @@ public partial class MidiParamCell : ObservableObject
     /// <summary>Параметр — кнопка: доступны режим работы и обратная полярность.</summary>
     public bool IsButton => Descriptor.Shape == MidiParamShape.Button;
 
-    /// <summary>Режимы кнопки: переключение, удержание (PTT), кнопка с фиксацией.</summary>
-    public IReadOnlyList<MidiButtonModeOption> ModeOptions => AllModes;
+    /// <summary>
+    /// Режимы кнопки: переключение, удержание (PTT), кнопка с фиксацией.
+    /// Новый список на каждое чтение — иначе ComboBox не перечитал бы названия
+    /// после смены языка.
+    /// </summary>
+    public IReadOnlyList<MidiButtonModeOption> ModeOptions => new[] { ToggleMode, HoldMode, LatchMode };
 
     /// <summary>Режим кнопки: Toggle / Hold (PTT) / Latch (кнопка с фиксацией).</summary>
     [ObservableProperty]
@@ -43,7 +65,7 @@ public partial class MidiParamCell : ObservableObject
     private bool _isInverted;
 
     [ObservableProperty]
-    private string _display = "unbound";
+    private string _display = "";
 
     [ObservableProperty]
     private bool _isBound;
@@ -71,7 +93,7 @@ public partial class MidiParamCell : ObservableObject
     {
         var binding = Owner.FindBinding(TargetType, StripId, Descriptor.Key);
         IsBound = binding != null;
-        Display = binding == null ? "unbound" : FormatBinding(binding);
+        Display = binding == null ? Loc.Get("Sm.Midi.Unbound") : FormatBinding(binding);
         _refreshing = true;
         Mode = binding?.Mode ?? MidiButtonMode.Toggle;
         IsInverted = binding?.IsInverted ?? false;
@@ -80,18 +102,38 @@ public partial class MidiParamCell : ObservableObject
 
     private static string FormatBinding(MidiBinding b) => b.MessageKind switch
     {
-        MidiMessageKind.ControlChange => $"CC {b.Control} · ch {b.Channel + 1}",
-        MidiMessageKind.NoteOn => $"Note {b.Control} · ch {b.Channel + 1}",
-        MidiMessageKind.NoteOff => $"NoteOff {b.Control} · ch {b.Channel + 1}",
-        MidiMessageKind.PitchWheel => "Pitch Wheel",
+        MidiMessageKind.ControlChange => Loc.Get("Sm.Midi.Binding.ControlChange", b.Control, b.Channel + 1),
+        MidiMessageKind.NoteOn => Loc.Get("Sm.Midi.Binding.NoteOn", b.Control, b.Channel + 1),
+        MidiMessageKind.NoteOff => Loc.Get("Sm.Midi.Binding.NoteOff", b.Control, b.Channel + 1),
+        MidiMessageKind.PitchWheel => Loc.Get("Sm.Midi.Binding.PitchWheel"),
         _ => "?"
     };
 
     partial void OnIsLearningChanged(bool value)
     {
-        if (value) Display = "listening…";
+        if (value) Display = Loc.Get("Sm.Midi.Listening");
         else Refresh();
     }
+}
+
+/// <summary>
+/// Пункт выпадающего списка MIDI-устройств. Реальные устройства хранят имя
+/// из системы, а «выключено» — локализованную надпись; выбор идёт по ссылке на
+/// объект, поэтому смена языка не может его сбросить (сравнение по имени, как
+/// было раньше, роняло выбор при переключении языка).
+/// </summary>
+public sealed class MidiDeviceOption : LocalizedViewModel
+{
+    /// <summary>Псевдоустройство «выключено»: <paramref name="device"/> — null.</summary>
+    public MidiDeviceOption(MidiInputDevice? device) => Device = device;
+
+    public MidiInputDevice? Device { get; }
+
+    public bool IsNone => Device is null;
+
+    public string Name => Device?.Name ?? Loc.Get("Sm.Midi.None");
+
+    public override string ToString() => Name;
 }
 
 /// <summary>
@@ -108,7 +150,7 @@ public class MidiStripRow
 /// <summary>
 /// VM окна MIDI-привязок: устройства, стрипы с параметрами, режим Learn.
 /// </summary>
-public partial class MidiBindingsViewModel : ObservableObject, IDisposable
+public partial class MidiBindingsViewModel : LocalizedViewModel
 {
     private readonly MainViewModel _main;
     private MidiParamCell? _learning;
@@ -116,10 +158,12 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
     public MidiBindingsViewModel(MainViewModel main)
     {
         _main = main;
-        Devices = new ObservableCollection<MidiInputDevice> { NoneDevice };
+
+        DeviceOptions.Add(new MidiDeviceOption(null));
         foreach (var device in main.MidiService.Devices)
-            Devices.Add(device);
-        _selectedDeviceName = main.Engine.Midi.DeviceName;
+            DeviceOptions.Add(new MidiDeviceOption(device));
+
+        _selectedDevice = FindOption(main.Engine.Midi.DeviceName);
 
         foreach (var input in main.Inputs)
         {
@@ -152,19 +196,26 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
         UpdateStatus();
     }
 
-    public ObservableCollection<MidiInputDevice> Devices { get; }
+    public ObservableCollection<MidiDeviceOption> DeviceOptions { get; } = new();
     public ObservableCollection<MidiStripRow> Strips { get; } = new();
 
-    /// <summary>Псевдоустройство «выключено».</summary>
-    private static readonly MidiInputDevice NoneDevice = new(-1, "(none)");
-
     [ObservableProperty]
-    private string? _selectedDeviceName;
+    private MidiDeviceOption? _selectedDevice;
 
     [ObservableProperty]
     private string _status = "";
 
     public bool IsOpen => _main.MidiService.IsOpen;
+
+    /// <summary>
+    /// Пункт по имени устройства. null — сохранённое устройство сейчас не
+    /// подключено: показываем «выключено», но имя НЕ стираем, чтобы при
+    /// переподключении контроллера привязка снова заработала.
+    /// </summary>
+    private MidiDeviceOption FindOption(string? deviceName) =>
+        DeviceOptions.FirstOrDefault(o => o.Device is not null &&
+            string.Equals(o.Device.Name, deviceName, StringComparison.Ordinal))
+        ?? DeviceOptions[0];
 
     private MidiParamCell CreateCell(MidiStripRow row, MidiParameterDescriptor descriptor) =>
         new()
@@ -175,10 +226,12 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
             StripId = row.StripId
         };
 
-    partial void OnSelectedDeviceNameChanged(string? value)
+    partial void OnSelectedDeviceChanged(MidiDeviceOption? value)
     {
-        // Пользователь выбрал «(none)» — явно выключить MIDI.
-        if (value == NoneDevice.Name)
+        if (value is null) return;
+
+        // Пользователь выбрал «выключено» — явно закрыть MIDI.
+        if (value.IsNone)
         {
             _main.Engine.Midi.DeviceName = null;
             _main.MidiService.Close();
@@ -188,19 +241,9 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // value == null приходит от ComboBox, когда сохранённое устройство
-        // сейчас не подключено: ComboBox не находит такой элемент и сбрасывает
-        // выбор. Сохранённое имя НЕ стираем, чтобы при переподключении
-        // контроллера привязка снова заработала.
-        if (value == null)
-        {
-            OnPropertyChanged(nameof(IsOpen));
-            UpdateStatus();
-            return;
-        }
-
-        _main.Engine.Midi.DeviceName = value;
-        _main.MidiService.Open(value);
+        var name = value.Device!.Name;
+        _main.Engine.Midi.DeviceName = name;
+        _main.MidiService.Open(name);
         // MidiSettingsChanged сбрасывает и отслеживание нажатий: устройство сменилось.
         _main.MidiSettingsChanged();
         RefreshAll();
@@ -220,7 +263,7 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
 
         _learning = cell;
         cell.IsLearning = true;
-        Status = "Move the MIDI control to bind…";
+        Status = Loc.Get("Sm.Midi.Status.MoveControl");
     }
 
     public void ClearBinding(MidiParamCell cell)
@@ -298,12 +341,28 @@ public partial class MidiBindingsViewModel : ObservableObject, IDisposable
     private void UpdateStatus()
     {
         Status = IsOpen
-            ? $"Listening: {_main.Engine.Midi.DeviceName}"
-            : "No MIDI input selected";
+            ? Loc.Get("Sm.Midi.Status.ListeningTo", _main.Engine.Midi.DeviceName)
+            : Loc.Get("Sm.Midi.Status.NoInput");
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Смена языка: надписи устройств и ячеек обновит базовый класс, а статус
+    /// и название параметров считаются здесь и в дескрипторах — пересчитываем явно.
+    /// </summary>
+    protected override void OnLanguageChangedCore()
+    {
+        foreach (var row in Strips)
+            foreach (var cell in row.Params)
+                cell.Refresh();
+        UpdateStatus();
+    }
+
+    protected override void DisposeCore()
     {
         _main.MidiService.MessageReceived -= OnRawMessage;
+        foreach (var option in DeviceOptions) option.Dispose();
+        foreach (var row in Strips)
+            foreach (var cell in row.Params)
+                cell.Dispose();
     }
 }

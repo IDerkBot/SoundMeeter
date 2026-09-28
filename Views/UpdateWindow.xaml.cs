@@ -15,13 +15,14 @@ namespace SoundMeeter.Views
         public UpdateWindow(IUpdateService updates, UpdateInfo update)
         {
             InitializeComponent();
+            Language = Loc.XmlLanguage;
             ViewModel = new UpdateViewModel(updates, update);
             DataContext = ViewModel;
 
             // План обновления показываем диалогом: удаление файлов необратимо,
             // и решение должен принимать человек, а не код (SM-A06).
             ViewModel.ConfirmPlan = (_, report) => MessageBox.Show(
-                this, report, "Установить обновление?",
+                this, report, Loc.Get("Sm.Update.ConfirmPlan"),
                 MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
 
             ViewModel.InstallCompleted += (_, _) =>

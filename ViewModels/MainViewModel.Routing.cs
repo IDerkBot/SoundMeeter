@@ -156,7 +156,7 @@ public partial class MainViewModel
     public async Task<(bool Success, string Error)> AssignAppToStripAsync(object app, InputChannelViewModel strip)
     {
         if (!Inputs.Contains(strip))
-            return (false, "Стрип не найден. Обновите список каналов.");
+            return (false, Loc.Get("Sm.Routing.StripNotFound"));
 
         string? path;
         string name;
@@ -179,18 +179,18 @@ public partial class MainViewModel
                 icon = path;
                 break;
             default:
-                return (false, "Неизвестный тип приложения.");
+                return (false, Loc.Get("Sm.Routing.UnknownAppType"));
         }
 
         if (string.IsNullOrWhiteSpace(path) && app is not AppViewModel)
-            return (false, "Не найден путь к исполняемому файлу приложения.");
+            return (false, Loc.Get("Sm.Routing.ExeNotFound"));
 
         await _appRoutingGate.WaitAsync();
         try
         {
             var stripId = strip.Id;
             if (!_engine.Inputs.Any(i => i.Id == stripId))
-                return (false, "Стрип был удалён. Повторите перенос.");
+                return (false, Loc.Get("Sm.Routing.StripRemoved"));
 
             // Куда уходит звук — решает выбранный стрип, и больше ничего не меняем.
             // Приложение играет в то render-устройство, которое этот канал снимает
@@ -230,9 +230,9 @@ public partial class MainViewModel
             var liveStrip = Inputs.FirstOrDefault(i => i.Id == stripId);
             var hint = liveStrip == null
                 ? ""
-                : $". Включите OUT/VIRT на стрипе «{liveStrip.Title}», чтобы направить канал";
+                : Loc.Get("Sm.Routing.EnableOutVirt", liveStrip.Title);
             Status = errors.Count > 0
-                ? "Правило сохранено; перенаправление пока не выполнено"
+                ? Loc.Get("Sm.Routing.SavedNoRedirect")
                 : $"{name} → {liveStrip?.Title ?? DeviceName(targetDeviceId)}{hint}";
             return (errors.Count == 0, string.Join(Environment.NewLine, errors.Distinct()));
         }
@@ -280,8 +280,8 @@ public partial class MainViewModel
             }
             await RefreshAppsCoreAsync();
             Status = errors.Count == 0
-                ? (targets.Count == 0 ? "Привязка удалена: сброс выхода запланирован при запуске" : "Привязка удалена: используется системный выход")
-                : "Не удалось сбросить выход приложения";
+                ? (targets.Count == 0 ? Loc.Get("Sm.Routing.UnbindPending") : Loc.Get("Sm.Routing.UnbindSystem"))
+                : Loc.Get("Sm.Routing.UnbindFailed");
             return (errors.Count == 0, string.Join(Environment.NewLine, errors.Distinct()));
         }
         finally { _appRoutingGate.Release(); }

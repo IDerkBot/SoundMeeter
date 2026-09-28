@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services.Logging;
 using System.IO;
@@ -125,6 +125,9 @@ namespace SoundMeeter.Services
                 settings.ObsDock = CloneObsDock(Settings.ObsDock);
                 settings.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
                 settings.LogLevel = AppLog.Level.ToString();
+                // Снимок движка про язык не знает, ровно как про маршруты приложений
+                // и док: язык живёт в Loc, а на диск его кладёт только он сам.
+                settings.Language = Loc.RequestedLanguage;
 
                 WriteAtomically(settings);
             }
@@ -158,7 +161,7 @@ namespace SoundMeeter.Services
         {
             if (!File.Exists(_path))
             {
-                LoadReport = "settings.json не найден — стартуем с настройками по умолчанию";
+                LoadReport = Loc.Get("Sm.Settings.NoFile");
                 _logger.LogInformation("{Report}", LoadReport);
                 return null;
             }
@@ -187,12 +190,12 @@ namespace SoundMeeter.Services
             if (outcome == MigrationOutcome.UnsupportedNewerVersion)
             {
                 HasUnsupportedNewerSchema = true;
-                LoadReport = migrationNote + "; файл не перезаписывается до явного сохранения";
+                LoadReport = migrationNote + "; " + Loc.Get("Sm.Settings.NotRewritten");
                 _logger.LogWarning("{Report}", LoadReport);
                 return null;
             }
 
-            LoadReport = migrationNote.Length > 0 ? migrationNote : "settings.json загружен";
+            LoadReport = migrationNote.Length > 0 ? migrationNote : Loc.Get("Sm.Settings.Loaded");
             _logger.LogInformation("settings.json загружен (схема {Version}): {Note}",
                 LoadedSchemaVersion, migrationNote.Length > 0 ? migrationNote : "без миграций");
             return loaded;
@@ -257,8 +260,7 @@ namespace SoundMeeter.Services
         /// </summary>
         private void QuarantineCorruptFile(Exception cause)
         {
-            LoadReport = $"settings.json не читается ({cause.Message}); " +
-                         $"файл сохранён как {CorruptFileName}, стартуем с настройками по умолчанию";
+            LoadReport = Loc.Get("Sm.Settings.Corrupt", cause.Message, CorruptFileName);
             _logger.LogWarning(cause, "settings.json не читается; откладываем как {File}", CorruptFileName);
 
             try

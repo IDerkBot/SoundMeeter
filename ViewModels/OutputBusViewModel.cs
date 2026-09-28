@@ -7,7 +7,7 @@ namespace SoundMeeter.ViewModels;
 /// <summary>
 /// Выходная шина (стрип вывода): громкость, мут, моно, соло, VU-метр.
 /// </summary>
-public partial class OutputBusViewModel : ObservableObject
+public partial class OutputBusViewModel : LocalizedViewModel
 {
     private readonly IAudioEngine _engine;
     private readonly Action _markDirty;
