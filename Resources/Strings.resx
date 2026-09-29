@@ -309,6 +309,57 @@
   <data name="Sm.OutputOption.GainTip" xml:space="preserve">
     <value>Send from the strip to this output, dB (applied immediately)</value>
   </data>
+  <data name="Sm.Func.ButtonAssigned" xml:space="preserve">
+    <value>{0} — assigned: {1}. Click — apply, right-click — change the assignment.</value>
+  </data>
+  <data name="Sm.Func.ButtonOff" xml:space="preserve">
+    <value>{0} — assigned: {1}. Click to turn it on.</value>
+  </data>
+  <data name="Sm.Func.ButtonOn" xml:space="preserve">
+    <value>{0} — on: {1}. Click to turn it off and bring the strip back to the routing it had before.</value>
+  </data>
+  <data name="Sm.Func.ButtonEmpty" xml:space="preserve">
+    <value>{0} — nothing is assigned. Click or right-click — assign OUT/VIRT outputs.</value>
+  </data>
+  <data name="Sm.Func.PopupTitle" xml:space="preserve">
+    <value>{0} — outputs of this strip</value>
+  </data>
+  <data name="Sm.Func.Exclusive" xml:space="preserve">
+    <value>Only the assigned outputs (turn off the rest)</value>
+  </data>
+  <data name="Sm.Func.ExclusiveTip" xml:space="preserve">
+    <value>On: the button brings the strip routing to exactly its own list. Off: the button only adds its outputs and leaves the other routes alone.</value>
+  </data>
+  <data name="Sm.Func.Label" xml:space="preserve">
+    <value>Button label</value>
+  </data>
+  <data name="Sm.Func.LabelHint" xml:space="preserve">
+    <value>empty — F1/F2</value>
+  </data>
+  <data name="Sm.Func.LabelTip" xml:space="preserve">
+    <value>Shown on the button instead of its number, up to 12 characters.</value>
+  </data>
+  <data name="Sm.Func.TurnOn" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="Sm.Func.TurnOff" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="Sm.Func.EngagedHint" xml:space="preserve">
+    <value>The button is on: the strip routing now follows its rule. Turn it off to bring the routing back.</value>
+  </data>
+  <data name="Sm.Func.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Sm.Func.NotAssigned" xml:space="preserve">
+    <value>Nothing is assigned — tick at least one output, otherwise the button does nothing.</value>
+  </data>
+  <data name="Sm.Func.NoOutputs" xml:space="preserve">
+    <value>No outputs to assign: the strip has no OUT/VIRT devices yet.</value>
+  </data>
+  <data name="Sm.Func.LiveTip" xml:space="preserve">
+    <value>The strip is routed to this output right now</value>
+  </data>
   <data name="Sm.Denoiser.Title" xml:space="preserve">
     <value>Denoiser (RNNoise)</value>
   </data>
@@ -479,6 +530,12 @@
   </data>
   <data name="Sm.Midi.Param.DenoiserEnabled" xml:space="preserve">
     <value>Denoiser</value>
+  </data>
+  <data name="Sm.Midi.Param.Func1" xml:space="preserve">
+    <value>Func 1</value>
+  </data>
+  <data name="Sm.Midi.Param.Func2" xml:space="preserve">
+    <value>Func 2</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Noise</value>

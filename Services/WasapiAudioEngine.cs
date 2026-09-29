@@ -838,6 +838,18 @@ public sealed class WasapiAudioEngine : IAudioEngine
             foreach (var busId in input.BusRouting.Keys.Where(k => !validBusIds.Contains(k)).ToList())
                 input.BusRouting.Remove(busId);
 
+            // Из назначений кнопок FUNC мёртвые шины тоже выкидываем: иначе кнопка
+            // «назначена» в выход, которого больше нет, и нажатие выглядело бы
+            // бесполезным (Exclusive при этом снял бы всё остальное).
+            foreach (var func in input.FuncButtons)
+                func.BusIds.RemoveAll(id => !validBusIds.Contains(id));
+
+            // ... то же про базовый роутинг, к которому кнопка возвращает стрип:
+            // ссылка на исчезнувший выход там просто мёртвая.
+            foreach (var busId in input.FuncBaseRouting.Keys.Where(k => !validBusIds.Contains(k)).ToList())
+                input.FuncBaseRouting.Remove(busId);
+
+
             foreach (var bus in BusesInternal)
             {
                 if (!input.BusRouting.ContainsKey(bus.Id))
@@ -866,7 +878,10 @@ public sealed class WasapiAudioEngine : IAudioEngine
         DenoiserFormantMidDb = source.DenoiserFormantMidDb,
         DenoiserFormantHighDb = source.DenoiserFormantHighDb,
         DenoiserFormantGroupDb = source.DenoiserFormantGroupDb,
-        BusRouting = CloneRouting(source.BusRouting)
+        BusRouting = CloneRouting(source.BusRouting),
+        FuncButtons = CloneFuncButtons(source.FuncButtons),
+        EngagedFunc = source.EngagedFunc,
+        FuncBaseRouting = new Dictionary<string, bool>(source.FuncBaseRouting, StringComparer.Ordinal)
     };
 
     private static OutputBusModel CloneBus(OutputBusModel source) => new()
@@ -887,6 +902,28 @@ public sealed class WasapiAudioEngine : IAudioEngine
         var copy = new Dictionary<string, BusRouting>(source.Count);
         foreach (var pair in source)
             copy[pair.Key] = new BusRouting { Enabled = pair.Value.Enabled, GainDb = pair.Value.GainDb };
+        return copy;
+    }
+
+    /// <summary>
+    /// Копия назначений кнопок FUNC. Список всегда приводится к числу слотов:
+    /// разметка стрипа бездумно обращается к первому и второму, а в файле
+    /// настроек их может не быть вовсе (старый пресет, битый JSON).
+    /// </summary>
+    private static List<FuncButtonModel> CloneFuncButtons(List<FuncButtonModel>? source)
+    {
+        var copy = new List<FuncButtonModel>(InputChannelModel.FuncButtonSlotCount);
+        for (int i = 0; i < InputChannelModel.FuncButtonSlotCount; i++)
+        {
+            var model = source is not null && i < source.Count ? source[i] : null;
+            copy.Add(new FuncButtonModel
+            {
+                Label = model?.Label ?? "",
+                Exclusive = model?.Exclusive ?? true,
+                BusIds = model?.BusIds is null ? new List<string>() : new List<string>(model.BusIds)
+            });
+        }
+
         return copy;
     }
 }

@@ -62,9 +62,7 @@
                 Background="Transparent"
                 PreviewMouseLeftButtonDown="OnStripDragStart"
                 PreviewMouseMove="OnStripDragMove">
-                <ContentControl
-                    Content="{Binding}"
-                    ContentTemplate="{StaticResource StripTitleTemplate}" />
+                <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
             </Border>
 
             <DockPanel
@@ -172,6 +170,45 @@
                         MouseRightButtonUp="OnDenRightClick"
                         Style="{StaticResource LedToggle}"
                         ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
+
+                    <!--
+                        Кнопки FUNC — переключатели: нажатие применяет
+                        назначенные выходы к роутингу стрипа, повторное снимает
+                        и возвращает прежний. ПКМ — назначение (попап).
+
+                        Кнопку без назначения отключать нельзя: у отключённого
+                        элемента не приходит ПКМ, и назначить выходы было бы
+                        уже нечем (попап открывает только она). Вместо этого
+                        приглушаем её, а нажатие такой кнопки открывает попап
+                        назначения (OnFuncClick).
+
+                        Обёртка нужна ради DataContext: привязки идут к
+                        FuncButtonViewModel, а не к стрипу.
+                    -->
+                    <Grid DataContext="{Binding Func1}">
+                        <ToggleButton
+                            x:Name="Func1Btn"
+                            Margin="2"
+                            Click="OnFuncClick"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                            MouseRightButtonUp="OnFuncRightClick"
+                            Opacity="{Binding ButtonOpacity}"
+                            Style="{StaticResource FuncBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+                    <Grid DataContext="{Binding Func2}">
+                        <ToggleButton
+                            x:Name="Func2Btn"
+                            Margin="2"
+                            Click="OnFuncClick"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                            MouseRightButtonUp="OnFuncRightClick"
+                            Opacity="{Binding ButtonOpacity}"
+                            Style="{StaticResource FuncBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
                 </UniformGrid>
 
                 <Popup
@@ -235,6 +272,26 @@
                     PlacementTarget="{Binding ElementName=DenBtn}"
                     StaysOpen="False">
                     <controls:DenoiserSettingsView />
+                </Popup>
+
+                <Popup
+                    x:Name="Func1Popup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=Func1Btn}"
+                    StaysOpen="False">
+                    <controls:FuncButtonSettingsView x:Name="Func1View" DataContext="{Binding Func1}" />
+                </Popup>
+
+                <Popup
+                    x:Name="Func2Popup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=Func2Btn}"
+                    StaysOpen="False">
+                    <controls:FuncButtonSettingsView x:Name="Func2View" DataContext="{Binding Func2}" />
                 </Popup>
             </Grid>
 

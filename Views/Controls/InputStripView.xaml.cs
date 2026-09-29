@@ -2,6 +2,7 @@ using SoundMeeter.Controls;
 using SoundMeeter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -9,7 +10,7 @@ namespace SoundMeeter.Views.Controls
 {
     /// <summary>
     /// Входной стрип микшера: имя канала, VU-метр с фейдером, кнопки
-    /// маршрутизации (OUT/VIRT/MONO/SOLO/MUTE/DEN) и приложения канала.
+    /// маршрутизации (OUT/VIRT/MONO/SOLO/MUTE/DEN/FUNC1/FUNC2) и приложения канала.
     /// DataContext — InputChannelViewModel, RemoveCommand приходит от MixerView.
     /// </summary>
     public partial class InputStripView : UserControl
@@ -17,6 +18,11 @@ namespace SoundMeeter.Views.Controls
         public InputStripView()
         {
             InitializeComponent();
+
+            // Применили или сняли правило — закрываем попап: результат виден по
+            // нажатой кнопке и по метрам, а не за стеной попапа.
+            Func1View.CloseRequested += (_, _) => Func1Popup.IsOpen = false;
+            Func2View.CloseRequested += (_, _) => Func2Popup.IsOpen = false;
         }
 
         /// <summary>Команда удаления стрипа (RemoveInput из MainViewModel).</summary>
@@ -131,6 +137,41 @@ namespace SoundMeeter.Views.Controls
             DenPopup.IsOpen = !DenPopup.IsOpen;
             e.Handled = true;
         }
+
+        #region Кнопки FUNC
+
+        // Само переключение делает ToggleButton (двусторонняя привязка IsChecked),
+        // а ПКМ открывает назначение. Попап опознаётся по кнопке: обе кнопки
+        // живут в одной колонке, а их контекст — FuncButtonViewModel, а не стрип.
+
+        private void OnFuncRightClick(object sender, MouseButtonEventArgs e)
+        {
+            if (FuncPopupOf(sender as FrameworkElement) is { } popup) popup.IsOpen = !popup.IsOpen;
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// Нажатие кнопки без назначения открывает попап назначения, а не
+        /// выглядит сломанной кнопкой: назначать выходы иначе негде — попап
+        /// открывается только по самой кнопке.
+        ///
+        /// Само переключение к этому моменту уже откатилось: пустое назначение
+        /// владелец стрипа отверг и поднял IsEngaged, поэтому кнопка осталась
+        /// не нажатой.
+        /// </summary>
+        private void OnFuncClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement button) return;
+            if (button.DataContext is not FuncButtonViewModel { CanApply: false }) return;
+            if (FuncPopupOf(button) is { } popup) popup.IsOpen = true;
+        }
+
+        private Popup? FuncPopupOf(FrameworkElement? button) =>
+            ReferenceEquals(button, Func1Btn) ? Func1Popup
+            : ReferenceEquals(button, Func2Btn) ? Func2Popup
+            : null;
+
+        #endregion
 
         private void Device_DragEnter(object sender, DragEventArgs e)
         {

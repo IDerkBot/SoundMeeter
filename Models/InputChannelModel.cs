@@ -6,6 +6,9 @@ namespace SoundMeeter.Models;
 /// </summary>
 public class InputChannelModel
 {
+    /// <summary>Сколько кнопок FUNC на стрипе (их число зашито в разметку).</summary>
+    public const int FuncButtonSlotCount = 2;
+
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string Name { get; set; } = "";
 
@@ -65,4 +68,32 @@ public class InputChannelModel
     /// Матрица роутинга: ключ = DeviceId выходной шины, значение = настройка (вкл + гейн).
     /// </summary>
     public Dictionary<string, BusRouting> BusRouting { get; set; } = new();
+
+    /// <summary>
+    /// Назначения двух кнопок FUNC (см. <see cref="FuncButtonModel"/>): список
+    /// всегда длиной <see cref="FuncButtonSlotCount"/>, лишние записи из файла
+    /// настроек отбрасываются, недостающие — добираются пустыми (миграция
+    /// 1 → 2 в SettingsMigrator).
+    /// </summary>
+    public List<FuncButtonModel> FuncButtons { get; set; } = new();
+
+    /// <summary>Номер включённой кнопки FUNC (индекс в <see cref="FuncButtons"/>).
+    /// <see cref="NoFuncEngaged"/> — ни одна не нажата. Активна может быть только
+    /// одна: обе кнопки описывают один и тот же роутинг стрипа, поэтому «нажаты
+    /// обе» — невозможное состояние, а не просто неудобное.</summary>
+    public int EngagedFunc { get; set; } = NoFuncEngaged;
+
+    /// <summary>Значение <see cref="EngagedFunc"/> для стрипа, у которого ни одна
+    /// кнопка не нажата.</summary>
+    public const int NoFuncEngaged = -1;
+
+    /// <summary>
+    /// Роутинг стрипа до включения кнопки FUNC: снимок флагов Enabled по Id шин.
+    /// Без него снятие кнопки некуда возвращать — «вернуть как было» не из чего.
+    ///
+    /// Хранится в пресете, а не только в памяти: иначе после перезапуска
+    /// приложения нажатая кнопка осталась бы включённой, а вернуть прежний
+    /// роутинг было бы уже нечем.
+    /// </summary>
+    public Dictionary<string, bool> FuncBaseRouting { get; set; } = new();
 }

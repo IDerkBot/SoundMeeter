@@ -244,6 +244,107 @@
         </Setter>
     </Style>
 
+<!--
+        Кнопки FUNC стрипа: работают как переключатели. Под нажатой кнопкой
+        роутинг стрипа принадлежит её правилу, повторное нажатие возвращает
+        прежний роутинг, поэтому состояние рисуется обычным Trigger на IsChecked
+        (никаких привязок в триггерах — см. ниже про MultiDataTrigger).
+
+        Все условия живут в Style.Triggers, а не в ControlTemplate.Triggers:
+        Binding-условия внутри шаблона недопустимы. Отдельного оттенка «нажата и
+        наведена» не делаем — MultiDataTrigger со смешанными условиями
+        (Binding + Property) в этом словаре падает на Condition.Seal, а порядок
+        триггеров и так отдаёт нажатое состояние последним.
+    -->
+    <Style x:Key="FuncBtn" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="#DDD" />
+        <Setter Property="Background" Value="#3A3A3D" />
+        <Setter Property="BorderBrush" Value="#555" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="2,3" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border
+                        x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="2">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.35" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#4A4A4E" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#2A2A2E" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#1E4A63" />
+                <Setter Property="BorderBrush" Value="#3AA0E0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        Строка выбора выхода в попапе кнопки FUNC: чекбокс назначения и точка
+        «стрип идёт сюда сейчас» — назначение и текущий роутинг разведены
+        (кнопку можно настроить, не включив маршрут).
+    -->
+    <DataTemplate x:Key="FuncTargetTemplate">
+        <Grid Height="18" Margin="0,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <CheckBox
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="4,0,4,0"
+                VerticalAlignment="Center"
+                FontSize="10"
+                Foreground="White"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis"
+                ToolTip="{Binding ToolTip}" />
+            <Ellipse
+                Grid.Column="2"
+                Width="7"
+                Height="7"
+                VerticalAlignment="Center"
+                ToolTip="{DynamicResource Sm.Func.LiveTip}">
+                <!--  Цвет задаётся только стилем: локальное Fill перебило бы триггер  -->
+                <Ellipse.Style>
+                    <Style TargetType="Ellipse">
+                        <Setter Property="Fill" Value="#4A4A4E" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                <Setter Property="Fill" Value="#3AA0E0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Ellipse.Style>
+            </Ellipse>
+        </Grid>
+    </DataTemplate>
+
     <!--  Строка выпадающего меню (иконка + текст, текст слева)  -->
     <Style x:Key="MenuRow" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />

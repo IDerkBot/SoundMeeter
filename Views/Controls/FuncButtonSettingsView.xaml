@@ -1,0 +1,133 @@
+<UserControl
+    x:Class="SoundMeeter.Views.Controls.FuncButtonSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="260"
+    d:DesignWidth="260"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!--
+        Попап назначения кнопки FUNC: выходы стрипа (аппаратные и виртуальные),
+        правило применения и метка кнопки. Отметки здесь только пишут заготовку —
+        роутинг стрипа меняется по нажатию самой кнопки.
+        DataContext — FuncButtonViewModel.
+    -->
+    <Border
+        Padding="6"
+        Background="#2B2B2B"
+        BorderBrush="#555"
+        BorderThickness="1"
+        CornerRadius="3">
+        <StackPanel Width="260">
+            <TextBlock
+                FontSize="10"
+                FontWeight="Bold"
+                Text="{Binding PopupTitle}" />
+
+            <!--
+                Списки ограничены по высоте так же, как в попапах OUT/VIRT: на
+                машине с десятком устройств попап иначе не поместился бы на экран.
+            -->
+            <TextBlock
+                Margin="0,6,0,2"
+                FontSize="9"
+                Foreground="#9A9A9A"
+                Text="{DynamicResource Sm.Strip.HardwareOutputs}" />
+            <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemTemplate="{StaticResource FuncTargetTemplate}" ItemsSource="{Binding HardwareTargets}" />
+            </ScrollViewer>
+
+            <TextBlock
+                Margin="0,6,0,2"
+                FontSize="9"
+                Foreground="#9A9A9A"
+                Text="{DynamicResource Sm.Strip.VirtualOutputs}" />
+            <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemTemplate="{StaticResource FuncTargetTemplate}" ItemsSource="{Binding VirtualTargets}" />
+            </ScrollViewer>
+
+            <TextBlock
+                Margin="0,4,0,0"
+                FontSize="9"
+                Foreground="#808080"
+                Text="{Binding EmptyHint}"
+                TextWrapping="Wrap"
+                Visibility="{Binding ShowEmptyHint, Converter={StaticResource BoolToVisibility}}" />
+
+            <!--
+                Пока кнопка нажата, роутинг стрипа принадлежит её правилу: об этом
+                говорим прямо в попапе, иначе «Включено» выглядит просто как
+                подсветка, а не как обещание вернуть прежнее состояние.
+            -->
+            <TextBlock
+                Margin="0,4,0,0"
+                FontSize="9"
+                Foreground="#7FB8D8"
+                Text="{Binding EngagedHint}"
+                TextWrapping="Wrap"
+                Visibility="{Binding ShowEngagedHint, Converter={StaticResource BoolToVisibility}}" />
+
+            <DockPanel Margin="0,8,0,0">
+                <TextBlock
+                    Width="70"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Text="{DynamicResource Sm.Func.Label}" />
+                <!--
+                    Тёмное поле с подсказкой: стиль общий с поиском, меняется
+                    только текст-подсказка из Tag.
+                -->
+                <TextBox
+                    MaxLength="12"
+                    Style="{StaticResource SearchTextBox}"
+                    Tag="{DynamicResource Sm.Func.LabelHint}"
+                    Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="{DynamicResource Sm.Func.LabelTip}" />
+            </DockPanel>
+
+            <CheckBox
+                Margin="0,6,0,0"
+                Content="{DynamicResource Sm.Func.Exclusive}"
+                FontSize="10"
+                Foreground="#DDD"
+                IsChecked="{Binding IsExclusive}"
+                ToolTip="{DynamicResource Sm.Func.ExclusiveTip}" />
+
+            <!--
+                Включить/выключить — те же действия, что и на кнопке стрипа
+                (ToggleButton): в попапе они просто под рукой, вместе с
+                назначением, которое нажимают чаще всего сразу после настройки.
+            -->
+            <StackPanel
+                Margin="0,8,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,6,0"
+                    Command="{Binding ClearCommand}"
+                    Content="{DynamicResource Sm.Func.Clear}"
+                    Style="{StaticResource RouteBtn}" />
+                <Button
+                    Margin="0,0,6,0"
+                    Command="{Binding TurnOffCommand}"
+                    Content="{DynamicResource Sm.Func.TurnOff}"
+                    IsEnabled="{Binding IsEngaged}"
+                    Style="{StaticResource RouteBtn}" />
+                <Button
+                    Command="{Binding TurnOnCommand}"
+                    Content="{DynamicResource Sm.Func.TurnOn}"
+                    IsEnabled="{Binding CanApply}"
+                    Style="{StaticResource RouteBtn}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

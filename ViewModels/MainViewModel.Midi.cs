@@ -196,6 +196,7 @@ public partial class MainViewModel
     private static bool IsButtonParam(string parameter) => parameter switch
     {
         "IsMuted" or "IsSolo" or "IsMono" or "DenoiserEnabled" => true,
+        MidiParameters.Func1Key or MidiParameters.Func2Key => true,
         _ => false
     };
 
@@ -250,6 +251,8 @@ public partial class MainViewModel
         "IsSolo" => vm.IsSolo,
         "IsMono" => vm.IsMono,
         "DenoiserEnabled" => vm.DenoiserEnabled,
+        MidiParameters.Func1Key => vm.Func1.IsEngaged,
+        MidiParameters.Func2Key => vm.Func2.IsEngaged,
         _ => false
     };
 
@@ -269,6 +272,12 @@ public partial class MainViewModel
             case "IsSolo": vm.IsSolo = value; break;
             case "IsMono": vm.IsMono = value; break;
             case "DenoiserEnabled": vm.DenoiserEnabled = value; break;
+
+            //  Кнопка FUNC: включение применяет её правило к роутингу стрипа,
+            //  снятие возвращает прежний. Владелец — сам стрип, поэтому идём
+            //  через IsEngaged, а не через правило напрямую.
+            case MidiParameters.Func1Key: vm.Func1.IsEngaged = value; break;
+            case MidiParameters.Func2Key: vm.Func2.IsEngaged = value; break;
         }
     }
 
@@ -310,6 +319,8 @@ public partial class MainViewModel
             case "IsMono": vm.IsMono = !vm.IsMono; break;
             case "IsSolo": vm.IsSolo = !vm.IsSolo; break;
             case "DenoiserEnabled": vm.DenoiserEnabled = !vm.DenoiserEnabled; break;
+            case MidiParameters.Func1Key: vm.Func1.IsEngaged = !vm.Func1.IsEngaged; break;
+            case MidiParameters.Func2Key: vm.Func2.IsEngaged = !vm.Func2.IsEngaged; break;
         }
     }
 

@@ -50,6 +50,12 @@ public sealed class MidiParameterDescriptor
 /// <summary>Каталог параметров, доступных для MIDI-привязки.</summary>
 public static class MidiParameters
 {
+    /// <summary>Ключ привязки кнопки FUNC1 (слот 1 входного стрипа).</summary>
+    public const string Func1Key = "Func1";
+
+    /// <summary>Ключ привязки кнопки FUNC2 (слот 2 входного стрипа).</summary>
+    public const string Func2Key = "Func2";
+
     public static readonly IReadOnlyList<MidiParameterDescriptor> All = new List<MidiParameterDescriptor>
     {
         new() { Key = "VolumeDb", LabelKey = "Sm.Midi.Param.VolumeDb", ForInput = true, ForBus = true, Shape = MidiParamShape.Fader, Min = -60, Max = 12 },
@@ -58,6 +64,13 @@ public static class MidiParameters
         new() { Key = "IsMono", LabelKey = "Sm.Midi.Param.IsMono", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
         new() { Key = "IsSolo", LabelKey = "Sm.Midi.Param.IsSolo", ForInput = true, ForBus = true, Shape = MidiParamShape.Button },
         new() { Key = "DenoiserEnabled", LabelKey = "Sm.Midi.Param.DenoiserEnabled", ForInput = true, Shape = MidiParamShape.Button },
+
+        //  Пользовательские кнопки FUNC стрипа. Ключи — по одному на слот
+        //  (Func1/Func2); число слотов задаёт InputChannelModel.FuncButtonSlotCount,
+        //  поэтому список и разметка ленты не должны с ними разойтись.
+        new() { Key = Func1Key, LabelKey = "Sm.Midi.Param.Func1", ForInput = true, Shape = MidiParamShape.Button },
+        new() { Key = Func2Key, LabelKey = "Sm.Midi.Param.Func2", ForInput = true, Shape = MidiParamShape.Button },
+
         new() { Key = "DenoiserNoiseRemover", LabelKey = "Sm.Midi.Param.DenoiserNoiseRemover", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
         new() { Key = "DenoiserDryWet", LabelKey = "Sm.Midi.Param.DenoiserDryWet", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
         new() { Key = "DenoiserFormantLowDb", LabelKey = "Sm.Midi.Param.DenoiserFormantLowDb", ForInput = true, Shape = MidiParamShape.Knob, Min = -24, Max = 24 },

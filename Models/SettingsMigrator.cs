@@ -34,7 +34,7 @@ public enum MigrationOutcome
 public static class SettingsMigrator
 {
     /// <summary>Версия схемы, которую понимает и пишет эта сборка.</summary>
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 3;
 
     /// <summary>
     /// Приводит загруженный снимок к <see cref="CurrentSchemaVersion"/>.
@@ -80,6 +80,12 @@ public static class SettingsMigrator
             case 0:
                 Migrate0To1(settings);
                 break;
+            case 1:
+                Migrate1To2(settings);
+                break;
+            case 2:
+                Migrate2To3(settings);
+                break;
             default:
                 // Сюда попасть нельзя: Migrate крутится только пока версия < Current.
                 settings.SchemaVersion = CurrentSchemaVersion;
@@ -119,6 +125,84 @@ public static class SettingsMigrator
             bus.VolumeDb = Sanitize(bus.VolumeDb, -60f, 12f);
 
         settings.SchemaVersion = 1;
+    }
+
+    /// <summary>
+    /// 1 → 2. Появились назначения кнопок FUNC у входных стрипов: список из
+    /// ровно <see cref="InputChannelModel.FuncButtonSlotCount"/> записей, у каждой —
+    /// непустой список Id шин и непустая подпись.
+    ///
+    /// Плоский список, а не словарь по номеру слота, выбран потому, что разметка
+    /// стрипа обращается к первому и второму назначению напрямую, а файл,
+    /// написанный вручную, может содержать сколько угодно записей — лишние
+    /// отбрасываем, недостающие добираем пустыми (кнопка без назначения просто
+    /// не делает ничего).
+    /// </summary>
+    private static void Migrate1To2(AppSettings settings)
+    {
+        foreach (var input in settings.Inputs)
+            input.FuncButtons = NormalizeFuncButtons(input.FuncButtons);
+
+        settings.SchemaVersion = 2;
+    }
+
+    /// <summary>
+    /// 2 → 3. Кнопки FUNC стали переключателями: у стрипа появились номер
+    /// нажатой кнопки (<see cref="InputChannelModel.EngagedFunc"/>) и снимок
+    /// роутинга, который она заменила
+    /// (<see cref="InputChannelModel.FuncBaseRouting"/>), — без него снятие
+    /// кнопки после перезапуска приложения возвращало бы некуда.
+    ///
+    /// Приводим к допустимому состоянию: номера вне диапазона, «нажатая кнопка
+    /// без назначения» (например, выход отключили, а пресет остался) и «нажатая
+    /// кнопка без базового роутинга» (возвращать ей нечего) — всё это означало бы
+    /// включённую кнопку, которая не может ни включить, ни вернуть.
+    /// </summary>
+    private static void Migrate2To3(AppSettings settings)
+    {
+        foreach (var input in settings.Inputs)
+        {
+            input.FuncButtons = NormalizeFuncButtons(input.FuncButtons);
+            input.FuncBaseRouting ??= new Dictionary<string, bool>();
+            input.FuncBaseRouting = input.FuncBaseRouting
+                .Where(pair => !string.IsNullOrWhiteSpace(pair.Key))
+                .GroupBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(group => group.Key, group => group.Last().Value, StringComparer.Ordinal);
+
+            bool engagedIsUsable = input.EngagedFunc >= 0
+                                   && input.EngagedFunc < InputChannelModel.FuncButtonSlotCount
+                                   && input.FuncButtons[input.EngagedFunc].BusIds.Count > 0
+                                   && input.FuncBaseRouting.Count > 0;
+            if (!engagedIsUsable) input.EngagedFunc = InputChannelModel.NoFuncEngaged;
+        }
+
+        settings.SchemaVersion = 3;
+    }
+
+    /// <summary>
+    /// Приводит список назначений к ровно <see cref="InputChannelModel.FuncButtonSlotCount"/>
+    /// записей: лишние отбрасываются, недостающие добираются пустыми, Id шин
+    /// чистятся от пустых строк и дублей. Разметка стрипа обращается к первому
+    /// и второму назначению напрямую, поэтому список короче неё быть не может.
+    /// </summary>
+    private static List<FuncButtonModel> NormalizeFuncButtons(List<FuncButtonModel>? source)
+    {
+        var normalized = new List<FuncButtonModel>(InputChannelModel.FuncButtonSlotCount);
+        for (int i = 0; i < InputChannelModel.FuncButtonSlotCount; i++)
+        {
+            var func = source is not null && i < source.Count ? source[i] : null;
+            normalized.Add(new FuncButtonModel
+            {
+                Label = func?.Label ?? "",
+                Exclusive = func?.Exclusive ?? true,
+                BusIds = (func?.BusIds ?? new List<string>())
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList()
+            });
+        }
+
+        return normalized;
     }
 
     /// <summary>

@@ -16,6 +16,14 @@ public partial class InputChannelViewModel : LocalizedViewModel
     private readonly Action _markDirty;
     private string _renameOriginal = "";
 
+    /// <summary>
+    /// true, пока роутинг стрипа меняет сама кнопка FUNC (применение правила
+    /// или возврат к базе). Отличает эти изменения от пользовательской правки в
+    /// попапах OUT/VIRT: пользовательская правка снимает нажатую кнопку, а
+    /// движение самой кнопки — нет, иначе она снимала бы сама себя.
+    /// </summary>
+    private bool _routingByFunc;
+
     public InputChannelModel Model { get; }
     public string Id => Model.Id;
     public bool IsMicrophone => Model.IsMicrophone;
@@ -163,6 +171,14 @@ public partial class InputChannelViewModel : LocalizedViewModel
     public ObservableCollection<OutputOptionViewModel> HardwareOutputs { get; } = new();
     public ObservableCollection<OutputOptionViewModel> VirtualOutputs { get; } = new();
 
+    /// <summary>
+    /// Пользовательские кнопки FUNC: назначенные этой кнопке выходы применяются
+    /// к роутингу стрипа по нажатию (ЛКМ), назначаются по правому клику.
+    /// </summary>
+    public FuncButtonViewModel Func1 { get; }
+
+    public FuncButtonViewModel Func2 { get; }
+
     /// <summary>Запущенные приложения, перенаправленные на этот стрип (канал).</summary>
     public ObservableCollection<AppViewModel> AssignedApps { get; } = new();
 
@@ -217,6 +233,16 @@ public partial class InputChannelViewModel : LocalizedViewModel
             else HardwareOutputs.Add(option);
         }
 
+        Func1 = CreateFunc(0, model, buses);
+        Func2 = CreateFunc(1, model, buses);
+
+        // Приводим к допустимому состоянию: у нажатой кнопки должно быть
+        // назначение. Иначе после отключения выхода осталась бы включённая
+        // кнопка, которая ничего не может включить (кнопка при этом отключена).
+        FuncButtonViewModel? engagedFunc = FuncByIndex(Model.EngagedFunc);
+        if (engagedFunc is not null && !engagedFunc.HasTargets)
+            Model.EngagedFunc = InputChannelModel.NoFuncEngaged;
+
         RefreshCounts();
     }
 
@@ -230,6 +256,8 @@ public partial class InputChannelViewModel : LocalizedViewModel
             if (option.BusId == busId) option.SetChannelName(channelName);
         foreach (var option in VirtualOutputs)
             if (option.BusId == busId) option.SetChannelName(channelName);
+        Func1.UpdateBusChannelName(busId, channelName);
+        Func2.UpdateBusChannelName(busId, channelName);
     }
 
     public string OutButtonText => $"OUT {HardwareOutputs.Count(o => o.IsEnabled)}/{HardwareOutputs.Count} ▾";
@@ -327,6 +355,7 @@ public partial class InputChannelViewModel : LocalizedViewModel
         _engine.SetRoute(Model.Id, option.BusId, option.IsEnabled);
         _markDirty();
         RefreshCounts();
+        ReleaseFuncScene();
     }
 
     /// <summary>
@@ -356,6 +385,199 @@ public partial class InputChannelViewModel : LocalizedViewModel
         OnPropertyChanged(nameof(VirtButtonText));
         OnPropertyChanged(nameof(HasHardware));
         OnPropertyChanged(nameof(HasVirtual));
+    }
+
+    /// <summary>
+    /// Пересчитывает кнопки FUNC после любого изменения роутинга стрипа: в
+    /// попапе обновляются точки «стрип идёт сюда» и подписи, у кнопок —
+    /// нажатое состояние.
+    /// </summary>
+    private void RefreshFuncStates()
+    {
+        Func1.RefreshState();
+        Func2.RefreshState();
+    }
+
+    #region Кнопки FUNC
+
+    /// <summary>Нажата ли кнопка FUNC с таким номером слота.</summary>
+    private bool IsFuncEngaged(FuncButtonViewModel func) =>
+        Model.EngagedFunc == func.Index;
+
+    /// <summary>Нажата ли какая-нибудь кнопка FUNC стрипа.</summary>
+    private bool IsAnyFuncEngaged => Model.EngagedFunc != InputChannelModel.NoFuncEngaged;
+
+    /// <summary>Кнопка по номеру слота (0 или 1); null — слот вне диапазона.</summary>
+    private FuncButtonViewModel? FuncByIndex(int index) => index switch
+    {
+        0 => Func1,
+        1 => Func2,
+        _ => null
+    };
+
+    /// <summary>
+    /// Нажатие и снятие кнопки FUNC. Здесь же живёт «активна может быть только
+    /// одна»: включение второй сначала возвращает стрип к базовому роутингу и
+    /// лишь затем применяет новое правило, иначе «дописка» считалась бы от
+    /// правила предыдущей кнопки, а не от того, что было до FUNC.
+    /// </summary>
+    private void SetFuncEngaged(FuncButtonViewModel func, bool engaged)
+    {
+        if (engaged == IsFuncEngaged(func)) return;
+
+        if (!engaged)
+        {
+            RestoreBaseRouting();
+            SetEngagedFunc(InputChannelModel.NoFuncEngaged);
+            return;
+        }
+
+        // Включение без назначения: в UI кнопка отключена, но программно сюда
+        // попасть можно. Сообщаем представлению, что состояние не изменилось,
+        // иначе ToggleButton остался бы нажатым при IsEngaged == false.
+        if (!func.CanApply)
+        {
+            RefreshFuncStates();
+            return;
+        }
+
+        if (IsAnyFuncEngaged) RestoreBaseRouting();
+        CaptureBaseRouting();
+        ApplyFunc(func);
+        SetEngagedFunc(func.Index);
+    }
+
+    /// <summary>Пишет нажатую кнопку в модель и обновляет обе кнопки ленты.</summary>
+    private void SetEngagedFunc(int index)
+    {
+        Model.EngagedFunc = index;
+        _markDirty();
+        RefreshFuncStates();
+    }
+
+    /// <summary>
+    /// Снимок текущего роутинга — «то, что было до FUNC», к чему кнопка
+    /// возвращает стрип при снятии.
+    /// </summary>
+    private void CaptureBaseRouting() =>
+        Model.FuncBaseRouting = AllOutputs.ToDictionary(o => o.BusId, o => o.IsEnabled, StringComparer.Ordinal);
+
+    private void RestoreBaseRouting()
+    {
+        var snapshot = Model.FuncBaseRouting;
+        if (snapshot.Count == 0) return;
+
+        // Возврат — это не пользовательская правка роутинга, поэтому нажатую
+        // кнопку он снимать не должен.
+        _routingByFunc = true;
+        try
+        {
+            foreach (var option in AllOutputs)
+                if (snapshot.TryGetValue(option.BusId, out bool enabled) && enabled != option.IsEnabled)
+                    option.IsEnabled = enabled;
+        }
+        finally { _routingByFunc = false; }
+
+        _markDirty();
+        RefreshCounts();
+        RefreshFuncStates();
+    }
+
+    /// <summary>
+    /// Применяет назначение кнопки FUNC к роутингу стрипа: маршруты переключает
+    /// <see cref="OutputOptionViewModel.IsEnabled"/>, оттуда же уходит
+    /// <c>SetRoute</c> в движок и сохраняется пресет. Меняем только то, что
+    /// отличается: лишний <c>SetRoute</c> пересобирает граф тапов.
+    /// </summary>
+    private void ApplyFunc(FuncButtonViewModel func)
+    {
+        var targets = func.SelectedBusIds;
+
+        _routingByFunc = true;
+        try
+        {
+            foreach (var option in AllOutputs)
+            {
+                bool assigned = targets.Contains(option.BusId);
+
+                // «Только свои» — стрип уходит ровно в назначенные выходы;
+                // «дописать» — свои включаются, чужие маршруты остаются как были.
+                bool enable = assigned || (!func.IsExclusive && option.IsEnabled);
+                if (enable != option.IsEnabled) option.IsEnabled = enable;
+            }
+        }
+        finally { _routingByFunc = false; }
+
+        _markDirty();
+        RefreshCounts();
+        RefreshFuncStates();
+    }
+
+    /// <summary>
+    /// Роутинг или назначение изменили мимо кнопки FUNC — сценарий больше не в
+    /// силе: снимаем кнопку, а текущий роутинг запоминаем как базу. Именно так,
+    /// а не «откатываем на базу»: пользовательская правка должна остаться в силе,
+    /// иначе галочка в OUT исчезла бы у него из-под курсора.
+    /// </summary>
+    private void ReleaseFuncScene()
+    {
+        if (_routingByFunc || !IsAnyFuncEngaged) return;
+
+        CaptureBaseRouting();
+        SetEngagedFunc(InputChannelModel.NoFuncEngaged);
+    }
+
+    /// <summary>Назначение кнопки изменилось (отметка выхода или режим) — это пресет.</summary>
+    private void OnFuncAssignmentChanged(FuncButtonViewModel func)
+    {
+        _markDirty();
+        ReleaseFuncScene();
+    }
+
+    /// <summary>Метка кнопки — только текст на кнопке, роутинг она не трогает.</summary>
+    private void OnFuncLabelChanged(FuncButtonViewModel func) => _markDirty();
+
+    /// <summary>Включён ли маршрут стрипа в этот выход — для точек в попапе FUNC.</summary>
+    private bool IsRouteEnabled(string busId) =>
+        AllOutputs.FirstOrDefault(o => string.Equals(o.BusId, busId, StringComparison.Ordinal))?.IsEnabled == true;
+
+    /// <summary>
+    /// Заводит назначение кнопки FUNC для слота. Списка в модели может не быть
+    /// вовсе (пресет, записанный до появления кнопок, или битый JSON): разметка
+    /// обращается к обоим слотам напрямую, поэтому пустое назначение дописываем.
+    /// </summary>
+    private FuncButtonViewModel CreateFunc(
+        int slot,
+        InputChannelModel model,
+        IReadOnlyList<OutputBusModel> buses)
+    {
+        while (model.FuncButtons.Count <= slot) model.FuncButtons.Add(new FuncButtonModel());
+        if (model.FuncButtons[slot] is null) model.FuncButtons[slot] = new FuncButtonModel();
+
+        return new FuncButtonViewModel(
+            slot + 1,
+            model.FuncButtons[slot],
+            buses,
+            IsRouteEnabled,
+            IsFuncEngaged,
+            SetFuncEngaged,
+            OnFuncAssignmentChanged,
+            OnFuncLabelChanged);
+    }
+
+    #endregion
+
+    private IEnumerable<OutputOptionViewModel> AllOutputs => HardwareOutputs.Concat(VirtualOutputs);
+
+    /// <summary>
+    /// Кнопки FUNC подписаны на смену языка вместе со стрипом, а стрипы
+    /// пересоздаются на каждом <c>ChannelsChanged</c>: без освобождения их
+    /// подписки копились бы в списке подписчиков Loc.LanguageChanged.
+    /// </summary>
+    protected override void DisposeCore()
+    {
+        Func1.Dispose();
+        Func2.Dispose();
     }
 
     /// <summary>

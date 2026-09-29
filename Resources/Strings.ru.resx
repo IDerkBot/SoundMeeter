@@ -309,6 +309,57 @@
   <data name="Sm.OutputOption.GainTip" xml:space="preserve">
     <value>Посылка стрипа в этот выход, дБ (применяется сразу)</value>
   </data>
+  <data name="Sm.Func.ButtonAssigned" xml:space="preserve">
+    <value>{0} — назначено: {1}. Клик — применить, ПКМ — изменить назначение.</value>
+  </data>
+  <data name="Sm.Func.ButtonOff" xml:space="preserve">
+    <value>{0} — назначено: {1}. Нажмите, чтобы включить.</value>
+  </data>
+  <data name="Sm.Func.ButtonOn" xml:space="preserve">
+    <value>{0} — включено: {1}. Нажмите, чтобы снять и вернуть стрипу прежний роутинг.</value>
+  </data>
+  <data name="Sm.Func.ButtonEmpty" xml:space="preserve">
+    <value>{0} — ничего не назначено. Нажмите или ПКМ — назначить выходы OUT/VIRT.</value>
+  </data>
+  <data name="Sm.Func.PopupTitle" xml:space="preserve">
+    <value>{0} — выходы этого стрипа</value>
+  </data>
+  <data name="Sm.Func.Exclusive" xml:space="preserve">
+    <value>Только указанные выходы (остальные выключить)</value>
+  </data>
+  <data name="Sm.Func.ExclusiveTip" xml:space="preserve">
+    <value>Вкл: кнопка приводит роутинг стрипа ровно к своему списку. Выкл: кнопка только добавляет свои выходы, остальные маршруты не трогает.</value>
+  </data>
+  <data name="Sm.Func.Label" xml:space="preserve">
+    <value>Подпись кнопки</value>
+  </data>
+  <data name="Sm.Func.LabelHint" xml:space="preserve">
+    <value>пусто — F1/F2</value>
+  </data>
+  <data name="Sm.Func.LabelTip" xml:space="preserve">
+    <value>Показывается на кнопке вместо номера, до 12 символов.</value>
+  </data>
+  <data name="Sm.Func.TurnOn" xml:space="preserve">
+    <value>Включить</value>
+  </data>
+  <data name="Sm.Func.TurnOff" xml:space="preserve">
+    <value>Снять</value>
+  </data>
+  <data name="Sm.Func.EngagedHint" xml:space="preserve">
+    <value>Кнопка включена: роутинг стрипа идёт по её правилу. Снимите её — вернётся прежний роутинг.</value>
+  </data>
+  <data name="Sm.Func.Clear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="Sm.Func.NotAssigned" xml:space="preserve">
+    <value>Ничего не назначено — отметьте хотя бы один выход, иначе кнопка ничего не делает.</value>
+  </data>
+  <data name="Sm.Func.NoOutputs" xml:space="preserve">
+    <value>Назначать нечего: у стрипа нет ни одного выхода OUT/VIRT.</value>
+  </data>
+  <data name="Sm.Func.LiveTip" xml:space="preserve">
+    <value>Сейчас стрип идёт в этот выход</value>
+  </data>
   <data name="Sm.Denoiser.Title" xml:space="preserve">
     <value>Денойзер (RNNoise)</value>
   </data>
@@ -479,6 +530,12 @@
   </data>
   <data name="Sm.Midi.Param.DenoiserEnabled" xml:space="preserve">
     <value>Денойзер</value>
+  </data>
+  <data name="Sm.Midi.Param.Func1" xml:space="preserve">
+    <value>Func 1</value>
+  </data>
+  <data name="Sm.Midi.Param.Func2" xml:space="preserve">
+    <value>Func 2</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Шум</value>
