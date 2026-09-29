@@ -64,6 +64,92 @@ public class InputChannelModel
     /// <summary>Formant Group, дБ (−12..+12) — общий makeup-gain EQ-секции.</summary>
     public float DenoiserFormantGroupDb { get; set; }
 
+    #region Эффекты стрипа (SM-B05)
+
+    // Поля эффектов читаются DSP на каждом пакете, поэтому любая правка слышна
+    // сразу. Диапазоны заданы здесь же как константы в Audio/*Dsp: миграция
+    // схемы приводит к ним значения из файла, иначе битый JSON (или правка
+    // руками) дал бы в аудиобуфер NaN или усиление в сотни раз.
+
+    /// <summary>
+    /// Значения эффектов по умолчанию — то, к чему двойной щелчок по крутилке
+    /// возвращает параметр. Вынесены отдельно от полей, чтобы «дефолт» нельзя
+    /// было случайно переписать, и чтобы одно место отвечало и за инициализацию,
+    /// и за сброс.
+    /// </summary>
+    public static class EffectDefaults
+    {
+        public const float CompressorThresholdDb = -18f;
+        public const float CompressorRatio = 3f;
+        public const float CompressorAttackMs = 10f;
+        public const float CompressorReleaseMs = 150f;
+        public const float CompressorMakeupDb = 0f;
+        public const float FxGainDb = 0f;
+        public const float DelayTimeMs = 250f;
+        public const float DelayFeedback = 35f;
+        public const float DelayDampingHz = 4000f;
+        public const float DelayMix = 0f;
+        public const float ReverbSize = 60f;
+        public const float ReverbDamping = 40f;
+        public const float ReverbMix = 0f;
+    }
+
+    /// <summary>Компрессор включён.</summary>
+    public bool CompressorEnabled { get; set; }
+
+    /// <summary>Порог компрессора, дБ (−60..0).</summary>
+    public float CompressorThresholdDb { get; set; } = EffectDefaults.CompressorThresholdDb;
+
+    /// <summary>Коэффициент сжатия, :1 (1..20).</summary>
+    public float CompressorRatio { get; set; } = EffectDefaults.CompressorRatio;
+
+    /// <summary>Время атаки компрессора, мс (0.1..100).</summary>
+    public float CompressorAttackMs { get; set; } = EffectDefaults.CompressorAttackMs;
+
+    /// <summary>Время отпускания компрессора, мс (10..1000).</summary>
+    public float CompressorReleaseMs { get; set; } = EffectDefaults.CompressorReleaseMs;
+
+    /// <summary>Makeup-gain компрессора, дБ (−12..+24): компенсирует потерю
+    /// уровня на сжатии.</summary>
+    public float CompressorMakeupDb { get; set; }
+
+    /// <summary>Trim после компрессора включён.</summary>
+    public bool FxGainEnabled { get; set; }
+
+    /// <summary>Уровень trim, дБ (−60..+24). Двусторонний, в отличие от входного
+    /// Gain микрофона (0..+60): им выравнивают громкость перед задержкой и
+    /// реверберацией, не трогая посылки на шины.</summary>
+    public float FxGainDb { get; set; }
+
+    /// <summary>Задержка включена.</summary>
+    public bool DelayEnabled { get; set; }
+
+    /// <summary>Время задержки, мс (1..2000).</summary>
+    public float DelayTimeMs { get; set; } = EffectDefaults.DelayTimeMs;
+
+    /// <summary>Обратная связь задержки, % повторов (0..90).</summary>
+    public float DelayFeedback { get; set; } = EffectDefaults.DelayFeedback;
+
+    /// <summary>Гашение верхов в петле повторов, Гц (200..18000).</summary>
+    public float DelayDampingHz { get; set; } = EffectDefaults.DelayDampingHz;
+
+    /// <summary>Доля мокрого сигнала задержки, % (0..100).</summary>
+    public float DelayMix { get; set; }
+
+    /// <summary>Реверберация включена.</summary>
+    public bool ReverbEnabled { get; set; }
+
+    /// <summary>Размер реверберации, % (0..100): время хвоста и плотность.</summary>
+    public float ReverbSize { get; set; } = EffectDefaults.ReverbSize;
+
+    /// <summary>Затухание верхов реверберации, % (0..100).</summary>
+    public float ReverbDamping { get; set; } = EffectDefaults.ReverbDamping;
+
+    /// <summary>Доля мокрого сигнала реверберации, % (0..100).</summary>
+    public float ReverbMix { get; set; }
+
+    #endregion
+
     /// <summary>
     /// Матрица роутинга: ключ = DeviceId выходной шины, значение = настройка (вкл + гейн).
     /// </summary>

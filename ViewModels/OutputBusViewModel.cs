@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
 
@@ -97,6 +98,13 @@ public partial class OutputBusViewModel : LocalizedViewModel
         Model.VolumeDb = value;
         _markDirty();
     }
+
+    /// <summary>Двойной щелчок по фейдеру — вернуть громкость стрипа к 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetVolume() => VolumeDb = DefaultVolumeDb;
+
+    /// <summary>Громкость стрипа по умолчанию, дБ.</summary>
+    public const float DefaultVolumeDb = 0f;
 
     partial void OnIsMutedChanged(bool value)
     {

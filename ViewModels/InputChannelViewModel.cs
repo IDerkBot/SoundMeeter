@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
 using System.Collections.ObjectModel;
@@ -168,6 +169,174 @@ public partial class InputChannelViewModel : LocalizedViewModel
     [ObservableProperty]
     private float _denoiserFormantGroupDb;
 
+    #region Эффекты стрипа (SM-B05)
+
+    [ObservableProperty]
+    private bool _compressorEnabled;
+
+    [ObservableProperty]
+    private bool _fxGainEnabled;
+
+    [ObservableProperty]
+    private bool _delayEnabled;
+
+    [ObservableProperty]
+    private bool _reverbEnabled;
+
+    /// <summary>Компрессор: порог, сжатие, атака, отпускание, makeup.</summary>
+    public StripEffectViewModel Compressor { get; private set; } = null!;
+
+    /// <summary>Уровень после компрессора (trim перед задержкой/реверберацией).</summary>
+    public StripEffectViewModel FxGain { get; private set; } = null!;
+
+    /// <summary>Задержка: время, повторы, гашение верхов, Wet.</summary>
+    public StripEffectViewModel Delay { get; private set; } = null!;
+
+    /// <summary>Реверберация: размер, затухание, Wet.</summary>
+    public StripEffectViewModel Reverb { get; private set; } = null!;
+
+    partial void OnCompressorEnabledChanged(bool value)
+    {
+        Model.CompressorEnabled = value;
+        _markDirty();
+    }
+
+    partial void OnFxGainEnabledChanged(bool value)
+    {
+        Model.FxGainEnabled = value;
+        _markDirty();
+    }
+
+    partial void OnDelayEnabledChanged(bool value)
+    {
+        Model.DelayEnabled = value;
+        _markDirty();
+    }
+
+    partial void OnReverbEnabledChanged(bool value)
+    {
+        Model.ReverbEnabled = value;
+        _markDirty();
+    }
+
+    private void CreateEffects()
+    {
+        Compressor = new StripEffectViewModel(
+            () => CompressorEnabled,
+            value => CompressorEnabled = value)
+        {
+            TitleKey = "Sm.Effect.Compressor",
+            ButtonText = "CMP"
+        };
+        Compressor.Knobs.Add(Knob("Sm.Effect.Threshold", "dB", "0.0", -60, 0, InputChannelModel.EffectDefaults.CompressorThresholdDb, () => Model.CompressorThresholdDb, v => Model.CompressorThresholdDb = v));
+        Compressor.Knobs.Add(Knob("Sm.Effect.Ratio", ":1", "0.0", 1, 20, InputChannelModel.EffectDefaults.CompressorRatio, () => Model.CompressorRatio, v => Model.CompressorRatio = v));
+        Compressor.Knobs.Add(Knob("Sm.Effect.Attack", "ms", "0.0", 0.1, 100, InputChannelModel.EffectDefaults.CompressorAttackMs, () => Model.CompressorAttackMs, v => Model.CompressorAttackMs = v));
+        Compressor.Knobs.Add(Knob("Sm.Effect.Release", "ms", "0", 10, 1000, InputChannelModel.EffectDefaults.CompressorReleaseMs, () => Model.CompressorReleaseMs, v => Model.CompressorReleaseMs = v));
+        Compressor.Knobs.Add(Knob("Sm.Effect.Makeup", "dB", "0.0", -12, 24, InputChannelModel.EffectDefaults.CompressorMakeupDb, () => Model.CompressorMakeupDb, v => Model.CompressorMakeupDb = v));
+
+        FxGain = new StripEffectViewModel(
+            () => FxGainEnabled,
+            value => FxGainEnabled = value)
+        {
+            TitleKey = "Sm.Effect.Gain",
+            ButtonText = "GN"
+        };
+        FxGain.Knobs.Add(Knob("Sm.Effect.Level", "dB", "0.0", -60, 24, InputChannelModel.EffectDefaults.FxGainDb, () => Model.FxGainDb, v => Model.FxGainDb = v));
+
+        Delay = new StripEffectViewModel(
+            () => DelayEnabled,
+            value => DelayEnabled = value)
+        {
+            TitleKey = "Sm.Effect.Delay",
+            ButtonText = "DLY"
+        };
+        Delay.Knobs.Add(Knob("Sm.Effect.Time", "ms", "0", 1, 2000, InputChannelModel.EffectDefaults.DelayTimeMs, () => Model.DelayTimeMs, v => Model.DelayTimeMs = v));
+        Delay.Knobs.Add(Knob("Sm.Effect.Feedback", "%", "0", 0, 90, InputChannelModel.EffectDefaults.DelayFeedback, () => Model.DelayFeedback, v => Model.DelayFeedback = v));
+        Delay.Knobs.Add(Knob("Sm.Effect.Damping", "Hz", "0", 200, 18000, InputChannelModel.EffectDefaults.DelayDampingHz, () => Model.DelayDampingHz, v => Model.DelayDampingHz = v));
+        Delay.Knobs.Add(Knob("Sm.Effect.Mix", "%", "0", 0, 100, InputChannelModel.EffectDefaults.DelayMix, () => Model.DelayMix, v => Model.DelayMix = v));
+
+        Reverb = new StripEffectViewModel(
+            () => ReverbEnabled,
+            value => ReverbEnabled = value)
+        {
+            TitleKey = "Sm.Effect.Reverb",
+            ButtonText = "RVB"
+        };
+        Reverb.Knobs.Add(Knob("Sm.Effect.Size", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbSize, () => Model.ReverbSize, v => Model.ReverbSize = v));
+        Reverb.Knobs.Add(Knob("Sm.Effect.Damping", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbDamping, () => Model.ReverbDamping, v => Model.ReverbDamping = v));
+        Reverb.Knobs.Add(Knob("Sm.Effect.Mix", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbMix, () => Model.ReverbMix, v => Model.ReverbMix = v));
+    }
+
+    /// <summary>
+    /// Крутилка параметра. Диапазон здесь и в DSP один и тот же: иначе
+    /// обработка срезала бы значение, а UI показывал бы его как есть.
+    /// </summary>
+    private EffectKnobViewModel Knob(
+        string nameKey,
+        string unit,
+        string format,
+        double min,
+        double max,
+        float defaultValue,
+        Func<float> get,
+        Action<float> set) =>
+        new(get, value =>
+        {
+            set(value);
+            _markDirty();
+        })
+        {
+            NameKey = nameKey,
+            Unit = unit,
+            Format = format,
+            Minimum = min,
+            Maximum = max,
+            DefaultValue = defaultValue
+        };
+
+    #endregion
+
+    #region Сброс параметров двойным щелчком
+
+    // Команды для ParamReset: дефолт каждого регулятора живёт в модели, а в
+    // разметку попадает только команда — поэтому число в разметке разойтись с
+    // моделью не может. Присваивание идёт через свойство ViewModel, так что
+    // сброс к тому же значению пресет зря не помечает.
+
+    /// <summary>Двойной щелчок по фейдеру стрипа — вернуть 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetVolume() => VolumeDb = 0f;
+
+    /// <summary>Двойной щелчок по крутилке входного усиления — вернуть 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetGain() => GainDb = 0f;
+
+    /// <summary>Двойной щелчок по Noise Remover — 100 % (денойзер полностью).</summary>
+    [RelayCommand]
+    private void ResetDenoiserNoiseRemover() => DenoiserNoiseRemover = 100f;
+
+    /// <summary>Двойной щелчок по Dry/Wet — 100 % (обработанный сигнал).</summary>
+    [RelayCommand]
+    private void ResetDenoiserDryWet() => DenoiserDryWet = 100f;
+
+    /// <summary>Двойной щелчок по пику Formant Low — 0 дБ (пик выключен).</summary>
+    [RelayCommand]
+    private void ResetDenoiserFormantLowDb() => DenoiserFormantLowDb = 0f;
+
+    /// <summary>Двойной щелчок по пику Formant Medium — 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetDenoiserFormantMidDb() => DenoiserFormantMidDb = 0f;
+
+    /// <summary>Двойной щелчок по пику Formant High — 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetDenoiserFormantHighDb() => DenoiserFormantHighDb = 0f;
+
+    /// <summary>Двойной щелчок по общему makeup-gain — 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetDenoiserFormantGroupDb() => DenoiserFormantGroupDb = 0f;
+
+    #endregion
+
     public ObservableCollection<OutputOptionViewModel> HardwareOutputs { get; } = new();
     public ObservableCollection<OutputOptionViewModel> VirtualOutputs { get; } = new();
 
@@ -235,6 +404,7 @@ public partial class InputChannelViewModel : LocalizedViewModel
 
         Func1 = CreateFunc(0, model, buses);
         Func2 = CreateFunc(1, model, buses);
+        CreateEffects();
 
         // Приводим к допустимому состоянию: у нажатой кнопки должно быть
         // назначение. Иначе после отключения выхода осталась бы включённая
@@ -578,6 +748,10 @@ public partial class InputChannelViewModel : LocalizedViewModel
     {
         Func1.Dispose();
         Func2.Dispose();
+        Compressor.Dispose();
+        FxGain.Dispose();
+        Delay.Dispose();
+        Reverb.Dispose();
     }
 
     /// <summary>

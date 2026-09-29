@@ -34,7 +34,7 @@ public enum MigrationOutcome
 public static class SettingsMigrator
 {
     /// <summary>Версия схемы, которую понимает и пишет эта сборка.</summary>
-    public const int CurrentSchemaVersion = 3;
+    public const int CurrentSchemaVersion = 4;
 
     /// <summary>
     /// Приводит загруженный снимок к <see cref="CurrentSchemaVersion"/>.
@@ -85,6 +85,9 @@ public static class SettingsMigrator
                 break;
             case 2:
                 Migrate2To3(settings);
+                break;
+            case 3:
+                Migrate3To4(settings);
                 break;
             default:
                 // Сюда попасть нельзя: Migrate крутится только пока версия < Current.
@@ -177,6 +180,42 @@ public static class SettingsMigrator
         }
 
         settings.SchemaVersion = 3;
+    }
+
+    /// <summary>
+    /// 3 → 4. У входного стрипа появились эффекты: компрессор, trim, задержка и
+    /// реверберация (SM-B05). У старых файлов полей нет, десериализация подставит
+    /// значения по умолчанию, а вручную испорченный файл мог оставить вне
+    /// диапазона или NaN — приводим всё к рабочим пределам, как и громкость в
+    /// <see cref="Migrate0To1"/>: одна такая запись в аудиобуфере глушит канал.
+    ///
+    /// Нулевые Wet (микширование) у обоих временных эффектов — не совпадение:
+    /// так они выключены по умолчанию, и включённый, но неслышный блок
+    /// вводил бы в заблуждение.
+    /// </summary>
+    private static void Migrate3To4(AppSettings settings)
+    {
+        foreach (var input in settings.Inputs)
+        {
+            input.CompressorThresholdDb = Sanitize(input.CompressorThresholdDb, -60f, 0f);
+            input.CompressorRatio = Sanitize(input.CompressorRatio, 1f, 20f);
+            input.CompressorAttackMs = Sanitize(input.CompressorAttackMs, 0.1f, 100f);
+            input.CompressorReleaseMs = Sanitize(input.CompressorReleaseMs, 10f, 1000f);
+            input.CompressorMakeupDb = Sanitize(input.CompressorMakeupDb, -12f, 24f);
+
+            input.FxGainDb = Sanitize(input.FxGainDb, -60f, 24f);
+
+            input.DelayTimeMs = Sanitize(input.DelayTimeMs, 1f, 2000f);
+            input.DelayFeedback = Sanitize(input.DelayFeedback, 0f, 90f);
+            input.DelayDampingHz = Sanitize(input.DelayDampingHz, 200f, 18000f);
+            input.DelayMix = Sanitize(input.DelayMix, 0f, 100f);
+
+            input.ReverbSize = Sanitize(input.ReverbSize, 0f, 100f);
+            input.ReverbDamping = Sanitize(input.ReverbDamping, 0f, 100f);
+            input.ReverbMix = Sanitize(input.ReverbMix, 0f, 100f);
+        }
+
+        settings.SchemaVersion = 4;
     }
 
     /// <summary>

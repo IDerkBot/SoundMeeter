@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panels="clr-namespace:SoundMeeter.Controls"
+    xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
     d:DesignWidth="160"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -123,11 +124,17 @@
                     Foreground="#AAA"
                     Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
 
-                <UniformGrid
+<!--
+                    Колонка кнопок стрипа: маршрутизация и состояние (слева в
+                    этом списке), ниже — две кнопки FUNC и сетка эффектов 2×2.
+                    Всё в одной колонке, поэтому ряды не наезжают друг на друга,
+                    а полоса растёт вниз по мере надобности.
+                -->
+                <StackPanel
                     Grid.RowSpan="2"
                     Grid.Column="1"
-                    VerticalAlignment="Top"
-                    Columns="1">
+                    VerticalAlignment="Top">
+                    <UniformGrid Columns="1">
                     <Button
                         x:Name="OutBtn"
                         Margin="2"
@@ -209,7 +216,57 @@
                             Style="{StaticResource FuncBtn}"
                             ToolTip="{Binding ToolTip}" />
                     </Grid>
-                </UniformGrid>
+                    </UniformGrid>
+
+                <!--
+                    Эффекты стрипа (SM-B05): компрессор, trim, задержка,
+                    реверберация. Сетка 2×2, чтобы колонка кнопок не выросла на
+                    четыре ряда: кнопки узкие, подписи в две буквы. ЛКМ — вкл/выкл,
+                    ПКМ — попап с крутилками.
+                -->
+                <UniformGrid Margin="0,4,0,0" Columns="2">
+                    <Grid DataContext="{Binding Compressor}">
+                        <ToggleButton
+                            x:Name="CompressorBtn"
+                            Margin="2"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                            MouseRightButtonUp="OnEffectRightClick"
+                            Style="{StaticResource EffectBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+                    <Grid DataContext="{Binding FxGain}">
+                        <ToggleButton
+                            x:Name="FxGainBtn"
+                            Margin="2"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                            MouseRightButtonUp="OnEffectRightClick"
+                            Style="{StaticResource EffectBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+                    <Grid DataContext="{Binding Delay}">
+                        <ToggleButton
+                            x:Name="DelayBtn"
+                            Margin="2"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                            MouseRightButtonUp="OnEffectRightClick"
+                            Style="{StaticResource EffectBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+                    <Grid DataContext="{Binding Reverb}">
+                        <ToggleButton
+                            x:Name="ReverbBtn"
+                            Margin="2"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                            MouseRightButtonUp="OnEffectRightClick"
+                            Style="{StaticResource EffectBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+                    </UniformGrid>
+                </StackPanel>
 
                 <Popup
                     x:Name="OutPopup"
@@ -293,6 +350,46 @@
                     StaysOpen="False">
                     <controls:FuncButtonSettingsView x:Name="Func2View" DataContext="{Binding Func2}" />
                 </Popup>
+
+                <Popup
+                    x:Name="CompressorPopup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=CompressorBtn}"
+                    StaysOpen="False">
+                    <controls:StripEffectSettingsView DataContext="{Binding Compressor}" />
+                </Popup>
+
+                <Popup
+                    x:Name="FxGainPopup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=FxGainBtn}"
+                    StaysOpen="False">
+                    <controls:StripEffectSettingsView DataContext="{Binding FxGain}" />
+                </Popup>
+
+                <Popup
+                    x:Name="DelayPopup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=DelayBtn}"
+                    StaysOpen="False">
+                    <controls:StripEffectSettingsView DataContext="{Binding Delay}" />
+                </Popup>
+
+                <Popup
+                    x:Name="ReverbPopup"
+                    Width="272"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PlacementTarget="{Binding ElementName=ReverbBtn}"
+                    StaysOpen="False">
+                    <controls:StripEffectSettingsView DataContext="{Binding Reverb}" />
+                </Popup>
             </Grid>
 
             <!--
@@ -330,7 +427,8 @@
                     HorizontalAlignment="Center"
                     Maximum="60"
                     ToolTip="{DynamicResource Sm.Strip.GainTip}"
-                    Value="{Binding GainDb, Mode=TwoWay}" />
+                    Value="{Binding GainDb, Mode=TwoWay}"
+                    strip:ParamReset.Command="{Binding ResetGainCommand}" />
                 <TextBlock
                     Margin="0,4,0,0"
                     HorizontalAlignment="Center"

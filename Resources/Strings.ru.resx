@@ -277,7 +277,7 @@
     <value>входное усиление</value>
   </data>
   <data name="Sm.Strip.GainTip" xml:space="preserve">
-    <value>Входное усиление канала, дБ. Применяется один раз до разветвления на шины. Тянуть мышью или колесом.</value>
+    <value>Входное усиление канала, дБ. Применяется один раз до разветвления на шины. Тянуть мышью или колесом. Двойной клик — 0 дБ.</value>
   </data>
   <data name="Sm.Strip.DropHint.Cable" xml:space="preserve">
     <value>Перетащите приложение — оно уйдёт в выход кабеля</value>
@@ -307,7 +307,10 @@
     <value>Скрыть это устройство со всех стрипов</value>
   </data>
   <data name="Sm.OutputOption.GainTip" xml:space="preserve">
-    <value>Посылка стрипа в этот выход, дБ (применяется сразу)</value>
+    <value>Посылка стрипа в этот выход, дБ (применяется сразу). Двойной клик — 0 дБ.</value>
+  </data>
+  <data name="Sm.Param.DoubleClickReset" xml:space="preserve">
+    <value>Двойной клик — вернуть значение по умолчанию.</value>
   </data>
   <data name="Sm.Func.ButtonAssigned" xml:space="preserve">
     <value>{0} — назначено: {1}. Клик — применить, ПКМ — изменить назначение.</value>
@@ -359,6 +362,60 @@
   </data>
   <data name="Sm.Func.LiveTip" xml:space="preserve">
     <value>Сейчас стрип идёт в этот выход</value>
+  </data>
+  <data name="Sm.Effect.Hint" xml:space="preserve">
+    <value>Эффект включён. Параметры читаются на лету — движок не перезапускается, поэтому правка слышна сразу.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOn" xml:space="preserve">
+    <value>{0} — {1} включён. Клик — выключить, ПКМ — параметры.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOff" xml:space="preserve">
+    <value>{0} — {1} выключен. Клик — включить, ПКМ — параметры.</value>
+  </data>
+  <data name="Sm.Effect.Compressor" xml:space="preserve">
+    <value>Компрессор</value>
+  </data>
+  <data name="Sm.Effect.Gain" xml:space="preserve">
+    <value>Уровень (trim)</value>
+  </data>
+  <data name="Sm.Effect.Delay" xml:space="preserve">
+    <value>Задержка</value>
+  </data>
+  <data name="Sm.Effect.Reverb" xml:space="preserve">
+    <value>Реверберация</value>
+  </data>
+  <data name="Sm.Effect.Threshold" xml:space="preserve">
+    <value>порог</value>
+  </data>
+  <data name="Sm.Effect.Ratio" xml:space="preserve">
+    <value>сжатие</value>
+  </data>
+  <data name="Sm.Effect.Attack" xml:space="preserve">
+    <value>атака</value>
+  </data>
+  <data name="Sm.Effect.Release" xml:space="preserve">
+    <value>отпускание</value>
+  </data>
+  <data name="Sm.Effect.Makeup" xml:space="preserve">
+    <value>компенсация</value>
+  </data>
+  <data name="Sm.Effect.Level" xml:space="preserve">
+    <value>уровень</value>
+  </data>
+  <data name="Sm.Effect.Time" xml:space="preserve">
+    <value>время</value>
+  </data>
+  <data name="Sm.Effect.Feedback" xml:space="preserve">
+    <value>повторы</value>
+  </data>
+  <data name="Sm.Effect.Damping" xml:space="preserve">
+    <value>гашение</value>
+  </data>
+  <data name="Sm.Effect.Mix" xml:space="preserve">
+    <value>wet</value>
+  </data>
+  <data name="Sm.Effect.Size" xml:space="preserve">
+    <value>размер</value>
   </data>
   <data name="Sm.Denoiser.Title" xml:space="preserve">
     <value>Денойзер (RNNoise)</value>
@@ -536,6 +593,18 @@
   </data>
   <data name="Sm.Midi.Param.Func2" xml:space="preserve">
     <value>Func 2</value>
+  </data>
+  <data name="Sm.Midi.Param.Compressor" xml:space="preserve">
+    <value>Компрессор</value>
+  </data>
+  <data name="Sm.Midi.Param.FxGain" xml:space="preserve">
+    <value>Trim</value>
+  </data>
+  <data name="Sm.Midi.Param.Delay" xml:space="preserve">
+    <value>Задержка</value>
+  </data>
+  <data name="Sm.Midi.Param.Reverb" xml:space="preserve">
+    <value>Реверберация</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Шум</value>

@@ -22,6 +22,14 @@ public sealed class InputSource
     private readonly InputChannelModel _model;
     private readonly SampleRingBuffer _ring = new(SampleRate * Channels * BufferSeconds);
     private readonly DenoiserDsp? _denoiser;
+
+    /// <summary>
+    /// Эффекты стрипа (SM-B05): компрессор, trim, задержка, реверберация.
+    /// Живут между пакетами, поэтому создаются один раз на источник: пересоздание
+    /// обнуляло бы огибающую компрессора и «съедало» хвост задержки.
+    /// </summary>
+    private readonly StripDsp _effects;
+
     private readonly ILogger _logger = AppLog.For<InputSource>();
     private IWaveIn? _waveIn;
 
@@ -43,6 +51,7 @@ public sealed class InputSource
     public InputSource(InputChannelModel model)
     {
         _model = model;
+        _effects = new StripDsp(model);
         try
         {
             _denoiser = new DenoiserDsp(model);
@@ -116,6 +125,11 @@ public sealed class InputSource
 
         _resampler = null;
         _resamplerRate = 0;
+
+        // Старт эффектов «с нуля»: продолжение прерванного хвоста задержки или
+        // реверберации дало бы щелчок в первом же пакете после перезапуска.
+        _effects.Reset();
+
         _logger.LogInformation("Strip «{Strip}» closed: device={Device}", _model.Name, _model.DeviceId);
     }
 
@@ -187,6 +201,12 @@ public sealed class InputSource
             //    возвращает ровно outFrames, поэтому буфер не раздувается.
             if (_model.DenoiserEnabled && _denoiser != null)
                 _denoiser.Process(outBuf, outFrames);
+
+            // 5) Эффекты стрипа (SM-B05): компрессор → trim → задержка →
+            //    реверберация. Стоят здесь, до записи в кольцо: блоки с
+            //    состоянием считаются один раз на пакет иначе, а во всех
+            //    посылках стрипа звучали бы по-разному.
+            _effects.Process(outBuf, outFrames);
 
             _ring.Write(outBuf.AsSpan(0, outFrames * 2));
         }

@@ -277,7 +277,7 @@
     <value>input gain</value>
   </data>
   <data name="Sm.Strip.GainTip" xml:space="preserve">
-    <value>Channel input gain, dB. Applied once, before splitting into buses. Drag with the mouse or the wheel.</value>
+    <value>Channel input gain, dB. Applied once, before splitting into buses. Drag with the mouse or the wheel. Double-click — 0 dB.</value>
   </data>
   <data name="Sm.Strip.DropHint.Cable" xml:space="preserve">
     <value>Drop an app here — it will go to the cable output</value>
@@ -307,7 +307,10 @@
     <value>Hide this device from all strips</value>
   </data>
   <data name="Sm.OutputOption.GainTip" xml:space="preserve">
-    <value>Send from the strip to this output, dB (applied immediately)</value>
+    <value>Send from the strip to this output, dB (applied immediately). Double-click — 0 dB.</value>
+  </data>
+  <data name="Sm.Param.DoubleClickReset" xml:space="preserve">
+    <value>Double-click — reset to the default value.</value>
   </data>
   <data name="Sm.Func.ButtonAssigned" xml:space="preserve">
     <value>{0} — assigned: {1}. Click — apply, right-click — change the assignment.</value>
@@ -359,6 +362,60 @@
   </data>
   <data name="Sm.Func.LiveTip" xml:space="preserve">
     <value>The strip is routed to this output right now</value>
+  </data>
+  <data name="Sm.Effect.Hint" xml:space="preserve">
+    <value>The effect is on. Parameters are read live — the engine does not restart, so the change is heard at once.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOn" xml:space="preserve">
+    <value>{0} — {1} is on. Click to turn it off, right-click for the parameters.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOff" xml:space="preserve">
+    <value>{0} — {1} is off. Click to turn it on, right-click for the parameters.</value>
+  </data>
+  <data name="Sm.Effect.Compressor" xml:space="preserve">
+    <value>Compressor</value>
+  </data>
+  <data name="Sm.Effect.Gain" xml:space="preserve">
+    <value>Gain (trim)</value>
+  </data>
+  <data name="Sm.Effect.Delay" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="Sm.Effect.Reverb" xml:space="preserve">
+    <value>Reverb</value>
+  </data>
+  <data name="Sm.Effect.Threshold" xml:space="preserve">
+    <value>threshold</value>
+  </data>
+  <data name="Sm.Effect.Ratio" xml:space="preserve">
+    <value>ratio</value>
+  </data>
+  <data name="Sm.Effect.Attack" xml:space="preserve">
+    <value>attack</value>
+  </data>
+  <data name="Sm.Effect.Release" xml:space="preserve">
+    <value>release</value>
+  </data>
+  <data name="Sm.Effect.Makeup" xml:space="preserve">
+    <value>makeup</value>
+  </data>
+  <data name="Sm.Effect.Level" xml:space="preserve">
+    <value>level</value>
+  </data>
+  <data name="Sm.Effect.Time" xml:space="preserve">
+    <value>time</value>
+  </data>
+  <data name="Sm.Effect.Feedback" xml:space="preserve">
+    <value>repeats</value>
+  </data>
+  <data name="Sm.Effect.Damping" xml:space="preserve">
+    <value>damping</value>
+  </data>
+  <data name="Sm.Effect.Mix" xml:space="preserve">
+    <value>wet</value>
+  </data>
+  <data name="Sm.Effect.Size" xml:space="preserve">
+    <value>size</value>
   </data>
   <data name="Sm.Denoiser.Title" xml:space="preserve">
     <value>Denoiser (RNNoise)</value>
@@ -536,6 +593,18 @@
   </data>
   <data name="Sm.Midi.Param.Func2" xml:space="preserve">
     <value>Func 2</value>
+  </data>
+  <data name="Sm.Midi.Param.Compressor" xml:space="preserve">
+    <value>Compressor</value>
+  </data>
+  <data name="Sm.Midi.Param.FxGain" xml:space="preserve">
+    <value>FX Gain</value>
+  </data>
+  <data name="Sm.Midi.Param.Delay" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="Sm.Midi.Param.Reverb" xml:space="preserve">
+    <value>Reverb</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Noise</value>

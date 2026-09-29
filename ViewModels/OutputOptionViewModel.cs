@@ -88,6 +88,13 @@ public partial class OutputOptionViewModel : LocalizedViewModel
         _onHidden(this);
     }
 
+    /// <summary>Двойной щелчок по ползунку посылки — вернуть ровно 0 дБ.</summary>
+    [RelayCommand]
+    private void ResetGain() => GainDb = DefaultGainDb;
+
+    /// <summary>Посылка по умолчанию — ровно 0 дБ (ровно в микс, без сдвига).</summary>
+    public const float DefaultGainDb = 0f;
+
     partial void OnIsEnabledChanged(bool value)
     {
         OnPropertyChanged(nameof(ShowGain));

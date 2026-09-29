@@ -197,6 +197,8 @@ public partial class MainViewModel
     {
         "IsMuted" or "IsSolo" or "IsMono" or "DenoiserEnabled" => true,
         MidiParameters.Func1Key or MidiParameters.Func2Key => true,
+        MidiParameters.CompressorEnabledKey or MidiParameters.FxGainEnabledKey
+            or MidiParameters.DelayEnabledKey or MidiParameters.ReverbEnabledKey => true,
         _ => false
     };
 
@@ -253,6 +255,10 @@ public partial class MainViewModel
         "DenoiserEnabled" => vm.DenoiserEnabled,
         MidiParameters.Func1Key => vm.Func1.IsEngaged,
         MidiParameters.Func2Key => vm.Func2.IsEngaged,
+        MidiParameters.CompressorEnabledKey => vm.CompressorEnabled,
+        MidiParameters.FxGainEnabledKey => vm.FxGainEnabled,
+        MidiParameters.DelayEnabledKey => vm.DelayEnabled,
+        MidiParameters.ReverbEnabledKey => vm.ReverbEnabled,
         _ => false
     };
 
@@ -278,6 +284,13 @@ public partial class MainViewModel
             //  через IsEngaged, а не через правило напрямую.
             case MidiParameters.Func1Key: vm.Func1.IsEngaged = value; break;
             case MidiParameters.Func2Key: vm.Func2.IsEngaged = value; break;
+
+            //  Эффекты (SM-B05): переключение ведёт в стрип, он же пишет
+            //  состояние в пресет.
+            case MidiParameters.CompressorEnabledKey: vm.CompressorEnabled = value; break;
+            case MidiParameters.FxGainEnabledKey: vm.FxGainEnabled = value; break;
+            case MidiParameters.DelayEnabledKey: vm.DelayEnabled = value; break;
+            case MidiParameters.ReverbEnabledKey: vm.ReverbEnabled = value; break;
         }
     }
 
@@ -321,6 +334,10 @@ public partial class MainViewModel
             case "DenoiserEnabled": vm.DenoiserEnabled = !vm.DenoiserEnabled; break;
             case MidiParameters.Func1Key: vm.Func1.IsEngaged = !vm.Func1.IsEngaged; break;
             case MidiParameters.Func2Key: vm.Func2.IsEngaged = !vm.Func2.IsEngaged; break;
+            case MidiParameters.CompressorEnabledKey: vm.CompressorEnabled = !vm.CompressorEnabled; break;
+            case MidiParameters.FxGainEnabledKey: vm.FxGainEnabled = !vm.FxGainEnabled; break;
+            case MidiParameters.DelayEnabledKey: vm.DelayEnabled = !vm.DelayEnabled; break;
+            case MidiParameters.ReverbEnabledKey: vm.ReverbEnabled = !vm.ReverbEnabled; break;
         }
     }
 

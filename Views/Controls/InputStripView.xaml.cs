@@ -173,6 +173,26 @@ namespace SoundMeeter.Views.Controls
 
         #endregion
 
+        #region Кнопки эффектов
+
+        // Включение/выключение делает ToggleButton (двусторонняя привязка
+        // IsChecked), а ПКМ открывает попап с крутилками.
+
+        private void OnEffectRightClick(object sender, MouseButtonEventArgs e)
+        {
+            if (EffectPopupOf(sender as FrameworkElement) is { } popup) popup.IsOpen = !popup.IsOpen;
+            e.Handled = true;
+        }
+
+        private Popup? EffectPopupOf(FrameworkElement? button) =>
+            ReferenceEquals(button, CompressorBtn) ? CompressorPopup
+            : ReferenceEquals(button, FxGainBtn) ? FxGainPopup
+            : ReferenceEquals(button, DelayBtn) ? DelayPopup
+            : ReferenceEquals(button, ReverbBtn) ? ReverbPopup
+            : null;
+
+        #endregion
+
         private void Device_DragEnter(object sender, DragEventArgs e)
         {
             var strip = DataContext as InputChannelViewModel;

@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:SoundMeeter.Controls"
+    xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:converters="clr-namespace:SoundMeeter.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -345,7 +346,86 @@
         </Grid>
     </DataTemplate>
 
-    <!--  Строка выпадающего меню (иконка + текст, текст слева)  -->
+    <!--
+        Крутилка параметра эффекта стрипа (SM-B05). Тот же контрол GainKnob, что
+        и у входного Gain микрофона: параметр, который пользователь уже знает по
+        стрипу микрофона, выглядит так же. Ширина 78 — три крутилки в ряд в
+        попапе эффекта.
+    -->
+    <DataTemplate x:Key="EffectKnobTemplate">
+        <StackPanel Width="78" Margin="0,4,0,0">
+            <controls:GainKnob
+                Width="56"
+                Height="56"
+                HorizontalAlignment="Center"
+                Maximum="{Binding Maximum}"
+                Minimum="{Binding Minimum}"
+                ToolTip="{Binding ToolTip}"
+                Value="{Binding Value, Mode=TwoWay}"
+                strip:ParamReset.Command="{Binding ResetCommand}" />
+            <TextBlock
+                Margin="0,2,0,0"
+                HorizontalAlignment="Center"
+                FontSize="9"
+                Foreground="#9A9A9A"
+                Text="{Binding Name}" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="9"
+                Foreground="#EEE"
+                Text="{Binding Display}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!--
+        Кнопки эффектов стрипа: работают как переключатели (ЛКМ), ПКМ — попап с
+        параметрами. Отключать их нельзя: у отключённого элемента не приходит
+        ПКМ, и настроить эффект было бы нечем. Состояние показывает IsChecked
+        обычного ToggleButton, а не привязкой в стиле — так тот же стиль
+        годится и для других переключателей стрипа.
+    -->
+    <Style x:Key="EffectBtn" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="#DDD" />
+        <Setter Property="Background" Value="#3A3A3D" />
+        <Setter Property="BorderBrush" Value="#555" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="2,2" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="FontSize" Value="8" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border
+                        x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="2">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.35" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#4A4A4E" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#1E4A63" />
+                <Setter Property="BorderBrush" Value="#3AA0E0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        Строка выпадающего меню (иконка + текст, текст слева)  -->
     <Style x:Key="MenuRow" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -484,7 +564,8 @@
                     SmallChange="0.5"
                     Style="{StaticResource DenSlider}"
                     ToolTip="{DynamicResource Sm.OutputOption.GainTip}"
-                    Value="{Binding GainDb, Mode=TwoWay}" />
+                    Value="{Binding GainDb, Mode=TwoWay}"
+                    strip:ParamReset.Command="{Binding ResetGainCommand}" />
             </DockPanel>
         </StackPanel>
     </DataTemplate>
@@ -552,6 +633,7 @@
             <Slider
                 Grid.Column="1"
                 Style="{StaticResource VoiceFader}"
+                strip:ParamReset.Command="{Binding ResetVolumeCommand}"
                 Value="{Binding VolumeDb, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
     </DataTemplate>
