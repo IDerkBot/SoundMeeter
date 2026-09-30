@@ -13,7 +13,7 @@ namespace SoundMeeter.Views
         public MainView()
         {
             InitializeComponent();
-            Language = Loc.XmlLanguage;
+            Language = LocResources.XmlLanguage;
         }
     }
 }

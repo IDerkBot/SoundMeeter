@@ -15,7 +15,7 @@ namespace SoundMeeter.Views
 
             // Окно создаётся уже после выбора языка, но не наследует Language от
             // родителя (у него своё визуальное дерево) — задаём явно.
-            Language = Loc.XmlLanguage;
+            Language = LocResources.XmlLanguage;
 
             DataContext = new MidiBindingsViewModel(viewModel);
             Closed += (_, _) =>

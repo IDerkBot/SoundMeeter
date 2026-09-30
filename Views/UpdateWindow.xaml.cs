@@ -15,7 +15,7 @@ namespace SoundMeeter.Views
         public UpdateWindow(IUpdateService updates, UpdateInfo update)
         {
             InitializeComponent();
-            Language = Loc.XmlLanguage;
+            Language = LocResources.XmlLanguage;
             ViewModel = new UpdateViewModel(updates, update);
             DataContext = ViewModel;
 

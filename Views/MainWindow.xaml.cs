@@ -15,7 +15,7 @@ namespace SoundMeeter.Views
 
             // Язык интерфейса, в т.ч. разделитель в StringFormat («0.0» / «0,0»).
             // У открытых окон ставит Loc, у созданных позже — их конструкторы.
-            Language = Loc.XmlLanguage;
+            Language = LocResources.XmlLanguage;
 
             ViewModel = viewModel;
             DataContext = viewModel;

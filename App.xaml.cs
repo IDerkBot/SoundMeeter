@@ -26,7 +26,11 @@ namespace SoundMeeter
             // Язык — до всего, что создаёт окна: словарь строк нужен разметке уже
             // при разборе первого XAML. Значение берём у системы и уточняем ниже,
             // как только прочитаны настройки.
-            Loc.Install(this);
+            //
+            // Именно LocResources, а не Loc: подключение словаря — это WPF
+            // (ResourceDictionary в Application.Resources). Сам Loc живёт в
+            // SoundMeeter.Audio и про UI ничего не знает.
+            LocResources.Install(this);
 
             var services = new ServiceCollection();
             services.AddSingleton<IAudioEngine, WasapiAudioEngine>();

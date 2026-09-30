@@ -39,7 +39,7 @@ namespace SoundMeeter.Views
         public DevicePickerWindow(IReadOnlyList<DeviceInfo> catalog, bool forInput, bool allowLoopback = false)
         {
             InitializeComponent();
-            Language = Loc.XmlLanguage;
+            Language = LocResources.XmlLanguage;
 
             Title = Loc.Get(forInput ? "Sm.Picker.ChooseInput" : "Sm.Picker.ChooseOutput");
 

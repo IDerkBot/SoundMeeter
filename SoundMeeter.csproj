@@ -11,22 +11,42 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current). -->
     <Version>0.0.1</Version>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
-    <!-- SM-A03: централизованное логирование (ILogger + ротируемый файловый провайдер). -->
+    <!--
+      NAudio и Microsoft.Extensions.Logging нужны и здесь: WasapiAudioEngine,
+      AudioService и MidiService остались в приложении, а ILogger внедряется
+      через DI. Денойзер и ресемплер живут в SoundMeeter.Audio.
+    -->
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
     <PackageReference Include="NAudio" Version="3.1.0" />
-    <!-- Нужен ради нативной rnnoise.dll (runtimes/win-x64/native). Обращаемся к ней
-         напрямую через RnNoiseInterop: managed-обёртка RNNoise.NET.Denoiser скрывает
-         своё кольцо буфера, из-за чего «сухой» и «денойзерный» сигналы расходятся
-         по времени, и не отдаёт вероятность речи (VAD). -->
+    <!--
+      rnnoise.dll нужна и здесь: сборка приложения portable (PublishSingleFile),
+      и нативный ассет из пакета копируется по цепочке ссылок, а не напрямую.
+      Обращаемся к ней через RnNoiseInterop в SoundMeeter.Audio: managed-обёртка
+      RNNoise.NET.Denoiser скрывает своё кольцо буфера, из-за чего «сухой» и
+      «денойзерный» сигналы расходятся по времени, и не отдаёт вероятность
+      речи (VAD).
+    -->
     <PackageReference Include="YellowDogMan.RRNoise.NET" Version="0.1.9" />
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+      Ядро без UI: обработка звука, модели пресета, миграции настроек, журнал и
+      строки локализации. Ссылка именно на него, а не наоборот, — единственное
+      направление, которое держит проект собираемым: WPF не должен просачиваться
+      в DSP, иначе строки в сообщениях об ошибках стоили бы целой платформы.
+    -->
+    <ProjectReference Include="..\SoundMeeter.Audio\SoundMeeter.Audio.csproj" />
     <ProjectReference Include="..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
   </ItemGroup>
 
