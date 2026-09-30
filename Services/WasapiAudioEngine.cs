@@ -62,16 +62,20 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
             var devices = new List<DeviceInfo>();
 
-            // Каталог устройств захвата (микрофоны)
+            // Каталог устройств захвата (микрофоны).
+            // MMDevice без финализатора (SM-A08): using обязателен, иначе каждый
+            // вызов RefreshDevices оставляет в процессе десятки COM-объектов.
             foreach (var device in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
             {
-                devices.Add(new DeviceInfo(device.ID, device.FriendlyName, true));
+                using (device)
+                    devices.Add(new DeviceInfo(device.ID, device.FriendlyName, true));
             }
 
             // Каталог устройств воспроизведения (для loopback-входов и выходных шин)
             foreach (var device in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
             {
-                devices.Add(new DeviceInfo(device.ID, device.FriendlyName, false));
+                using (device)
+                    devices.Add(new DeviceInfo(device.ID, device.FriendlyName, false));
             }
 
             // Связываем половинки виртуальных кабелей: приложения уходят в его выход,
@@ -679,6 +683,13 @@ public sealed class WasapiAudioEngine : IAudioEngine
         try
         {
             using var enumerator = new MMDeviceEnumerator();
+
+            // ВНИМАНИЕ: device здесь намеренно НЕ освобождается через using.
+            // WasapiOut хранит его в поле (`private readonly MMDevice mmDevice`)
+            // и пользуется до самого закрытия шины — Dispose здесь сделал бы
+            // use-after-dispose. Владение переходит к WasapiOut вместе с
+            // объектом шины. WasapiCapture и WasapiLoopbackCapture устройство,
+            // наоборот, не удерживают (см. InputSource.Start).
             var device = enumerator.GetDevice(bus.DeviceId);
             if (device == null) throw new InvalidOperationException($"Device {bus.DeviceId} not found");
 

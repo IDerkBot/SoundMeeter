@@ -49,21 +49,29 @@ namespace SoundMeeter.Services
             return Task.Run(() =>
             {
                 var devices = new List<AudioDevice>();
-                var collection = _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
 
-                // Получаем дефолтное устройство для пометки
-                var defaultDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-                var defaultId = defaultDevice?.ID ?? "";
+                // УТЕЧКА (SM-A08): MMDevice — это COM-обёртка над IMMDevice, и
+                // финализатора у неё НЕТ: без явного Dispose() ссылка на
+                // устройство не отпускается никогда. Метод зовётся из таймера
+                // каждые 2 секунды, поэтому за сутки утекали сотни тысяч
+                // COM-объектов, и процесс разрастался до гигабайтов.
+                // Устройство нужно только на время чтения ID и имени — всё, что
+                // живёт дольше, получает копию строк.
+                using var defaultDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                string defaultId = defaultDevice?.ID ?? "";
 
-                foreach (var device in collection)
+                foreach (var device in _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
-                    devices.Add(new AudioDevice
+                    using (device)
                     {
-                        Id = device.ID, // Этот ID напрямую скармливается AppRouter
-                        Name = device.FriendlyName,
-                        IconPath = string.Empty,
-                        IsDefault = device.ID == defaultId
-                    });
+                        devices.Add(new AudioDevice
+                        {
+                            Id = device.ID, // Этот ID напрямую скармливается AppRouter
+                            Name = device.FriendlyName,
+                            IconPath = string.Empty,
+                            IsDefault = device.ID == defaultId
+                        });
+                    }
                 }
 
                 return devices;
@@ -79,13 +87,16 @@ namespace SoundMeeter.Services
                 var completedResets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var failedResets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                var devices = _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-
-                foreach (var device in devices)
+                foreach (var device in _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
+                    // Тот же случай, что и в GetAudioOutputDevicesAsync (SM-A08):
+                    // MMDevice без финализатора, а обход идёт каждые 2 секунды.
+                    // AudioSessionManager — тоже COM-объект, и он держит
+                    // коллекцию сессий, поэтому освобождается вместе с устройством.
+                    using var deviceScope = device;
                     try
                     {
-                        var sessionManager = device.AudioSessionManager;
+                        using var sessionManager = device.AudioSessionManager;
                         if (sessionManager == null) continue;
 
                         var sessions = sessionManager.Sessions;
@@ -272,6 +283,17 @@ namespace SoundMeeter.Services
             lock (_cacheLock)
             {
                 _iconCache.Clear();
+            }
+
+            // Сам перечислитель — тоже COM-объект (SM-A08). Без этого он и его
+            // внутренние ссылки на перечисление устройств живут до конца процесса.
+            try
+            {
+                _deviceEnumerator.Dispose();
+            }
+            catch
+            {
+                // Устройство могло исчезнуть при выключении — гасим молча.
             }
         }
     }
