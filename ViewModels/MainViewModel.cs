@@ -74,7 +74,8 @@ public partial class MainViewModel : LocalizedViewModel
         ISettingsService settingsService,
         IDispatcherService dispatcherService,
         IUpdateService updateService,
-        IObsDockServer obsDock)
+        IObsDockServer obsDock,
+        IStartupService startup)
     {
         _audioService = audioService;
         _installedAppsService = installedAppsService;
@@ -85,6 +86,7 @@ public partial class MainViewModel : LocalizedViewModel
         _settings = settings;
         _midi = midi;
         _dock = obsDock;
+        _startup = startup;
         _engine.ChannelsChanged += OnChannelsChanged;
         _engine.StateChanged += OnStateChanged;
         _midi.MessageReceived += OnMidiMessageReceived;

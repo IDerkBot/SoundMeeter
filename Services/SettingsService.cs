@@ -128,6 +128,11 @@ namespace SoundMeeter.Services
                 // Снимок движка про язык не знает, ровно как про маршруты приложений
                 // и док: язык живёт в Loc, а на диск его кладёт только он сам.
                 settings.Language = Loc.RequestedLanguage;
+                // То же с поведением приложения (SM-D01/SM-D02): движок о них не
+                // знает, а без переноса первое же фоновое сохранение (через 5 с
+                // после старта) стёрло бы их, и настройки «откатывались» бы сами.
+                settings.TrayEnabled = Settings.TrayEnabled;
+                settings.RunAtStartup = Settings.RunAtStartup;
 
                 WriteAtomically(settings);
             }

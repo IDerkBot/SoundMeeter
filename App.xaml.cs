@@ -14,6 +14,8 @@ namespace SoundMeeter
     {
         public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
+        private SingleInstanceGuard? _instance;
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -22,6 +24,19 @@ namespace SoundMeeter
             // устройств) снова останутся без следа — ровно та проблема, ради
             // которой логирование и заводилось (SM-A03).
             AppLog.Initialize(Microsoft.Extensions.Logging.LogLevel.Information);
+
+            // Один экземпляр (SM-D03). Проверка идёт до всего остального: второй
+            // процесс не должен ни создавать окна, ни трогать устройства.
+            // Заодно просим первый экземпляр показать окно — с треем иначе
+            // повторный клик по ярлыку выглядел бы как «ничего не произошло».
+            _instance = new SingleInstanceGuard();
+            if (_instance.AlreadyRunning)
+            {
+                SingleInstanceGuard.RequestShowWindow();
+                AppLog.Shutdown();
+                Shutdown();
+                return;
+            }
 
             // Язык — до всего, что создаёт окна: словарь строк нужен разметке уже
             // при разборе первого XAML. Значение берём у системы и уточняем ниже,
@@ -43,6 +58,8 @@ namespace SoundMeeter
             services.AddSingleton<IInstalledAppsService, InstalledAppsService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
             services.AddSingleton<IUpdateService, UpdateService>();
+            // Автозапуск вместе с Windows (SM-D01).
+            services.AddSingleton<IStartupService, StartupService>();
             // Док-панель OBS: локальный сервер, отдающий страницу панели.
             services.AddSingleton<IObsDockServer, ObsDockServer>();
 
@@ -67,6 +84,11 @@ namespace SoundMeeter
 
             var viewModel = ServiceProvider.GetRequiredService<MainViewModel>();
 
+            // Настройки поведения приложения: трей и автозапуск (SM-D01/SM-D02).
+            // Читаются до показа окна, чтобы иконка в трее появилась сразу, а не
+            // мигала через секунду после старта.
+            viewModel.RestoreAppBehaviour();
+
             // Сначала восстанавливаем пресет: возвращаем оба списка стрипов И
             // набор «скрытых» устройств (см. ApplyPreset). Только затем
             // перечитываем каталог, чтобы AdoptDevicesUnlocked не создал
@@ -75,6 +97,10 @@ namespace SoundMeeter
             engine.RefreshDevices();
 
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+
+            // Повторный запуск выводит окно из трея (SM-D03).
+            _instance?.ListenForShowRequest(() => Dispatcher.Invoke(mainWindow.ShowFromTray));
+
             mainWindow.Show();
 
             // Тихо проверяем GitHub Releases после показа окна: без модальных окон,
@@ -102,6 +128,16 @@ namespace SoundMeeter
             catch
             {
                 // Игнорируем ошибки закрытия журнала.
+            }
+            try
+            {
+                // Мьютекс отпускается последним: до этого момента второй экземпляр
+                // ещё может считать первый работающим, что и нужно.
+                _instance?.Dispose();
+            }
+            catch
+            {
+                // Игнорируем ошибки освобождения одиночного экземпляра.
             }
             base.OnExit(e);
         }

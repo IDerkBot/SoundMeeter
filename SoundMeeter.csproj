@@ -7,12 +7,36 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <!--
+      WinForms подключён только ради NotifyIcon (значок в трее, SM-D02). Раньше трей
+      был написан прямом вызовом Shell_NotifyIcon, и это стоило
+      System.ExecutionEngineException — ошибки уровня CLR на чтении структуры
+      NOTIFYICONDATA из неинициализированной памяти. Готовый класс надёжнее, а
+      смешение WPF и WinForms в одном процессе штатно поддерживается.
+    -->
+    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current). -->
     <Version>0.0.1</Version>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <!--
+    UseWindowsForms добавляет глобальные using System.Windows.Forms и
+    System.Drawing, а они конфликтуют с WPF-типами с теми же именами:
+    Application, Control, Point, Pen, IDataObject, DragEventArgs,
+    MouseEventArgs, KeyEventArgs. Конфликт вылезает по всему проекту целиком,
+    даже в файлах, которые про WinForms не знают.
+
+    Поэтому подключение WinForms остаётся (оно нужно NotifyIcon), а
+    неявные импорты убираются: файл, который правда работает с треем,
+    подключает System.Windows.Forms явно у себя.
+  -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />

@@ -183,6 +183,34 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <!--
+                            Поведение приложения (SM-D01/SM-D02): значок в трее и
+                            автозапуск вместе с Windows. Отдельная группа потому,
+                            что это не действия над звуком, а то, как приложение
+                            ведёт себя в системе: обе галочки применяются сразу и
+                            без подтверждения, а отмена галочки «запускать
+                            вместе с Windows» убирает запись из реестра.
+                        -->
+                        <Border
+                            Height="1"
+                            Margin="4,6"
+                            Background="#3F3F46" />
+                        <TextBlock
+                            Margin="8,0,0,2"
+                            FontSize="10"
+                            Foreground="#7C7C7C"
+                            Text="{DynamicResource Sm.Tray.Menu}" />
+                        <CheckBox
+                            Margin="6,0,0,0"
+                            Content="{DynamicResource Sm.Tray.Enabled}"
+                            IsChecked="{Binding TrayEnabled, Mode=TwoWay}"
+                            ToolTip="{DynamicResource Sm.Tray.EnabledTip}" />
+                        <CheckBox
+                            Margin="6,2,0,0"
+                            Content="{DynamicResource Sm.Tray.Startup}"
+                            IsChecked="{Binding RunAtStartup, Mode=TwoWay}"
+                            ToolTip="{DynamicResource Sm.Tray.StartupTip}" />
                     </StackPanel>
                 </Border>
             </Popup>
