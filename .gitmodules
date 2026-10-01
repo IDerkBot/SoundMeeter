@@ -1,0 +1,3 @@
+[submodule "src/StreamerTools.Style"]
+	path = src/StreamerTools.Style
+	url = https://github.com/IDerkBot/StreamerTools.Style
