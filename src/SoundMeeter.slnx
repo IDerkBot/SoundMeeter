@@ -10,4 +10,5 @@
   <Project Path="SoundMeeter.Update.Tests/SoundMeeter.Update.Tests.csproj" />
   <Project Path="SoundMeeter.Update/SoundMeeter.Update.csproj" />
   <Project Path="SoundMeeter/SoundMeeter.csproj" />
+  <Project Path="StreamerTools.Style/StreamerTools.Style.csproj" />
 </Solution>

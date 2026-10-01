@@ -61,7 +61,7 @@
     <ProjectReference Include="..\SoundMeeter.Update\SoundMeeter.Update.csproj" />
     <ProjectReference Include="..\SoundMeeter.StartUp\SoundMeeter.StartUp.csproj" />
     <ProjectReference Include="..\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.csproj" />
-    <ProjectReference Include="..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
+    <ProjectReference Include="..\StreamerTools.Style\StreamerTools.Style.csproj" />
   </ItemGroup>
 
   <ItemGroup>
