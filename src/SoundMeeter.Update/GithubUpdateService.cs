@@ -15,8 +15,14 @@ namespace SoundMeeter.Services
     /// endpoint /releases/latest сам не отдаёт черновики и пре-релизы, поэтому достаточно
     /// одного запроса. Дальше — выбор portable-zip ассета, скачивание с прогрессом,
     /// распаковка и подмена файлов (см. <see cref="UpdateApplier"/>).
+    ///
+    /// Имя класса уточняет ИСТОЧНИК, а не механизм: релизов может быть несколько
+    /// (свой сервер, зеркало, корпоративный GitLab), и все они реализуют один и тот
+    /// же <see cref="IUpdateService"/>. Поэтому контракт для остального приложения
+    /// остаётся <see cref="IUpdateService"/>, а конкретный источник добавляется
+    /// рядом — без правок в UI и в диспетчере обновлений.
     /// </summary>
-    public class UpdateService : IUpdateService, IDisposable
+    public class GithubUpdateService : IUpdateService, IDisposable
     {
         public const string Owner = "IDerkBot";
         public const string Repo = "SoundMeeter";
@@ -32,13 +38,13 @@ namespace SoundMeeter.Services
         private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly HttpClient _http;
-        private readonly ILogger _logger = AppLog.For<UpdateService>();
+        private readonly ILogger _logger = AppLog.For<GithubUpdateService>();
         private bool _disposed;
 
-        public UpdateService() : this(new HttpClient()) { }
+        public GithubUpdateService() : this(new HttpClient()) { }
 
         /// <summary>Конструктор с внешним HttpClient — чтобы подменить в тестах.</summary>
-        public UpdateService(HttpClient http)
+        public GithubUpdateService(HttpClient http)
         {
             _http = http ?? throw new ArgumentNullException(nameof(http));
             if (_http.Timeout == TimeSpan.FromSeconds(100))

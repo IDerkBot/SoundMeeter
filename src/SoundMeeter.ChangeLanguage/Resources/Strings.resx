@@ -1,0 +1,1086 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Sm.Common.Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Sm.Common.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Sm.Common.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Sm.Common.Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Sm.Common.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Sm.Language.Menu" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Sm.Language.MenuTip" xml:space="preserve">
+    <value>Interface language. Applies immediately, without a restart.</value>
+  </data>
+  <data name="Sm.Language.FollowSystem" xml:space="preserve">
+    <value>Same as Windows</value>
+  </data>
+  <data name="Sm.Language.English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Sm.Language.Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="Sm.Main.NoVirtualCable" xml:space="preserve">
+    <value>No virtual cable detected. For virtual channels (CABLE Input / Output) install VB-Cable from vb-audio.com — apps then pick 'CABLE Input' as their audio device.</value>
+  </data>
+  <data name="Sm.Toolbar.Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Sm.Toolbar.SettingsTip" xml:space="preserve">
+    <value>Maintenance: devices, MIDI, OBS dock, updates, logs</value>
+  </data>
+  <data name="Sm.Toolbar.RefreshDevices" xml:space="preserve">
+    <value>Refresh devices</value>
+  </data>
+  <data name="Sm.Toolbar.RefreshDevicesTip" xml:space="preserve">
+    <value>Re-read the list of audio devices</value>
+  </data>
+  <data name="Sm.Toolbar.Midi" xml:space="preserve">
+    <value>MIDI</value>
+  </data>
+  <data name="Sm.Toolbar.MidiTip" xml:space="preserve">
+    <value>Bind MIDI controllers to channels and commands</value>
+  </data>
+  <data name="Sm.Toolbar.ObsDock" xml:space="preserve">
+    <value>OBS dock</value>
+  </data>
+  <data name="Sm.Toolbar.ObsDockTip" xml:space="preserve">
+    <value>OBS dock panel: VU meter, fader and Mute/Solo right inside OBS</value>
+  </data>
+  <data name="Sm.Toolbar.CheckUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="Sm.Toolbar.CheckUpdatesTip" xml:space="preserve">
+    <value>Check for updates via GitHub Releases</value>
+  </data>
+  <data name="Sm.Toolbar.CheckUpdatesFailed" xml:space="preserve">
+    <value>Update check</value>
+  </data>
+  <data name="Sm.Toolbar.Logs" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="Sm.Toolbar.LogsTip" xml:space="preserve">
+    <value>Application log, verbosity level and diagnostics copy</value>
+  </data>
+  <data name="Sm.Toolbar.Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Sm.Toolbar.Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Sm.Toolbar.EngineRunning" xml:space="preserve">
+    <value>Engine: running</value>
+  </data>
+  <data name="Sm.Toolbar.EngineStopped" xml:space="preserve">
+    <value>Engine: stopped</value>
+  </data>
+  <data name="Sm.Toolbar.StripCounts" xml:space="preserve">
+    <value>{0} inputs / {1} buses</value>
+  </data>
+  <data name="Sm.Mixer.Inputs" xml:space="preserve">
+    <value>INPUTS</value>
+  </data>
+  <data name="Sm.Mixer.Outputs" xml:space="preserve">
+    <value>OUTPUTS</value>
+  </data>
+  <data name="Sm.Mixer.AddInputTip" xml:space="preserve">
+    <value>Add input strip</value>
+  </data>
+  <data name="Sm.Mixer.AddOutputTip" xml:space="preserve">
+    <value>Add output strip</value>
+  </data>
+  <data name="Sm.Strip.RemoveTip" xml:space="preserve">
+    <value>Remove strip</value>
+  </data>
+  <data name="Sm.Strip.ChooseInputTip" xml:space="preserve">
+    <value>Choose input source</value>
+  </data>
+  <data name="Sm.Strip.ChooseOutputTip" xml:space="preserve">
+    <value>Choose output device</value>
+  </data>
+  <data name="Sm.Strip.HardwareOutputs" xml:space="preserve">
+    <value>Hardware outputs</value>
+  </data>
+  <data name="Sm.Strip.HardwareOutputsTip" xml:space="preserve">
+    <value>Hardware outputs (for monitoring)</value>
+  </data>
+  <data name="Sm.Strip.VirtualOutputs" xml:space="preserve">
+    <value>Virtual outputs</value>
+  </data>
+  <data name="Sm.Strip.VirtualOutputsTip" xml:space="preserve">
+    <value>Virtual outputs (VB-Cable / VAC)</value>
+  </data>
+  <data name="Sm.Strip.Mono" xml:space="preserve">
+    <value>MONO</value>
+  </data>
+  <data name="Sm.Strip.MonoTip" xml:space="preserve">
+    <value>Mono</value>
+  </data>
+  <data name="Sm.Strip.Solo" xml:space="preserve">
+    <value>SOLO</value>
+  </data>
+  <data name="Sm.Strip.SoloTip" xml:space="preserve">
+    <value>Solo</value>
+  </data>
+  <data name="Sm.Strip.Mute" xml:space="preserve">
+    <value>MUTE</value>
+  </data>
+  <data name="Sm.Strip.MuteTip" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="Sm.Strip.MonoShort" xml:space="preserve">
+    <value>M</value>
+  </data>
+  <data name="Sm.Strip.SoloShort" xml:space="preserve">
+    <value>S</value>
+  </data>
+  <data name="Sm.Strip.Denoiser" xml:space="preserve">
+    <value>DEN</value>
+  </data>
+  <data name="Sm.Strip.DenoiserTip" xml:space="preserve">
+    <value>Denoiser (RNNoise): settings — right-click</value>
+  </data>
+  <data name="Sm.Strip.AppTargetChoose" xml:space="preserve">
+    <value>choose…</value>
+  </data>
+  <data name="Sm.Strip.AppTargetTip" xml:space="preserve">
+    <value>Applications of the channel go to this device, while the strip captures the cable input. Usually it is the output of the same cable.</value>
+  </data>
+  <data name="Sm.Strip.GainLabel" xml:space="preserve">
+    <value>input gain</value>
+  </data>
+  <data name="Sm.Strip.GainTip" xml:space="preserve">
+    <value>Channel input gain, dB. Applied once, before splitting into buses. Drag with the mouse or the wheel. Double-click — 0 dB.</value>
+  </data>
+  <data name="Sm.Strip.DropHint.Cable" xml:space="preserve">
+    <value>Drop an app here — it will go to the cable output</value>
+  </data>
+  <data name="Sm.Strip.DropHint.Any" xml:space="preserve">
+    <value>Drop an app here</value>
+  </data>
+  <data name="Sm.Strip.DropHint.CableNoPeer" xml:space="preserve">
+    <value>Paired output not found — pick it below</value>
+  </data>
+  <data name="Sm.Strip.DropHint.Microphone" xml:space="preserve">
+    <value>A microphone does not accept apps</value>
+  </data>
+  <data name="Sm.Strip.DropHint.NoSource" xml:space="preserve">
+    <value>No source assigned</value>
+  </data>
+  <data name="Sm.Strip.Reject.Cable" xml:space="preserve">
+    <value>Could not work out the paired cable output from the name '{0}'. Set it with the 'Apps → …' button — it is the output of the same cable (for the 'L1In.…' input that is 'L1Out.…').</value>
+  </data>
+  <data name="Sm.Strip.Reject.Microphone" xml:space="preserve">
+    <value>'{0}' is a microphone: it captures sound from the capture device, not from apps. Drop the app on a channel (a strip with a loopback source) or on a virtual cable input.</value>
+  </data>
+  <data name="Sm.Strip.Reject.NoSource" xml:space="preserve">
+    <value>'{0}' has no source assigned. Pick one (click the source name) and drop the app again.</value>
+  </data>
+  <data name="Sm.OutputOption.HideTip" xml:space="preserve">
+    <value>Hide this device from all strips</value>
+  </data>
+  <data name="Sm.OutputOption.GainTip" xml:space="preserve">
+    <value>Send from the strip to this output, dB (applied immediately). Double-click — 0 dB.</value>
+  </data>
+  <data name="Sm.Param.DoubleClickReset" xml:space="preserve">
+    <value>Double-click — reset to the default value.</value>
+  </data>
+  <data name="Sm.Func.ButtonAssigned" xml:space="preserve">
+    <value>{0} — assigned: {1}. Click — apply, right-click — change the assignment.</value>
+  </data>
+  <data name="Sm.Func.ButtonOff" xml:space="preserve">
+    <value>{0} — assigned: {1}. Click to turn it on.</value>
+  </data>
+  <data name="Sm.Func.ButtonOn" xml:space="preserve">
+    <value>{0} — on: {1}. Click to turn it off and bring the strip back to the routing it had before.</value>
+  </data>
+  <data name="Sm.Func.ButtonEmpty" xml:space="preserve">
+    <value>{0} — nothing is assigned. Click or right-click — assign OUT/VIRT outputs.</value>
+  </data>
+  <data name="Sm.Func.PopupTitle" xml:space="preserve">
+    <value>{0} — outputs of this strip</value>
+  </data>
+  <data name="Sm.Func.Exclusive" xml:space="preserve">
+    <value>Only the assigned outputs (turn off the rest)</value>
+  </data>
+  <data name="Sm.Func.ExclusiveTip" xml:space="preserve">
+    <value>On: the button brings the strip routing to exactly its own list. Off: the button only adds its outputs and leaves the other routes alone.</value>
+  </data>
+  <data name="Sm.Func.Label" xml:space="preserve">
+    <value>Button label</value>
+  </data>
+  <data name="Sm.Func.LabelHint" xml:space="preserve">
+    <value>empty — F1/F2</value>
+  </data>
+  <data name="Sm.Func.LabelTip" xml:space="preserve">
+    <value>Shown on the button instead of its number, up to 12 characters.</value>
+  </data>
+  <data name="Sm.Func.TurnOn" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="Sm.Func.TurnOff" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="Sm.Func.EngagedHint" xml:space="preserve">
+    <value>The button is on: the strip routing now follows its rule. Turn it off to bring the routing back.</value>
+  </data>
+  <data name="Sm.Func.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Sm.Func.NotAssigned" xml:space="preserve">
+    <value>Nothing is assigned — tick at least one output, otherwise the button does nothing.</value>
+  </data>
+  <data name="Sm.Func.NoOutputs" xml:space="preserve">
+    <value>No outputs to assign: the strip has no OUT/VIRT devices yet.</value>
+  </data>
+  <data name="Sm.Func.LiveTip" xml:space="preserve">
+    <value>The strip is routed to this output right now</value>
+  </data>
+  <data name="Sm.Effect.Hint" xml:space="preserve">
+    <value>The effect is on. Parameters are read live — the engine does not restart, so the change is heard at once.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOn" xml:space="preserve">
+    <value>{0} — {1} is on. Click to turn it off, right-click for the parameters.</value>
+  </data>
+  <data name="Sm.Effect.ToolTipOff" xml:space="preserve">
+    <value>{0} — {1} is off. Click to turn it on, right-click for the parameters.</value>
+  </data>
+  <data name="Sm.Effect.Compressor" xml:space="preserve">
+    <value>Compressor</value>
+  </data>
+  <data name="Sm.Effect.Gain" xml:space="preserve">
+    <value>Gain (trim)</value>
+  </data>
+  <data name="Sm.Effect.Delay" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="Sm.Effect.Reverb" xml:space="preserve">
+    <value>Reverb</value>
+  </data>
+  <data name="Sm.Effect.Threshold" xml:space="preserve">
+    <value>threshold</value>
+  </data>
+  <data name="Sm.Effect.Ratio" xml:space="preserve">
+    <value>ratio</value>
+  </data>
+  <data name="Sm.Effect.Attack" xml:space="preserve">
+    <value>attack</value>
+  </data>
+  <data name="Sm.Effect.Release" xml:space="preserve">
+    <value>release</value>
+  </data>
+  <data name="Sm.Effect.Makeup" xml:space="preserve">
+    <value>makeup</value>
+  </data>
+  <data name="Sm.Effect.Level" xml:space="preserve">
+    <value>level</value>
+  </data>
+  <data name="Sm.Effect.Time" xml:space="preserve">
+    <value>time</value>
+  </data>
+  <data name="Sm.Effect.Feedback" xml:space="preserve">
+    <value>repeats</value>
+  </data>
+  <data name="Sm.Effect.Damping" xml:space="preserve">
+    <value>damping</value>
+  </data>
+  <data name="Sm.Effect.Mix" xml:space="preserve">
+    <value>wet</value>
+  </data>
+  <data name="Sm.Effect.Size" xml:space="preserve">
+    <value>size</value>
+  </data>
+  <data name="Sm.Denoiser.Title" xml:space="preserve">
+    <value>Denoiser (RNNoise)</value>
+  </data>
+  <data name="Sm.Denoiser.NoiseRemover" xml:space="preserve">
+    <value>Noise Remover</value>
+  </data>
+  <data name="Sm.Denoiser.DryWet" xml:space="preserve">
+    <value>Dry / Wet Balance</value>
+  </data>
+  <data name="Sm.Denoiser.FormantLow" xml:space="preserve">
+    <value>Formant Low</value>
+  </data>
+  <data name="Sm.Denoiser.FormantMid" xml:space="preserve">
+    <value>Formant Medium</value>
+  </data>
+  <data name="Sm.Denoiser.FormantHigh" xml:space="preserve">
+    <value>Formant High</value>
+  </data>
+  <data name="Sm.Denoiser.FormantGroup" xml:space="preserve">
+    <value>Formant Group</value>
+  </data>
+  <data name="Sm.StripApps.ResetTip" xml:space="preserve">
+    <value>Reset to the default device</value>
+  </data>
+  <data name="Sm.StripApps.RemoveRuleTip" xml:space="preserve">
+    <value>Remove the rule</value>
+  </data>
+  <data name="Sm.StripApps.Pending" xml:space="preserve">
+    <value>Waiting for an audio session / to be applied</value>
+  </data>
+  <data name="Sm.Apps.WithAudio" xml:space="preserve">
+    <value>Apps with audio</value>
+  </data>
+  <data name="Sm.Apps.Installed" xml:space="preserve">
+    <value>Installed apps</value>
+  </data>
+  <data name="Sm.Apps.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Sm.Apps.Loading" xml:space="preserve">
+    <value>Loading the app list...</value>
+  </data>
+  <data name="Sm.Apps.SearchHint" xml:space="preserve">
+    <value>🔍 Search by name or publisher...</value>
+  </data>
+  <data name="Sm.Log.Title" xml:space="preserve">
+    <value>SoundMeeter log</value>
+  </data>
+  <data name="Sm.Log.Level" xml:space="preserve">
+    <value>Level:</value>
+  </data>
+  <data name="Sm.Log.LevelTip" xml:space="preserve">
+    <value>Log verbosity. Applied immediately, saved to settings</value>
+  </data>
+  <data name="Sm.Log.File" xml:space="preserve">
+    <value>File:</value>
+  </data>
+  <data name="Sm.Log.FileTip" xml:space="preserve">
+    <value>Log files: the current one and the archived ones</value>
+  </data>
+  <data name="Sm.Log.Folder" xml:space="preserve">
+    <value>Log folder</value>
+  </data>
+  <data name="Sm.Log.FolderTip" xml:space="preserve">
+    <value>Open the log directory in File Explorer</value>
+  </data>
+  <data name="Sm.Log.CopyDiagnostics" xml:space="preserve">
+    <value>Copy diagnostics</value>
+  </data>
+  <data name="Sm.Log.CopyDiagnosticsTip" xml:space="preserve">
+    <value>Log + version + device and strip list to the clipboard</value>
+  </data>
+  <data name="Sm.Log.NotCreated" xml:space="preserve">
+    <value>The log has not been created yet.</value>
+  </data>
+  <data name="Sm.Log.Status.LevelSet" xml:space="preserve">
+    <value>Log level: {0}</value>
+  </data>
+  <data name="Sm.Log.Status.Size" xml:space="preserve">
+    <value>{0} — {1} characters</value>
+  </data>
+  <data name="Sm.Log.Status.Copied" xml:space="preserve">
+    <value>Diagnostics copied to the clipboard</value>
+  </data>
+  <data name="Sm.Log.Status.CopyFailed" xml:space="preserve">
+    <value>Could not copy diagnostics: {0}</value>
+  </data>
+  <data name="Sm.Log.Status.FolderFailed" xml:space="preserve">
+    <value>Could not open the log folder: {0}</value>
+  </data>
+  <data name="Sm.Midi.Title" xml:space="preserve">
+    <value>MIDI bindings</value>
+  </data>
+  <data name="Sm.Midi.Input" xml:space="preserve">
+    <value>MIDI input:</value>
+  </data>
+  <data name="Sm.Midi.Status" xml:space="preserve">
+    <value>Status: </value>
+  </data>
+  <data name="Sm.Midi.Learn" xml:space="preserve">
+    <value>Learn</value>
+  </data>
+  <data name="Sm.Midi.ModeTip" xml:space="preserve">
+    <value>Toggle — press to switch, Hold (PTT) — active while held, Latch — a latching button (the controller sends the state)</value>
+  </data>
+  <data name="Sm.Midi.Reverse" xml:space="preserve">
+    <value>Reverse</value>
+  </data>
+  <data name="Sm.Midi.ReverseTip" xml:space="preserve">
+    <value>Inverted polarity: 0 = pressed, 127 = released</value>
+  </data>
+  <data name="Sm.Midi.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Sm.Midi.None" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="Sm.Midi.Unbound" xml:space="preserve">
+    <value>unbound</value>
+  </data>
+  <data name="Sm.Midi.Listening" xml:space="preserve">
+    <value>listening…</value>
+  </data>
+  <data name="Sm.Midi.Binding.ControlChange" xml:space="preserve">
+    <value>CC {0} · ch {1}</value>
+  </data>
+  <data name="Sm.Midi.Binding.NoteOn" xml:space="preserve">
+    <value>Note {0} · ch {1}</value>
+  </data>
+  <data name="Sm.Midi.Binding.NoteOff" xml:space="preserve">
+    <value>NoteOff {0} · ch {1}</value>
+  </data>
+  <data name="Sm.Midi.Binding.PitchWheel" xml:space="preserve">
+    <value>Pitch Wheel</value>
+  </data>
+  <data name="Sm.Midi.Mode.Toggle" xml:space="preserve">
+    <value>Toggle</value>
+  </data>
+  <data name="Sm.Midi.Mode.Hold" xml:space="preserve">
+    <value>Hold (PTT)</value>
+  </data>
+  <data name="Sm.Midi.Mode.Latch" xml:space="preserve">
+    <value>Latch</value>
+  </data>
+  <data name="Sm.Midi.Status.MoveControl" xml:space="preserve">
+    <value>Move the MIDI control to bind…</value>
+  </data>
+  <data name="Sm.Midi.Status.ListeningTo" xml:space="preserve">
+    <value>Listening: {0}</value>
+  </data>
+  <data name="Sm.Midi.Status.NoInput" xml:space="preserve">
+    <value>No MIDI input selected</value>
+  </data>
+  <data name="Sm.Midi.Param.VolumeDb" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="Sm.Midi.Param.GainDb" xml:space="preserve">
+    <value>Gain</value>
+  </data>
+  <data name="Sm.Midi.Param.IsMuted" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="Sm.Midi.Param.IsMono" xml:space="preserve">
+    <value>Mono</value>
+  </data>
+  <data name="Sm.Midi.Param.IsSolo" xml:space="preserve">
+    <value>Solo</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserEnabled" xml:space="preserve">
+    <value>Denoiser</value>
+  </data>
+  <data name="Sm.Midi.Param.Func1" xml:space="preserve">
+    <value>Func 1</value>
+  </data>
+  <data name="Sm.Midi.Param.Func2" xml:space="preserve">
+    <value>Func 2</value>
+  </data>
+  <data name="Sm.Midi.Param.Compressor" xml:space="preserve">
+    <value>Compressor</value>
+  </data>
+  <data name="Sm.Midi.Param.FxGain" xml:space="preserve">
+    <value>FX Gain</value>
+  </data>
+  <data name="Sm.Midi.Param.Delay" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="Sm.Midi.Param.Reverb" xml:space="preserve">
+    <value>Reverb</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
+    <value>DEN Noise</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserDryWet" xml:space="preserve">
+    <value>DEN Dry/Wet</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserFormantLowDb" xml:space="preserve">
+    <value>DEN Form. Low</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserFormantMidDb" xml:space="preserve">
+    <value>DEN Form. Mid</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserFormantHighDb" xml:space="preserve">
+    <value>DEN Form. High</value>
+  </data>
+  <data name="Sm.Midi.Param.DenoiserFormantGroupDb" xml:space="preserve">
+    <value>DEN Form. Gain</value>
+  </data>
+  <data name="Sm.Obs.Title" xml:space="preserve">
+    <value>OBS dock</value>
+  </data>
+  <data name="Sm.Obs.Serve" xml:space="preserve">
+    <value>Serve the dock while SoundMeeter is running (start it automatically)</value>
+  </data>
+  <data name="Sm.Obs.Port" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="Sm.Obs.CopyUrl" xml:space="preserve">
+    <value>Copy URL</value>
+  </data>
+  <data name="Sm.Obs.CopyUrlTip" xml:space="preserve">
+    <value>Copy the panel address to the clipboard</value>
+  </data>
+  <data name="Sm.Obs.Install" xml:space="preserve">
+    <value>Install dock in OBS</value>
+  </data>
+  <data name="Sm.Obs.InstallTip" xml:space="preserve">
+    <value>Append the panel to the OBS dock list (user.ini). OBS needs a restart afterwards.</value>
+  </data>
+  <data name="Sm.Obs.Remove" xml:space="preserve">
+    <value>Remove from OBS</value>
+  </data>
+  <data name="Sm.Obs.Hint" xml:space="preserve">
+    <value>OBS reads the dock list on startup, so it has to be restarted after installing. If the dock does not show up — View → Docks → Browser Dock and paste the copied URL.</value>
+  </data>
+  <data name="Sm.Obs.AllInputs" xml:space="preserve">
+    <value>All input channels</value>
+  </data>
+  <data name="Sm.Obs.AllOutputs" xml:space="preserve">
+    <value>All output channels</value>
+  </data>
+  <data name="Sm.Obs.SelectAll" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="Sm.Obs.SelectNone" xml:space="preserve">
+    <value>Select none</value>
+  </data>
+  <data name="Sm.Obs.AllHint" xml:space="preserve">
+    <value>'All …' means every strip of that group. The lists below add specific channels on top of it — useful to keep only a couple of channels in the dock.</value>
+  </data>
+  <data name="Sm.Obs.StartServer" xml:space="preserve">
+    <value>Start server</value>
+  </data>
+  <data name="Sm.Obs.StopServer" xml:space="preserve">
+    <value>Stop server</value>
+  </data>
+  <data name="Sm.Obs.State.ObsRunning" xml:space="preserve">
+    <value>OBS is running — close it before adding or removing the dock</value>
+  </data>
+  <data name="Sm.Obs.State.Registered" xml:space="preserve">
+    <value>Dock is registered in OBS (restart OBS to see it)</value>
+  </data>
+  <data name="Sm.Obs.State.NotRegistered" xml:space="preserve">
+    <value>Dock is not registered in OBS</value>
+  </data>
+  <data name="Sm.Obs.Status.InvalidPort" xml:space="preserve">
+    <value>Port {0} is not valid: use a number from 1024 to 65535.</value>
+  </data>
+  <data name="Sm.Obs.Status.Saved" xml:space="preserve">
+    <value>Saved. The panel will show {0} channel(s) at {1}.</value>
+  </data>
+  <data name="Sm.Obs.Status.UrlCopied" xml:space="preserve">
+    <value>URL copied. In OBS: View → Docks → Browser Dock → paste the URL.</value>
+  </data>
+  <data name="Sm.Obs.Status.CopyFailed" xml:space="preserve">
+    <value>Failed to copy URL: {0}</value>
+  </data>
+  <data name="Sm.Obs.Status.ServerOn" xml:space="preserve">
+    <value>server on port {0}</value>
+  </data>
+  <data name="Sm.Obs.Status.ServerOff" xml:space="preserve">
+    <value>server stopped</value>
+  </data>
+  <data name="Sm.Obs.Status.NoPanels" xml:space="preserve">
+    <value>no panels connected</value>
+  </data>
+  <data name="Sm.Obs.Status.PanelsCount" xml:space="preserve">
+    <value>{0} panel(s) connected</value>
+  </data>
+  <data name="Sm.Obs.AssetMissing" xml:space="preserve">
+    <value>SoundMeeter: the dock panel is broken (no embedded resource {0}).</value>
+  </data>
+  <data name="Sm.Update.Status.Checking" xml:space="preserve">
+    <value>SoundMeeter {0}: checking for updates…</value>
+  </data>
+  <data name="Sm.Update.Status.UpToDate" xml:space="preserve">
+    <value>SoundMeeter {0}: no updates</value>
+  </data>
+  <data name="Sm.Update.Status.CheckFailed" xml:space="preserve">
+    <value>Update check failed: {0}</value>
+  </data>
+  <data name="Sm.Update.Status.Available" xml:space="preserve">
+    <value>An update is available</value>
+  </data>
+  <data name="Sm.Update.Banner.Installable" xml:space="preserve">
+    <value>SoundMeeter {0} is available (you have {1}).</value>
+  </data>
+  <data name="Sm.Update.Banner.NoPortable" xml:space="preserve">
+    <value>SoundMeeter {0} is available (you have {1}), but the release has no portable archive.</value>
+  </data>
+  <data name="Sm.Update.Banner.DismissTip" xml:space="preserve">
+    <value>Hide until the next check</value>
+  </data>
+  <data name="Sm.UpdateWindow.Title" xml:space="preserve">
+    <value>SoundMeeter update</value>
+  </data>
+  <data name="Sm.UpdateWindow.Installed" xml:space="preserve">
+    <value>Installed: </value>
+  </data>
+  <data name="Sm.UpdateWindow.OpenGitHub" xml:space="preserve">
+    <value>Open in GitHub</value>
+  </data>
+  <data name="Sm.UpdateWindow.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Sm.UpdateWindow.Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Sm.Update.Status.NoNotes" xml:space="preserve">
+    <value>This release has no description.</value>
+  </data>
+  <data name="Sm.Update.Status.Downloading" xml:space="preserve">
+    <value>Downloading {0}…</value>
+  </data>
+  <data name="Sm.Update.Status.Extracting" xml:space="preserve">
+    <value>Extracting…</value>
+  </data>
+  <data name="Sm.Update.Status.Verifying" xml:space="preserve">
+    <value>Verifying the archive…</value>
+  </data>
+  <data name="Sm.Update.Status.Rejected" xml:space="preserve">
+    <value>Update rejected: {0}</value>
+  </data>
+  <data name="Sm.Update.Status.Cancelled" xml:space="preserve">
+    <value>Installation cancelled.</value>
+  </data>
+  <data name="Sm.Update.Status.Applying" xml:space="preserve">
+    <value>Replacing files and restarting…</value>
+  </data>
+  <data name="Sm.Update.Status.Restarting" xml:space="preserve">
+    <value>The update is being installed. The app will close.</value>
+  </data>
+  <data name="Sm.Update.Status.DownloadCancelled" xml:space="preserve">
+    <value>Download cancelled.</value>
+  </data>
+  <data name="Sm.Update.Status.Failed" xml:space="preserve">
+    <value>Could not install the update: {0}</value>
+  </data>
+  <data name="Sm.Picker.ChooseInput" xml:space="preserve">
+    <value>Choose input source</value>
+  </data>
+  <data name="Sm.Picker.ChooseOutput" xml:space="preserve">
+    <value>Choose output device</value>
+  </data>
+  <data name="Sm.Picker.Hint" xml:space="preserve">
+    <value>Choose audio device. None removes the assignment.</value>
+  </data>
+  <data name="Sm.Picker.SearchHint" xml:space="preserve">
+    <value>🔍 Search device name...</value>
+  </data>
+  <data name="Sm.Picker.KindTip" xml:space="preserve">
+    <value>Show only microphones or only speakers</value>
+  </data>
+  <data name="Sm.Picker.None" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="Sm.Picker.Loopback" xml:space="preserve">
+    <value>(loopback)</value>
+  </data>
+  <data name="Sm.Picker.Empty" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="Sm.Picker.KindAll" xml:space="preserve">
+    <value>ALL</value>
+  </data>
+  <data name="Sm.Picker.KindMic" xml:space="preserve">
+    <value>MIC</value>
+  </data>
+  <data name="Sm.Picker.KindSpk" xml:space="preserve">
+    <value>SPK</value>
+  </data>
+  <data name="Sm.Picker.TagMic" xml:space="preserve">
+    <value>MIC  {0}</value>
+  </data>
+  <data name="Sm.Picker.TagSpk" xml:space="preserve">
+    <value>SPK  {0}  ({1})</value>
+  </data>
+  <data name="Sm.Routing.DialogCaption" xml:space="preserve">
+    <value>Audio routing</value>
+  </data>
+  <data name="Sm.Routing.StripNotFound" xml:space="preserve">
+    <value>Strip not found. Refresh the channel list.</value>
+  </data>
+  <data name="Sm.Routing.UnknownAppType" xml:space="preserve">
+    <value>Unknown app type.</value>
+  </data>
+  <data name="Sm.Routing.ExeNotFound" xml:space="preserve">
+    <value>Could not find the path to the app executable.</value>
+  </data>
+  <data name="Sm.Routing.StripRemoved" xml:space="preserve">
+    <value>The strip was removed. Drop it again.</value>
+  </data>
+  <data name="Sm.Routing.SavedNoRedirect" xml:space="preserve">
+    <value>Rule saved, but the redirect has not been applied yet</value>
+  </data>
+  <data name="Sm.Routing.EnableOutVirt" xml:space="preserve">
+    <value>. Turn on OUT/VIRT on the '{0}' strip to route the channel</value>
+  </data>
+  <data name="Sm.Routing.UnbindPending" xml:space="preserve">
+    <value>Binding removed: resetting the output on next start</value>
+  </data>
+  <data name="Sm.Routing.UnbindSystem" xml:space="preserve">
+    <value>Binding removed: the system output is used</value>
+  </data>
+  <data name="Sm.Routing.UnbindFailed" xml:space="preserve">
+    <value>Could not reset the app output</value>
+  </data>
+  <data name="Sm.Routing.NotApplied" xml:space="preserve">
+    <value>Windows did not apply the route for PID {0} (0x{1:X8}). Check the app's audio session and the selected device.</value>
+  </data>
+  <data name="Sm.Routing.ComFailed" xml:space="preserve">
+    <value>COM error: HRESULT 0x{0:X8}</value>
+  </data>
+  <data name="Sm.Update.ConfirmPlan" xml:space="preserve">
+    <value>Install the update?</value>
+  </data>
+  <data name="Sm.Signature.UnsignedNone" xml:space="preserve">
+    <value>no signature information</value>
+  </data>
+  <data name="Sm.Signature.UnsignedUnreadable" xml:space="preserve">
+    <value>the signature could not be read: {0}</value>
+  </data>
+  <data name="Sm.Signature.Trusted" xml:space="preserve">
+    <value>the certificate is trusted</value>
+  </data>
+  <data name="Sm.Signature.UntrustedRoot" xml:space="preserve">
+    <value>the issuing certificate is not trusted</value>
+  </data>
+  <data name="Sm.Signature.CheckFailed" xml:space="preserve">
+    <value>could not run the signature check: {0}</value>
+  </data>
+  <data name="Sm.Settings.NoFile" xml:space="preserve">
+    <value>settings.json not found — starting with default settings</value>
+  </data>
+  <data name="Sm.Settings.Loaded" xml:space="preserve">
+    <value>settings.json loaded</value>
+  </data>
+  <data name="Sm.Settings.Migrated" xml:space="preserve">
+    <value>settings schema migrated {0} → {1}</value>
+  </data>
+  <data name="Sm.Settings.NewerSchema" xml:space="preserve">
+    <value>settings.json was written by schema version {0}, but this build only understands {1} — settings were not applied</value>
+  </data>
+  <data name="Sm.Settings.NotRewritten" xml:space="preserve">
+    <value>the file is not rewritten until an explicit save</value>
+  </data>
+  <data name="Sm.Settings.Corrupt" xml:space="preserve">
+    <value>settings.json is unreadable ({0}); the file was kept as {1}, starting with default settings</value>
+  </data>
+  <data name="Sm.Settings.NoPreset" xml:space="preserve">
+    <value>No saved settings — a minimal set of strips was created</value>
+  </data>
+  <data name="Sm.Obs.ObsRunning" xml:space="preserve">
+    <value>OBS is running and will overwrite user.ini on exit. Close OBS and try again.</value>
+  </data>
+  <data name="Sm.Obs.ParseFailed" xml:space="preserve">
+    <value>Could not parse {0} in {1}. The file was not modified.</value>
+  </data>
+  <data name="Sm.Obs.WriteFailed" xml:space="preserve">
+    <value>Could not modify {0}: {1}</value>
+  </data>
+  <data name="Sm.Obs.ConfigMissing" xml:space="preserve">
+    <value>{0} not found. Run OBS at least once so that it creates the configuration.</value>
+  </data>
+  <data name="Sm.Obs.NothingToRemove" xml:space="preserve">
+    <value>The SoundMeeter dock is not in the OBS configuration — there is nothing to remove.</value>
+  </data>
+  <data name="Sm.Obs.Installed" xml:space="preserve">
+    <value>Dock added to OBS. Restart OBS — the panel will appear under View → Docks → SoundMeeter.</value>
+  </data>
+  <data name="Sm.Obs.PortBusy" xml:space="preserve">
+    <value>Could not start the OBS dock server on port {0} ({1}). The port is in use: close the other program or pick a different port in the dock settings.</value>
+  </data>
+  <data name="Sm.Update.Check.NoReleases" xml:space="preserve">
+    <value>{0} — no releases in {1}/{2} yet</value>
+  </data>
+  <data name="Sm.Update.Check.UpToDate" xml:space="preserve">
+    <value>{0} — the installed version is up to date</value>
+  </data>
+  <data name="Sm.Update.Check.GitHubError" xml:space="preserve">
+    <value>GitHub API returned {0} {1}</value>
+  </data>
+  <data name="Sm.Update.Check.TagUnparsed" xml:space="preserve">
+    <value>could not parse the release tag</value>
+  </data>
+  <data name="Sm.Update.Check.Cancelled" xml:space="preserve">
+    <value>the check was cancelled</value>
+  </data>
+  <data name="Sm.Update.Check.AvailableNoPortable" xml:space="preserve">
+    <value>Version {0} is available, but without a portable archive</value>
+  </data>
+  <data name="Sm.Update.Check.AvailableWith" xml:space="preserve">
+    <value>Version {0} is available ({1})</value>
+  </data>
+  <data name="Sm.Update.Check.Truncated" xml:space="preserve">
+    <value>The update archive is incomplete: got {0} of {1} bytes.</value>
+  </data>
+  <data name="Sm.Update.Report.Header" xml:space="preserve">
+    <value>Checking update archive {0}</value>
+  </data>
+  <data name="Sm.Update.Report.Directory" xml:space="preserve">
+    <value>Directory: </value>
+  </data>
+  <data name="Sm.Update.Report.Kept" xml:space="preserve">
+    <value>Autostart keys and the %APPDATA%\SoundMeeter settings folder are not touched.</value>
+  </data>
+  <data name="Sm.Update.Plan.PayloadMissing" xml:space="preserve">
+    <value>The unpacked update archive was not found.</value>
+  </data>
+  <data name="Sm.Update.Plan.NoExe" xml:space="preserve">
+    <value>The release archive {0} has no {1} — the update does not look like a SoundMeeter build.</value>
+  </data>
+  <data name="Sm.Update.Plan.NoAssembly" xml:space="preserve">
+    <value>The release archive {0} has no {1} — the update is incomplete.</value>
+  </data>
+  <data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
+    <value>{0} in the release archive {1} is suspiciously small ({2} bytes) — the update was rejected.</value>
+  </data>
+  <data name="Sm.Update.Plan.FilesTotal" xml:space="preserve">
+    <value>Files in the build: {0}, {1} in total</value>
+  </data>
+  <data name="Sm.Update.Plan.NoStale" xml:space="preserve">
+    <value>No stale files in the install directory</value>
+  </data>
+  <data name="Sm.Update.Plan.StaleCount" xml:space="preserve">
+    <value>{0} files will be deleted</value>
+  </data>
+  <data name="Sm.Update.Plan.ExeTooSmall" xml:space="preserve">
+    <value>{0} in the release archive is suspiciously small ({1} bytes) — this is not a Windows executable.</value>
+  </data>
+  <data name="Sm.Update.Plan.NotAnExe" xml:space="preserve">
+    <value>{0} is not a Windows executable (no MZ signature).</value>
+  </data>
+  <data name="Sm.Update.Plan.PeOk" xml:space="preserve">
+    <value>{0}: PE header is fine, {1}</value>
+  </data>
+  <data name="Sm.Update.Plan.SignatureValid" xml:space="preserve">
+    <value>The Authenticode signature is valid: {0}</value>
+  </data>
+  <data name="Sm.Update.Plan.SignatureInvalid" xml:space="preserve">
+    <value>The Authenticode signature of {0} is invalid ({1}) — the update was rejected.</value>
+  </data>
+  <data name="Sm.Update.Plan.Unsigned" xml:space="preserve">
+    <value>{0} is not signed (SoundMeeter builds are unsigned)</value>
+  </data>
+  <data name="Sm.Update.Plan.DeletionNone" xml:space="preserve">
+    <value>No files from the current build will be removed.</value>
+  </data>
+  <data name="Sm.Update.Plan.DeletionOne" xml:space="preserve">
+    <value>One file will be removed:</value>
+  </data>
+  <data name="Sm.Update.Plan.DeletionMany" xml:space="preserve">
+    <value>{0} files will be removed:</value>
+  </data>
+  <data name="Sm.Update.Plan.DeletionMore" xml:space="preserve">
+    <value>… and {0} more files (the full list is in the log)</value>
+  </data>
+  <data name="Sm.Update.Script.Caption" xml:space="preserve">
+    <value>SoundMeeter: update</value>
+  </data>
+  <data name="Sm.Update.Script.AppDidNotExit" xml:space="preserve">
+    <value>The app did not exit within 5 minutes — the update was cancelled.</value>
+  </data>
+  <data name="Sm.Update.Script.CopyFailed" xml:space="preserve">
+    <value>Could not replace the files in {0}. Close the programs that use SoundMeeter files and try updating again.</value>
+  </data>
+  <data name="Sm.Update.Script.LaunchFailed" xml:space="preserve">
+    <value>The files were updated, but the app could not be started. Open SoundMeeter.exe manually: {0}</value>
+  </data>
+  <data name="Sm.Dock.Connection" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="Sm.Dock.EngineStopped" xml:space="preserve">
+    <value>engine stopped</value>
+  </data>
+  <data name="Sm.Dock.NoChannels" xml:space="preserve">
+    <value>No channels selected.&lt;br&gt;Choose them in SoundMeeter → OBS dock.</value>
+  </data>
+  <data name="Sm.Dock.VolumeTitle" xml:space="preserve">
+    <value>Volume (double-click = 0 dB)</value>
+  </data>
+  <data name="Sm.Dock.In" xml:space="preserve">
+    <value>IN</value>
+  </data>
+  <data name="Sm.Dock.Out" xml:space="preserve">
+    <value>OUT</value>
+  </data>
+  <data name="Sm.Dock.Mute" xml:space="preserve">
+    <value>MUTE</value>
+  </data>
+  <data name="Sm.Dock.Solo" xml:space="preserve">
+    <value>SOLO</value>
+  </data>
+  <data name="Sm.Unit.Bytes" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="Sm.Unit.Kilobytes" xml:space="preserve">
+    <value>KB</value>
+  </data>
+  <data name="Sm.Unit.Megabytes" xml:space="preserve">
+    <value>MB</value>
+  </data>
+  <data name="Sm.Unit.Gigabytes" xml:space="preserve">
+    <value>GB</value>
+  </data>
+  <data name="Sm.Tray.Menu" xml:space="preserve">
+   <value>Application</value>
+  </data>
+  <data name="Sm.Tray.Enabled" xml:space="preserve">
+   <value>Minimize to tray</value>
+  </data>
+  <data name="Sm.Tray.EnabledTip" xml:space="preserve">
+   <value>Show an icon in the notification area. With it on, closing the window hides it instead of quitting — exit from the tray menu.</value>
+  </data>
+  <data name="Sm.Tray.Startup" xml:space="preserve">
+   <value>Start with Windows</value>
+  </data>
+  <data name="Sm.Tray.StartupTip" xml:space="preserve">
+   <value>Launch SoundMeeter when you log in. Adds a record to the current user's Run key; turning it off removes that record.</value>
+  </data>
+  <data name="Sm.Tray.On" xml:space="preserve">
+   <value>on</value>
+  </data>
+  <data name="Sm.Tray.Off" xml:space="preserve">
+   <value>off</value>
+  </data>
+  <data name="Sm.Tray.Enable" xml:space="preserve">
+   <value>enable</value>
+  </data>
+  <data name="Sm.Tray.Disable" xml:space="preserve">
+   <value>disable</value>
+  </data>
+  <data name="Sm.Tray.StartupFailedTitle" xml:space="preserve">
+   <value>Startup entry</value>
+  </data>
+  <data name="Sm.Tray.StartupFailedMessage" xml:space="preserve">
+   <value>Could not turn startup {0}. The switch stayed as it is in the system.</value>
+  </data>
+  <data name="Sm.Tray.Open" xml:space="preserve">
+   <value>Open SoundMeeter</value>
+  </data>
+  <data name="Sm.Tray.RunToggle" xml:space="preserve">
+   <value>Start / stop engine</value>
+  </data>
+  <data name="Sm.Tray.Exit" xml:space="preserve">
+   <value>Exit</value>
+  </data>
+</root>

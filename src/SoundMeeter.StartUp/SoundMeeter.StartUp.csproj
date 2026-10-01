@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <AssemblyName>SoundMeeter.StartUp</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <!--
+      Запуск приложения: автозапуск вместе с Windows через ключ Run (SM-D01) и
+      гарантия одного работающего экземпляра (SM-D03). Обе задачи — про то, как
+      приложение ведёт себя в сеансе Windows, поэтому живут вместе.
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.Logger\SoundMeeter.Logger.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter" />
+    <InternalsVisibleTo Include="SoundMeeter.StartUp.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <AssemblyName>SoundMeeter.TrayIcon</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <!--
+      Значок в системном лотке (SM-D02).
+
+      WinForms подключён ради NotifyIcon: трей сначала был написан прямом вызовом
+      Shell_NotifyIcon, и это стоило System.ExecutionEngineException — ошибки
+      уровня CLR на чтении структуры NOTIFYICONDATA из неинициализированной
+      памяти. Готовый класс надёжнее, а смешение WPF и WinForms в одном процессе
+      штатно поддерживается.
+    -->
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      UseWindowsForms добавляет глобальные using System.Windows.Forms и
+      System.Drawing, а они конфликтуют с WPF-типами с теми же именами
+      (Application, Control, Point, Pen, DragEventArgs…). Здесь файлов мало, и
+      импорты нужны явно, поэтому глобальные убраны, а подключение сборки
+      оставлено.
+    -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.Logger\SoundMeeter.Logger.csproj" />
+    <ProjectReference Include="..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter" />
+  </ItemGroup>
+
+</Project>

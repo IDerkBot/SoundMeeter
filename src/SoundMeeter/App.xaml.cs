@@ -57,7 +57,7 @@ namespace SoundMeeter
             services.AddSingleton<IAudioService, AudioService>();
             services.AddSingleton<IInstalledAppsService, InstalledAppsService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
-            services.AddSingleton<IUpdateService, UpdateService>();
+            services.AddSingleton<IUpdateService, GithubUpdateService>();
             // Автозапуск вместе с Windows (SM-D01).
             services.AddSingleton<IStartupService, StartupService>();
             // Док-панель OBS: локальный сервер, отдающий страницу панели.

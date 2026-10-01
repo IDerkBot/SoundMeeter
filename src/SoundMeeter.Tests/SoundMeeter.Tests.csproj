@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      Тот же RID, что у SoundMeeter: без него проект собирается как MSIL, а
+      ссылка на win-x64-сборку даёт MSB3270 и расхождение архитектур.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Тесты дёргают устаревшие API NAudio (MmDevice, WasapiCapture) так же,
+         как и сам модуль: предупреждения о них повторяют предупреждения сборки
+         SoundMeeter и не дают ничего нового. -->
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter\SoundMeeter.csproj" />
+  </ItemGroup>
+
+</Project>

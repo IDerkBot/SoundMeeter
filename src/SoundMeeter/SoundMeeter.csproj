@@ -7,36 +7,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <!--
-      WinForms подключён только ради NotifyIcon (значок в трее, SM-D02). Раньше трей
-      был написан прямом вызовом Shell_NotifyIcon, и это стоило
-      System.ExecutionEngineException — ошибки уровня CLR на чтении структуры
-      NOTIFYICONDATA из неинициализированной памяти. Готовый класс надёжнее, а
-      смешение WPF и WinForms в одном процессе штатно поддерживается.
-    -->
-    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current). -->
     <Version>0.0.1</Version>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
-
-  <!--
-    UseWindowsForms добавляет глобальные using System.Windows.Forms и
-    System.Drawing, а они конфликтуют с WPF-типами с теми же именами:
-    Application, Control, Point, Pen, IDataObject, DragEventArgs,
-    MouseEventArgs, KeyEventArgs. Конфликт вылезает по всему проекту целиком,
-    даже в файлах, которые про WinForms не знают.
-
-    Поэтому подключение WinForms остаётся (оно нужно NotifyIcon), а
-    неявные импорты убираются: файл, который правда работает с треем,
-    подключает System.Windows.Forms явно у себя.
-  -->
-  <ItemGroup>
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />
@@ -63,14 +39,28 @@
     <PackageReference Include="YellowDogMan.RRNoise.NET" Version="0.1.9" />
   </ItemGroup>
 
-  <ItemGroup>
+<ItemGroup>
     <!--
-      Ядро без UI: обработка звука, модели пресета, миграции настроек, журнал и
-      строки локализации. Ссылка именно на него, а не наоборот, — единственное
-      направление, которое держит проект собираемым: WPF не должен просачиваться
-      в DSP, иначе строки в сообщениях об ошибках стоили бы целой платформы.
+      Модули приложения вынесены в отдельные сборки (SM-A09). Каждая отвечает за
+      одну задачу и тянет ровно то, что нужно ей:
+
+        SoundMeeter.Audio         обработка звука, модель пресета, миграции (без WPF)
+        SoundMeeter.Logger        журнал в ротируемый файл (SM-A03)
+        SoundMeeter.ChangeLanguage строки локализации EN/RU (SM-C07)
+        SoundMeeter.Update        обновление с GitHub Releases (SM-A06/SM-E03)
+        SoundMeeter.StartUp       автозапуск вместе с Windows и один экземпляр (SM-D01/D03)
+        SoundMeeter.TrayIcon      значок в системном лотке (SM-D02)
+
+      Направление ссылок одно: модули ссылаются на Logger и ChangeLanguage, но не
+      друг на друга и никогда — на приложение. Поэтому циклов не возникает, а
+      переезд отдельной задачи не задевает остальные.
     -->
     <ProjectReference Include="..\SoundMeeter.Audio\SoundMeeter.Audio.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Logger\SoundMeeter.Logger.csproj" />
+    <ProjectReference Include="..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Update\SoundMeeter.Update.csproj" />
+    <ProjectReference Include="..\SoundMeeter.StartUp\SoundMeeter.StartUp.csproj" />
+    <ProjectReference Include="..\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.csproj" />
     <ProjectReference Include="..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
   </ItemGroup>
 

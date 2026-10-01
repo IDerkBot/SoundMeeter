@@ -184,7 +184,7 @@
 ### SM-A07 — Ядро без UI в отдельной сборке
 **Приоритет:** P2 · **Статус:** реализовано (2026-09-29) · **Файлы:** новый проект
 `Modules/SoundMeeter.Audio` (`Audio/`, `Models/`, `Logging/`, `Loc.cs`,
-`Resources/Strings*.resx`), `Modules/SoundMeeter/Services/LocResources.cs`
+`ChangeLanguage/Resources/Strings*.resx`), `Services/LocResources.cs`
 
 Требование: обработка звука, модель пресета и миграции настроек не должны
 зависеть от WPF — иначе любая проверка DSP обязана поднимать графику, а
@@ -228,7 +228,7 @@ Namespace'ы не менялись: `SoundMeeter.Audio`, `SoundMeeter.Models`,
   без него не копируется нативный `rnnoise.dll` из пакета.
 
 ### SM-D01 — Автозапуск вместе с Windows
-**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `Services/StartupService.cs`
+**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `StartUp/StartupService.cs`
 (`IStartupService`), `ViewModels/MainViewModel.Behaviour.cs`,
 `App.xaml.cs`, `Views/Controls/MixerToolbarView.xaml`, `Models/AppSettings.cs`
 (поле `RunAtStartup`), `Models/SettingsMigrator.cs` (миграция `4 → 5`)
@@ -259,7 +259,7 @@ Namespace'ы не менялись: `SoundMeeter.Audio`, `SoundMeeter.Models`,
 - Пометка в `settings.json` не может включить автозапуск в обход системы.
 
 ### SM-D02 — Значок в системном лотке и сворачивание вместо закрытия
-**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `Services/TrayIconService.cs`,
+**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `TrayIcon/TrayIconService.cs`,
 `Views/MainWindow.xaml.cs`, `ViewModels/MainViewModel.Behaviour.cs`,
 `Views/Controls/MixerToolbarView.xaml`, `Models/AppSettings.cs` (поле
 `TrayEnabled`)
@@ -332,6 +332,80 @@ WASAPI-клиента на одном устройстве расходятся 
 - Мьютекс освобождается при нормальном выходе, иначе после аварийного завершения
   программа считалась бы «уже работающей».
 
+### SM-A09 — Разбиение на модульные сборки
+**Приоритет:** P2 · **Статус:** сделано · **Файлы:** новые проекты
+`Modules/SoundMeeter.Logger`, `SoundMeeter.ChangeLanguage`, `SoundMeeter.Update`,
+`SoundMeeter.StartUp`, `SoundMeeter.TrayIcon` + правки `SoundMeeter.csproj`,
+`SoundMeeter.Audio.csproj`
+
+Приложение разбито на сборки по задачам, а не по слоям. Границы взяты из
+фактических зависимостей, а не из желания «так правильнее»:
+
+| проект | содержимое | зависимости |
+|---|---|---|
+| `SoundMeeter.Audio` | DSP, `InputSource`, модель пресета, `SettingsMigrator` | Logger, ChangeLanguage |
+| `SoundMeeter.Logger` | `AppLog`, `RotatingFileLoggerProvider` (SM-A03) | — |
+| `SoundMeeter.ChangeLanguage` | `Loc`, `Strings*.resx` (SM-C07), без WPF | — |
+| `SoundMeeter.Update` | `GithubUpdateService`, `UpdateApplier`, `AuthenticodeVerifier`, `IUpdateService`, модели `UpdatePlan`/`UpdateInfo`/`GitHubReleaseDto`/`AppVersion` | Logger, ChangeLanguage |
+| `SoundMeeter.StartUp` | `StartupService` (SM-D01), `SingleInstanceGuard` (SM-D03) | Logger |
+| `SoundMeeter.TrayIcon` | `TrayIconService` (SM-D02) | Logger, ChangeLanguage |
+
+Направление ссылок одно: модули ссылаются на Logger и ChangeLanguage, но не друг
+на друга и никогда — на приложение. Циклов не возникает, поэтому переезд
+отдельной задачи не задевает остальные.
+
+`UpdateService` переименован в `GithubUpdateService`: имя уточняет источник
+релизов, а не механизм обновления. Контракт остался `IUpdateService` — о нём
+знает остальное приложение, и он не должен упоминать GitHub. Второй источник
+(свой сервер, зеркало) добавится как ещё одна реализация того же интерфейса, без
+правок в UI.
+
+`AppVersion` переехал в `SoundMeeter.Update` вместе с `UpdatePlan` и
+`UpdateInfo`: он читается только механизмом обновления и в ядре обработки звука
+был лишним.
+
+Тесты разведены по тем же границам: `AppVersionTests` — в
+`SoundMeeter.Update.Tests`, `LocTests` — в `SoundMeeter.ChangeLanguage.Tests`.
+Иначе имя проекта «Audio.Tests» врало бы о своём содержимом.
+
+Критерии приёмки:
+- Ни один модуль не ссылается на приложение и не ссылается на другой модуль,
+  кроме Logger и ChangeLanguage.
+- `SoundMeeter.Audio.dll` по-прежнему не тянет WPF.
+- Все строки локализации находятся из `SoundMeeter.ChangeLanguage` (иначе
+  `Loc.Get` вернёт `⟨Sm.Ключ⟩` молча, без исключения).
+- Тестов не потеряно при переносе.
+
+Ловушки, зафиксированные при переносе:
+- `resx` обязан лежать в подкаталоге `Resources\`. Положенный в корень проекта,
+  он встраивается как `SoundMeeter.Strings`, а `Loc` ищет
+  `SoundMeeter.Resources.Strings` — и весь интерфейс молча превращается в
+  список ключей. Именно на это упали 5 тестов `LocTests` при первом переносе.
+- `UseWindowsForms` пришлось убрать и из самого приложения: после того как трей
+  уехал в отдельный проект, WinForms ему больше не нужен, а глобальные `using`
+  из него конфликтуют с WPF-типами по всему проекту.
+- `LocResources` (мост WPF: `ResourceDictionary`, `XmlLanguage`) обязан остаться в
+  приложении. Положенный в `ChangeLanguage` рядом с `Loc`, он заставил объявить
+  там `UseWPF`, и WPF доехал до `SoundMeeter.Audio` по цепочке `ProjectReference`:
+  `Audio → ChangeLanguage → PresentationFramework`. Прямые ссылки `Audio` при этом
+  выглядели чисто, поэтому нарушение не видели ни компилятор, ни функциональные
+  тесты. `ChangeLanguage` оставлен без `UseWPF`.
+
+Инвариант границ защищён тестами, а не только договорённостью:
+- `AudioModuleBoundaryTests` (в `SoundMeeter.Audio.Tests`) обходит граф ссылок от
+  `Audio` и проверяет, что WPF не встречается ни в одной достижимой сборке, а
+  также что ядро не ссылается на приложение, `Update`, `TrayIcon` и `StartUp`.
+- `ModuleBoundaryTests` (в `SoundMeeter.Tests`) проверяет, что прикладные модули
+  не ссылаются друг на друга, база (`Logger`, `ChangeLanguage`) ни на что не
+  ссылается, и никто не ссылается на приложение.
+
+Стража проверялась мутациями, и это выявило две собственные ошибки в нём:
+1. Первая версия смотрела только прямые ссылки `Audio` и проходила при реальном
+   нарушении — WPF сидел на два уровня глубже. Пришлось обходить граф.
+2. Мутация `<UseWPF>true</UseWPF>` без WPF-кода оказалась инертной: компилятор не
+   пишет ссылку на сборку, из которой код не используется. Ловится только
+   настоящее нарушение — WPF-код в базовом модуле.
+
 ### SM-A08 — Утечка памяти: неосвобождённые COM-объекты MMDevice
 **Приоритет:** P0 · **Статус:** исправлено (2026-09-30) · **Файлы:**
 `Services/AudioService.cs`, `Services/WasapiAudioEngine.cs`,
@@ -391,7 +465,7 @@ WASAPI-клиента на одном устройстве расходятся 
 в журнале, причина в отставании потока захвата, а не в утечке объектов.
 
 ### SM-A06 — Безопасность автообновления
-**Приоритет:** P0 · **Статус:** реализовано (2026-09-27) · **Файлы:** `Services/UpdateApplier.cs`, `Services/AuthenticodeVerifier.cs`, `Models/UpdatePlan.cs`
+**Приоритет:** P0 · **Статус:** реализовано (2026-09-27) · **Файлы:** `Update/UpdateApplier.cs`, `Update/AuthenticodeVerifier.cs`, `Update/UpdatePlan.cs`
 
 `UpdateApplier` генерирует `.ps1` во временном каталоге и запускает его с
 `-ExecutionPolicy Bypass`; `robocopy /MIR` затем удаляет из каталога установки
@@ -490,7 +564,7 @@ RNNoise уже возвращает вероятность речи, но в т�
 `Models/SettingsMigrator.cs` (шаг `3 → 4`), `ViewModels/StripEffectViewModel.cs`,
 `Views/Controls/StripEffectSettingsView.xaml`, `Views/Controls/MixerTheme.xaml`
 (`EffectBtn`, `EffectKnobTemplate`), `Models/MidiSettings.cs`,
-`ViewModels/MainViewModel.Midi.cs`, `Resources/Strings*.resx`
+`ViewModels/MainViewModel.Midi.cs`, `ChangeLanguage/Resources/Strings*.resx`
 
 На каждом входе сейчас есть только RNNoise-денойзер с тремя formant-пиками.
 VoiceMeeter/другие аналоги дают компрессор, гейт и эквалайзер на канал — это
@@ -586,7 +660,7 @@ insert'ами с регулятором Wet, а не посылками. Рег�
 `ViewModels/OutputOptionViewModel.cs`, `ViewModels/StripEffectViewModel.cs`,
 `Models/InputChannelModel.cs` (`EffectDefaults`), `Views/Controls/MixerTheme.xaml`,
 `Views/Controls/DenoiserSettingsView.xaml`, `Views/Controls/InputStripView.xaml`,
-`Resources/Strings*.resx`
+`ChangeLanguage/Resources/Strings*.resx`
 
 Требование: двойной щелчок по любому регулятору возвращает его значение по
 умолчанию.
@@ -708,8 +782,8 @@ Shift+колесо — шаг 1 дБ, перетаскивание относи�
 - Персистентность порядка проверяется после перезапуска приложения.
 
 ### SM-C07 — Локализация интерфейса
-**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `Resources/Strings.resx`,
-`Resources/Strings.ru.resx`, `Services/Loc.cs`, `ViewModels/LocalizedViewModel.cs`,
+**Приоритет:** P2 · **Статус:** сделано · **Файлы:** `ChangeLanguage/Resources/Strings.resx`,
+`ChangeLanguage/Resources/Strings.ru.resx`, `ChangeLanguage/Loc.cs`, `ViewModels/LocalizedViewModel.cs`,
 `Models/AppSettings.cs` (`Language`), `Views/Controls/MixerToolbarView.xaml`
 
 UI-строки вынесены в ресурсы, добавлен переключатель RU/EN с сохранением выбора.
@@ -758,7 +832,7 @@ UI-строки вынесены в ресурсы, добавлен перек�
 `ViewModels/InputChannelViewModel.cs`, `ViewModels/MainViewModel.Midi.cs`,
 `Views/Controls/FuncButtonSettingsView.xaml`, `Views/Controls/InputStripView.xaml`,
 `Views/Controls/MixerTheme.xaml` (`FuncBtn`, `FuncTargetTemplate`),
-`Resources/Strings*.resx`
+`ChangeLanguage/Resources/Strings*.resx`
 
 Требование: в колонке кнопок входного стрипа (рядом с MONO/SOLO/MUTE/DEN) две
 пользовательские кнопки FUNC, на которые назначается вывод стрипа в указанные
