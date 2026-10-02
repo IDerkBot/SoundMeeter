@@ -36,8 +36,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+      Кто имеет право видеть internal: ядро (SoundMeeter.Core — ViewModels и
+      WasapiAudioEngine), приложение (SoundMeeter.App — имя сборки exe осталось
+      прежним) и оба тестовых проекта. SoundMeeter.Tests больше не существует —
+      после разделения на Core/App его логику и UI разнесли по
+      SoundMeeter.Core.Tests и SoundMeeter.App.Tests.
+    -->
     <InternalsVisibleTo Include="SoundMeeter.Audio.Tests" />
-    <InternalsVisibleTo Include="SoundMeeter.Tests" />
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
+    <InternalsVisibleTo Include="SoundMeeter.App.Tests" />
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
     <InternalsVisibleTo Include="SoundMeeter" />
   </ItemGroup>
 

@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>SoundMeeter.Core</AssemblyName>
+    <!--
+      RootNamespace именно SoundMeeter: перенесённые файлы объявляют namespace
+      SoundMeeter.ViewModels / SoundMeeter.Services / SoundMeeter.AudioPolicy, и
+      оставить их такими же — значит не трогать ни один using, ни одну строку
+      разметки (в XAML стоит clr-namespace:SoundMeeter.Views.Controls и
+      d:DataType на модель ядра). Проект называется Core, а пространства имён
+      остаются прежними — как это уже сделано в ChangeLanguage.
+    -->
+    <RootNamespace>SoundMeeter</RootNamespace>
+    <!--
+      Собираем RID: библиотека без него не получает нативные ассеты пакетов
+      (rnnoise.dll из YellowDogMan.RRNoise.NET) в свой выход, и portable-публикация
+      приложения остаётся без денойзера.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      UseWPF ЗДЕСЬ БОЛЬШЕ НЕТ (SM-A10, этап 2) — и это не украшение, а требование,
+      которое теперь проверяется тестом CoreWpfFreeTests в SoundMeeter.Core.Tests.
+
+      Что стояло за этим флагом и куда делось:
+        * значки приложений — BitmapImage/ImageSource в AppViewModel,
+          ConfiguredAppViewModel, InstalledAppViewModel и в мёртвом
+          IAudioService.GetAppIcon. Теперь значок достаёт UI: конвертеры
+          FileIconConverter/ProcessIconConverter и единственная копия P/Invoke
+          в ShellIcons. Ядро отдаёт только путь или PID;
+        * Application.Current.Dispatcher в LocalizedViewModel — подстраховка, ветка
+          «с фонового потока» не срабатывала никогда (Loc.LanguageChanged поднимают
+          только App.OnStartup и MainViewModel.SelectLanguage, оба с UI-потока).
+          Реальная маршрутизация осталась там, где события действительно фоновые
+          (MIDI, команды дока) и идёт через IDispatcherService;
+        * DispatcherTimer метров — стал IUiTimer (реализация DispatcherTimerAdapter
+          в приложении);
+        * ICollectionView для фильтра установленных программ — стал обычный
+          ObservableCollection, который пересобирается сам;
+        * Clipboard в LogViewModel и ObsDockSettingsViewModel — стал IClipboardService;
+        * LocResources (ResourceDictionary + XmlLanguage) — уехал в приложение ещё
+          на этапе 1.
+
+      Если флаг вернётся «на всякий случай», ядро снова станет непереносимым в
+      не-WPF хост, и проверка об этом (CoreWpfFreeTests) упадёт.
+    -->
+
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <!-- WasapiOut/WasapiCapture в NAudio 3.1.0 помечены obsolete (SM-A09-era
+         предупреждение, переехало сюда вместе с WasapiAudioEngine). -->
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
+    <!-- WasapiAudioEngine, AudioService и MidiService живут здесь, поэтому NAudio
+         нужен ядру напрямую (в приложении кода на NAudio больше нет). -->
+    <PackageReference Include="NAudio" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Ядро — слой, который собирает модули: ViewModels видят IAudioEngine,
+      IUpdateService и IStartupService, поэтому ссылки на Update и StartUp
+      законны и идут отсюда. Направление прежнее, модули по-прежнему не знают
+      друг о друге (MainViewModel.Update.cs и MainViewModel.Behaviour.cs — единственные
+      точки входа в Update и StartUp).
+
+      SoundMeeter.TrayIcon сюда НЕ подключается: значок в трее это UI (WinForms
+      NotifyIcon), и его держит окно в SoundMeeter.App.
+    -->
+    <ProjectReference Include="..\SoundMeeter.Audio\SoundMeeter.Audio.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Logger\SoundMeeter.Logger.csproj" />
+    <ProjectReference Include="..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Update\SoundMeeter.Update.csproj" />
+    <ProjectReference Include="..\SoundMeeter.StartUp\SoundMeeter.StartUp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- InstalledAppsService читает файл от BaseDirectory/Resources — путь на диске
+         не меняется, меняется только то, какой проект его копирует в выход. -->
+    <None Update="Resources\system_apps_filter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Панель док-панели OBS: вшиваем в сборку ядра, а не приложения. ObsDockAssets
+       читает ресурс через Assembly.GetExecutingAssembly(), поэтому ресурс обязан
+       лежать в той же сборке, что и сервер: иначе dock отдаст 404 (или, что хуже,
+       тихо пустую страницу) после переезда сервера. Логические имена
+       "obs-dock.*" те же — их знает ObsDockAssets. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\obs-dock\index.html" LogicalName="obs-dock.index.html" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.css" LogicalName="obs-dock.dock.css" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.js" LogicalName="obs-dock.dock.js" />
+  </ItemGroup>
+
+</Project>

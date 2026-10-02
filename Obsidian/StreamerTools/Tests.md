@@ -1,20 +1,50 @@
-Пункт 1 сделан. Тест-проект в репозитории: **61 тест, ~1 с, без аудиоустройств и без администратора.**
-
 ## Что появилось
 
-`Modules/SoundMeeter.Tests` (xUnit 2.5.3), добавлен в `StreamerTools.slnx`:
+Тестов теперь шесть проектов, **120 тестов, ~6 с, без аудиоустройств и без администратора**
+(до разделения на Core/App был один проект `SoundMeeter.Tests` на 48 тестов):
+
+| Проект | Тестов | Файлы |
+|---|---|---|
+| `SoundMeeter.App.Tests` | 54 | `FuncButtonTests`, `StripEffectTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
+| `SoundMeeter.Core.Tests` | 11 | `AudioEnginePresetTests`, `MidiBindingTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
+| `SoundMeeter.Audio.Tests` | 31 | `StripDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
+| `SoundMeeter.Update.Tests` | 18 | `AppVersionTests`, выбор ассета релиза |
+| `SoundMeeter.ChangeLanguage.Tests` | 6 | все ключи локализации находятся, все языковые файлы полны |
 
 | Файл | Что защищает |
 |---|---|
 | `FuncButtonTests` | назначение, эксклюзивность, аддитивный режим, возврат базы, метка, кнопка без назначения |
-| `SettingsMigratorTests` | v0→4, чистка мусора, JSON round-trip, отказ от новой схемы |
 | `AudioEnginePresetTests` | чистка мёртвых Id, глубокое копирование снимка, «перезапуск» |
 | `StripDspTests` | компрессор/trim/задержка/реверберация на сигнале, NaN-защита |
 | `StripEffectTests` | крутилки, попап, раскладка колонки, клики |
 | `MidiBindingTests` | дескрипторы Func, Set/Get/Toggle через приватный диспетчер |
 | `ParamResetTests` | сброс всех пяти типов регуляторов, «повторный сброс не пачкает пресет» |
+| `ModuleBoundaryTests` | 9 проверок: модули не знают друг о друге, не знают про ядро и приложение, ядро не знает про приложение и UI-модули, приложение знает про ядро, точка входа только у приложения |
+| `AppIconTests` | значок по пути и по PID на настоящем файле Windows: непустой, замороженный, кэшируется, на мусоре и на мёртвом PID возвращает null, ConvertBack падает |
+| `CoreWpfFreeTests` | ядро не ссылается на WPF ни прямо, ни по цепочке; ядро — библиотека без точки входа |
 
-Инфраструктура — `UiHost` (STA-поток с `Application` и `Loc`), `FakeAudioEngine`, `VisualTree`, `Signal`, `Strips`.
+Инфраструктура — `UiHost` и `VisualTree` живут в `SoundMeeter.App.Tests` (нужна разметка и
+настоящий `Application`), `FakeAudioEngine` и `Strips` — в `SoundMeeter.Core.Tests`, откуда
+`App.Tests` линкует их исходники (`<Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\...">`
+). Дублировать фикстуры нельзя: `FakeAudioEngine` — реализация `IAudioEngine`, и вторая копия
+разошлась бы с первой по сигнатуре.
+
+## Граница «ядро не тянет UI» — теперь проверяется
+
+`UseWPF` снят с `SoundMeeter.Core`, и это проверяет `CoreWpfFreeTests` (обход всего графа
+ссылок ядра, а не одного уровня — см. историю с `LocResources` в `ChangeLanguage`).
+`SoundMeeter.Core.Tests` тоже без `UseWPF`: если в ядре снова появится `System.Windows`,
+этот проект даже не соберётся, а тест падать не будет.
+
+Проверено пробой в обе стороны:
+* вернул `UseWPF` в Core — `CoreWpfFreeTests.CoreDoesNotDependOnWpf` упал;
+* положил в Core файл с `System.Windows.Application` — сборка Core отказалась
+  (`CS0234`), то есть границу держит уже и компилятор.
+
+Тонкость, о которой стоит помнить (перенесена из этапа 1): `Assembly.GetReferencedAssemblies()`
+показывает сборки, ТИПЫ которых реально используются. Просто добавленный `ProjectReference`
+без единого `using` в метаданных не появляется и тестом не ловится — ловится только
+настоящая связь. Первая проба «добавил ссылку на TrayIcon» так и осталась зелёной.
 
 ## Что выяснилось по дороге
 

@@ -9,6 +9,150 @@
 
 ## LAST_ACTION
 
+### Resolved (этот turn) — этап 2 SM-A10: ядро без WPF (UseWPF снят, граница закреплена тестом)
+- ЗАДАЧА: «Всё, я закрыл приложение, можешь выполнять этап 2» — то есть убрать WPF из
+  `SoundMeeter.Core`, как и было записано планом в конце предыдущего turn.
+- ЧТО ЗАКРЫТО ИНТЕРФЕЙСАМИ (по одному на зависимость, все — в Core, реализации в App):
+  * ЗНАЧКИ. `BitmapImage`/`ImageSource` жили в `AppViewModel`, `ConfiguredAppViewModel`,
+    `InstalledAppViewModel` (у каждого своя копия P/Invoke `SHGetFileInfo`) и в
+    `IAudioService.GetAppIcon(uint)`, который НЕ ВЫЗЫВАЛСЯ НИ РАЗУ. Теперь значок
+    достаёт UI: `Converters/FileIconConverter` (путь), `Converters/ProcessIconConverter`
+    (PID) и единственная копия interop в `Services/ShellIcons.cs` с кэшем по пути.
+    Ядро отдаёт только строку `IconPath` или `uint ProcessId`. Мёртвый `GetAppIcon`
+    удалён вместе с кэшем и `using System.Drawing`.
+  * ПОТОК UI. `IDispatcherService` расширен `Post(Action)` и `HasThreadAccess`; реализация
+    `DispatcherService` переехала в App и берёт `Application.Current.Dispatcher` один
+    раз в конструкторе. `LocalizedViewModel` больше не знает про `Application.Current`:
+    добавлен `protected virtual RunOnUiThread` (по умолчанию сразу). Переопределяют его
+    ровно два места — `MainViewModel` и `MidiBindingsViewModel`, потому что только там
+    события реально приходят с фонового потока (MIDI-порт и команды дока).
+    Обоснование снятия подстраховки в базовом классе: `Loc.LanguageChanged` поднимают
+    только `App.OnStartup` и `MainViewModel.SelectLanguage`, оба с UI-потока, поэтому
+    ветка «с фонового потока» не срабатывала никогда.
+  * ТАЙМЕР МЕТРОВ. `DispatcherTimer` в `MainViewModel` → `IUiTimer`
+    (`Interval`/`Ticked`/`Start`/`Stop`/`IDisposable`), реализация
+    `Services/DispatcherTimerAdapter.cs`. Период 33 мс остался в ядре (`MeterInterval`),
+    регистрация в DI — синглтон (создаётся на UI-потоке в `App.OnStartup`).
+  * ФИЛЬТР СПИСКА. `ICollectionView` + `Filter` → обычный `ObservableCollection`
+    `FilteredInstalledApps` и `RefilterInstalledApps()` (тот же предикат: имя/издатель,
+    регистронезависимо). Вызывается из обработчика строки поиска и после загрузки списка.
+  * БУФЕР ОБМЕНА. `Clipboard.SetText` в `LogViewModel` и `ObsDockSettingsViewModel` →
+    `IClipboardService`; реализация `Services/ClipboardService.cs` бросает наружу, если
+    вызвали не с UI-потока (буфер живёт в STA).
+- ГРАНИЦА ЗАКРЕПЛЕНА ТЕСТОМ: `CoreWpfFreeTests` (в Core.Tests) — обход ВСЕГО графа
+  ссылок ядра и запрет `PresentationFramework`/`PresentationCore`/`WindowsBase`/
+  `System.Xaml`, плюс проверка, что у ядра нет точки входа. В `ModuleBoundaryTests`
+  добавлена парная проверка «у приложения точка входа есть, у ядра нет».
+  `SoundMeeter.Core.Tests` тоже остался без `UseWPF` — вторая линия защиты (компилятор).
+- ТЕСТЫ ЗНАЧКОВ (новых 9, `AppIconTests`): значок по реальному `System32\notepad.exe`
+  непустой и замороженный, кэш возвращает тот же экземпляр, на пустом/несуществующем
+  пути и на мёртвом PID — null без исключения, `ConvertBack` бросает. Раньше на код
+  извлечения значка НИ ОДНОГО теста не было — он работал «на глаз».
+- ИТОГ: `dotnet build src\SoundMeeter.slnx` (Debug и Release) — 0 ошибок, 0 своих
+  предупреждений; `dotnet test` — 120 зелёных (было 108: +2 границы, +1 точка входа,
+  +9 значков). `SoundMeeter.Core.dll` больше не ссылается ни на одну сборку WPF, а в
+  выходе `SoundMeeter.Core.Tests` WPF-сборок нет вообще.
+- ЖИВОЙ ПРОГОН (приложение на машине пользователя): окно открылось, пресет 6 входов /
+  5 шин, док OBS на 17954, трей, тихая проверка обновлений. Док-панель проверена по
+  сети: WebSocket-клиент получил 3 снимка подряд по 1799 байт, 8 реальных каналов с
+  дБ и именами (`engine=True`) — значит `IUiTimer` тикает и публикует состояние. Команда
+  `{"op":"mute"}` из дока прошла круг сокет → диспетчер → VM → модель → снимок
+  (`mute=False → True`), состояние возвращено (`True → False`).
+- ЧЕСТНО О СТАТУСЕ: кликов мышью по UI после этапа 2 не делал (запуск был фоновым, а
+  закрыть его из не-elevated шелла нельзя). Значки проверены тестами на реальных файлах,
+  но глазами в окне — нет; окно настроек дока и «копировать диагностику» не жал.
+  Приложение, запущенное на проверку, осталось жить (PID 29256) — его надо закрыть из
+  трея, сам закрыть не могу.
+- ЧТО ОСТАЛОСЬ (уже не про границы): `IAudioEngine` на 25 членов (разбить на
+  IRoutingTable/IDeviceCatalog/IRStripTopology/IPresetStore); статики `Loc`/`AppLog`;
+  CI; отсутствие фильтра по `ProcessId`-у в списке установленных программ не проверяется
+  тестом (нет лёгкой фикстуры MainViewModel — 10 зависимостей в конструкторе).
+
+### Resolved (этот turn) — приложение разделено на SoundMeeter.Core и SoundMeeter.App (SM-A10)
+- ЗАДАЧА (от пользователя): «Давай разделим SoundMeeter на SoundMeeter.Core и
+  SoundMeeter.App». Ответы пользователя на границы: (1) ядро в итоге должно быть
+  БЕЗ WPF, но работать поэтапно; (2) тесты разделить на `SoundMeeter.Core.Tests` и
+  `SoundMeeter.App.Tests`; (3) `SoundMeeter.Audio` не трогать, оставить модулем.
+- ЧТО СДЕЛАНО (этап 1 — механический переезд, логика не менялась):
+  * `SoundMeeter.Core` (новый, net10.0-windows): `ViewModels/**` (20 файлов),
+    `Services/**` (кроме LocResources), `AudioPolicy/**`, `Resources/
+    system_apps_filter.json`, встроенные `obs-dock.{index.html,dock.css,dock.js}`.
+  * `SoundMeeter.App` (новый WinExe): `App.xaml(.cs)`, `AssemblyInfo.cs`,
+    `app.manifest`, `Views/**`, `Controls/**`, `Converters/**`,
+    `Services/LocResources.cs`, `Resources/Icon.ico`.
+  * `InternalsVisibleTo`: в Logger/ChangeLanguage/Update/StartUp добавлен
+    `SoundMeeter.Core`; в Audio — оба тестовых проекта вместо `SoundMeeter.Tests`.
+    В комментариях csproj записано, что имя сборки приложения — `SoundMeeter`,
+    и почему это нельзя менять здесь.
+- РЕШЕНИЯ, КОТОРЫЕ СТОИТ ПОМНИТЬ:
+  * `AssemblyName` у App остался `SoundMeeter`, а не `SoundMeeter.App`: имя exe —
+    контракт релиза (`UpdateApplier.MainExecutableName = "SoundMeeter.exe"`,
+    проверка архива и `Start-Process` при перезапуске). Переименование — отдельная
+    задача, и начинать её надо с `UpdateApplier`.
+  * Пространства имён НЕ менялись (`SoundMeeter.ViewModels`,
+    `SoundMeeter.Services`, `SoundMeeter.AudioPolicy` в Core; `SoundMeeter.Views`,
+    `SoundMeeter.Controls`, `SoundMeeter.Converters` в App). Поэтому ни один
+    `using` и ни одна `clr-namespace` в XAML не правились; `pack://.../SoundMeeter
+    ;component/Views/Controls/MixerTheme.xaml` в тестах осталась валидной.
+  * `LocResources` ушёл в App, а не остался в Core: он подключает словарь к
+    `Application.Resources` и ставит `FrameworkElement.Language` — это WPF по
+    определению, и в финальном ядре ему не место.
+  * obs-dock вшит в `SoundMeeter.Core.dll`: `ObsDockAssets` читает ресурс через
+    `Assembly.GetExecutingAssembly()`, и ресурс обязан лежать в той же сборке, что
+    сервер, иначе док отдаст 404 после переезда. Проверено: `obs-dock.index.html`,
+    `obs-dock.dock.css`, `obs-dock.dock.js` в манифесте Core.
+  * `NAudio` и `YellowDogMan.RRNoise.NET` оставлены и в App: кода на NAudio в
+    оболочке больше нет, но portable-публикация (PublishSingleFile) обязана
+    включать `rnnoise.dll` и сборки NAudio. Убирать — только вместе с проверкой
+    публикации.
+  * RID `win-x64` продублирован в Core: библиотека без него не получает нативные
+    ассеты пакетов в свой выход.
+- ТЕСТЫ РАЗДЕЛЕНЫ:
+  * `SoundMeeter.Core.Tests` (9): `AudioEnginePresetTests`, `MidiBindingTests`,
+    фикстуры `Strips` + `FakeAudioEngine`. Ссылается только на Core.
+  * `SoundMeeter.App.Tests` (44): `FuncButtonTests`, `StripEffectTests`,
+    `ParamResetTests`, `ModuleBoundaryTests`, STA-хост `UiHost` + `VisualTree`.
+    Фикстуры Core линкуются исходниками (`<Compile Include="..\SoundMeeter.Core.Tests\
+    Infrastructure\*.cs" Link="..."/>`) — одна правка на два проекта.
+  * Про `ModuleBoundaryTests`: он видит все сборки только из App.Tests (App → Core →
+    модули, App → TrayIcon), поэтому переехал туда же.
+- НОВЫЕ ПРОВЕРКИ ГРАНИЦ (`ModuleBoundaryTests`, +5):
+  `NoModuleDependsOnTheCore`, `CoreDoesNotDependOnTheApplication`,
+  `CoreDoesNotDependOnUiModules` (по ВСЕМУ графу ядра, а не по прямым ссылкам),
+  `ApplicationDependsOnCore`, `ApplicationIsTheOnlyLayerThatKnowsAboutEveryModule`.
+- ГРАБЛЯ (важно для будущих проверок): `Assembly.GetReferencedAssemblies()` показывает
+  только сборки, ТИПЫ которых реально используются. Добавленный `ProjectReference`
+  без единого `using` в метаданных не появляется — первая проба «добавил ссылку на
+  TrayIcon» осталась зелёной, и только настоящее использование (`typeof(ITrayIconService)`)
+  уронило `CoreDoesNotDependOnUiModules`. Проверено и откачено.
+- ПРОВЕРЕНО: `dotnet build src\SoundMeeter.slnx` — 0 ошибок, 0 предупреждений;
+  `dotnet test src\SoundMeeter.slnx` — 108 тестов зелёные (было 103: +5 проверок
+  границ; 48 тестов SoundMeeter.Tests разошлись как 9 + 39 + 5). В выходе App:
+  `SoundMeeter.exe`/`SoundMeeter.dll` на месте, `rnnoise.dll` едет,
+  `Resources/system_apps_filter.json` копируется. Живой запуск новой сборки на
+  машине пользователя: процесс поднялся, окно «SoundMeeter» открылось, пресет
+  восстановился (6 входов, 5 шин), док OBS поднялся на 127.0.0.1:17954, трей
+  создался, тихая проверка обновления отработала; второй экземпляр корректно
+  отказал по мьютексу.
+- ЧЕСТНО О СТАТУСЕ: окно и док вживую не щёлкал (живой прогон UI после переезда не
+  делался — приложение запускалось фоновым процессом, и закрыть его из
+  не-elevated шелла нельзя: `CloseMainWindow` уходит в трей, `taskkill` отказал по
+  правам). Окно, трей и док живы по логу и по заголовку окна; клики по UI после
+  разделения не проверялись.
+- ЧТО ОСТАЛОСЬ (SM-A10, этап 2 — отдельными шагами, по порядку):
+  1. `IIconProvider`: `BitmapImage`/`ImageSource` в `AppViewModel`,
+     `ConfiguredAppViewModel`, `InstalledAppViewModel` и `IAudioService.GetAppIcon`
+     — это единственное, что тянет WPF в ядро из данных;
+  2. `IUiTimer` (или расширить `IDispatcherService`) вместо `DispatcherTimer` в
+     `MainViewModel` и `Application.Current.Dispatcher` в `LocalizedViewModel`,
+     `MainViewModel.Midi`, `MidiBindingsViewModel`;
+  3. отказ от `ICollectionView` в `MainViewModel.Routing` в пользу обычной
+     отфильтрованной коллекции (в разметке это `ItemsControl.ItemsSource`);
+  4. снять `UseWPF` с Core и закрепить границу тестом по образцу
+     `AudioModuleBoundaryTests.CoreDoesNotDependOnWpf` — до этого пункта проверять
+     нечего, и врать проверкам нельзя;
+  5. после п.4 убрать `UseWPF` и STA-хост из `SoundMeeter.Core.Tests`.
+
 ### Resolved (этот turn) — перенос приложения только перенаправляет звук, стрипы не трогаем
 - ЖАЛОБА пользователя: «перестало перемещать приложения на стрипы с ошибкой (Не
   удалось закрепить стрип за устройством) и указывается устройство на котором

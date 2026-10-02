@@ -38,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Значок в трее держит окно приложения, поэтому internal-видимость нужна
+         только сборке exe. Имя сборки приложения — SoundMeeter (не
+         SoundMeeter.App), см. SoundMeeter.App.csproj. -->
     <InternalsVisibleTo Include="SoundMeeter" />
   </ItemGroup>
 

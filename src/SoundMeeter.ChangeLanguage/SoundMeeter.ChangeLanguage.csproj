@@ -38,6 +38,9 @@
     <InternalsVisibleTo Include="SoundMeeter.Audio" />
     <InternalsVisibleTo Include="SoundMeeter.Update" />
     <InternalsVisibleTo Include="SoundMeeter.TrayIcon" />
+    <!-- SoundMeeter — имя сборки приложения, SoundMeeter.Core — слой с
+         ViewModels: ~99 вызовов Loc.Get живут именно там. -->
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
     <InternalsVisibleTo Include="SoundMeeter" />
     <InternalsVisibleTo Include="SoundMeeter.ChangeLanguage.Tests" />
   </ItemGroup>

@@ -81,49 +81,35 @@ cross-platform path and no `#if` platform guards.
 dotnet build src\SoundMeeter.slnx -c Release
 
 # or just the application
-dotnet build src\SoundMeeter\SoundMeeter.csproj -c Release
+dotnet build src\SoundMeeter.App\SoundMeeter.App.csproj -c Release
 ```
 
 The solution uses the new XML `.slnx` solution format, so it needs a recent SDK
 (developed against 10.0.401).
 
+The shared style library `StreamerTools.Style` is a git submodule at `src/StreamerTools.Style`.
+Initialize it before the first build:
+
+```powershell
+git submodule update --init
+```
+
 ### Run
 
 ```powershell
-dotnet run --project src\SoundMeeter\SoundMeeter.csproj
+dotnet run --project src\SoundMeeter.App\SoundMeeter.App.csproj
 ```
 
 or launch the produced executable directly (it will prompt for elevation):
 
 ```
-src\SoundMeeter\bin\Release\net10.0-windows\win-x64\SoundMeeter.exe
+src\SoundMeeter.App\bin\Release\net10.0-windows\win-x64\SoundMeeter.exe
 ```
 
-### Known blocker: missing `StreamerTools.Style` reference
-
-**A clean clone of this repository does not build as-is.**
-
-`src/SoundMeeter/SoundMeeter.csproj:64` contains:
-
-```xml
-<ProjectReference Include="..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
-```
-
-From `src/SoundMeeter/`, `..\..\` resolves to the repository root, but
-`StreamerTools.Style/` does not exist here — the shared style library lives in a separate
-repository. The path was valid when the module sat at
-`StreamerTools\StreamerTools\Modules\SoundMeeter\` and broke when the projects were moved
-into this repository (commit `d08c1f3 decomposit project`).
-
-It also breaks two XAML files, which depend on the same assembly:
-
-- `App.xaml:9` — `/StreamerTools.Style;component/Themes/DarkTheme.xaml`
-- `Views/MixerToolbarView.xaml:7-8` — `StreamerTools.Style.Controls.Icon`,
-  `StreamerTools.Style.AttachedProperties.Button.LeftIcon`
-
-To build, either vendor the project to `StreamerTools.Style/` at the repository root, or
-repoint the `ProjectReference` at wherever the project actually lives. Until then, expect
-MSB3202-style resolution errors on the application project; the other projects build fine.
+The project is called `SoundMeeter.App`, but the assembly and the executable are named
+`SoundMeeter`: the executable name is part of the release contract (the updater looks for
+`SoundMeeter.exe` inside the portable ZIP and restarts the process by that name), so
+renaming it is a separate task that has to start from `UpdateApplier`.
 
 ---
 
@@ -133,18 +119,19 @@ MSB3202-style resolution errors on the application project; the other projects b
 dotnet test src\SoundMeeter.slnx
 ```
 
-95 xUnit tests across four projects, no audio hardware required:
+120 xUnit tests across six projects, no audio hardware required:
 
 | Project | Tests | Covers |
 |---|---|---|
-| `SoundMeeter.Tests` | 48 | ViewModels, settings service, OBS dock server, module boundaries, UI (STA host) |
+| `SoundMeeter.App.Tests` | 54 | WPF views and controls (STA host), param reset, effect popups, app icons, module and layer boundaries |
+| `SoundMeeter.Core.Tests` | 11 | ViewModels, MIDI bindings, preset restore through the engine, "core stays WPF-free" |
 | `SoundMeeter.Audio.Tests` | 31 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
-| `SoundMeeter.Update.Tests` | 10 | Semantic version comparison and release-asset selection |
+| `SoundMeeter.Update.Tests` | 18 | Semantic version comparison and release-asset selection |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | Every localization key resolves; every language file is complete |
 
 xUnit v2 cannot host an STA thread, so UI tests go through
-`SoundMeeter.Tests/Infrastructure/UiHost.cs`, which spins up a single STA thread with a
-real `Application` and localization installed.
+`SoundMeeter.App.Tests/Infrastructure/UiHost.cs`, which spins up a single STA thread with
+a real `Application` and localization installed.
 
 There is no CI pipeline — tests are run manually. That is tracked as a known gap.
 
@@ -154,15 +141,19 @@ There is no CI pipeline — tests are run manually. That is tracked as a known g
 
 ```
 src/
-├── SoundMeeter/                  WPF application (WinExe)
+├── SoundMeeter.App/              WPF shell (WinExe, assembly "SoundMeeter")
 │   ├── App.xaml.cs               composition root, startup sequence
-│   ├── Services/                 audio engine, settings, MIDI, OBS dock, audio policy COM
-│   ├── ViewModels/               MainViewModel split into 6 partials + per-strip VMs
-│   ├── Views/                    MainView decomposed into UserControls
+│   ├── Views/                    MainView decomposed into UserControls + windows
+│   ├── Views/Controls/           per-strip views, MixerTheme resource dictionary
 │   ├── Controls/                 SegmentedMeter, GainKnob, HorizontalFillPanel
 │   ├── Converters/               value converters
+│   ├── Services/LocResources.cs  merges localized strings into Application.Resources
+│   └── Resources/                application icon
+├── SoundMeeter.Core/             ViewModels + services (logic layer, no WPF)
+│   ├── ViewModels/               MainViewModel split into 6 partials + per-strip VMs
+│   ├── Services/                 audio engine, settings, MIDI, OBS dock server
 │   ├── AudioPolicy/              undocumented AudioPolicyConfig interop
-│   └── Resources/                icon, app filter, embedded obs-dock assets
+│   └── Resources/                app filter (copied to output), embedded obs-dock assets
 ├── SoundMeeter.Audio/            audio core + models (WPF-free)
 │   ├── Audio/                    capture, ring buffer, taps, DSP chain, RNNoise
 │   └── Models/                   settings schema, migrator (v0 → v5)
@@ -171,31 +162,58 @@ src/
 ├── SoundMeeter.Update/           GitHub Releases auto-update
 ├── SoundMeeter.StartUp/          run-at-startup + single instance
 ├── SoundMeeter.TrayIcon/         NotifyIcon
-└── *.Tests/                      four test projects
+└── *.Tests/                      six test projects
 ```
 
 ### Module rules
 
 Dependencies point one way only, and this is enforced by tests rather than convention
-(`ModuleBoundaryTests`, `AudioModuleBoundaryTests` inspect
+(`ModuleBoundaryTests`, `AudioModuleBoundaryTests`, `CoreWpfFreeTests` inspect
 `Assembly.GetReferencedAssemblies()`):
 
 - No feature module references another feature module
+- No module references the core or the application
 - `SoundMeeter.Logger` and `SoundMeeter.ChangeLanguage` are the base layer and reference nothing of their own
-- No module references the application
-- **`SoundMeeter.Audio` must not reach WPF** — `PresentationFramework`, `PresentationCore`,
-  `WindowsBase` and `System.Xaml` are rejected even transitively
+- The core does not reference the application, and the application references the core
+- The core does not reference the UI modules (`SoundMeeter.TrayIcon`, `StreamerTools.Style`)
+- **Neither the core nor `SoundMeeter.Audio` may reach WPF** — `PresentationFramework`,
+  `PresentationCore`, `WindowsBase` and `System.Xaml` are rejected even transitively
+  (`CoreWpfFreeTests`, `AudioModuleBoundaryTests`)
 
 ```
               ┌──────────────────────────┐
-              │      SoundMeeter (App)  │  WPF, WinExe
+              │ SoundMeeter.App (WPF)    │  WinExe, assembly "SoundMeeter"
+              └───────┬──────────┬───────┘
+                      ▼          │
+              ┌──────────────────────────┐
+              │     SoundMeeter.Core    │  ViewModels + services
               └────────┬─────────────────┘
-     ┌─────────┬───────┼────────┬──────────┬────────────┐
-     ▼         ▼       ▼        ▼          ▼            ▼
-  Audio     Logger  ChangeLang Update   StartUp     TrayIcon
-     └──────►  └──────┴─────┴──────────┘
-                 (base — no outbound edges)
+      ┌─────────┬───────┼────────┬──────────┬───────────┐
+      ▼         ▼       ▼        ▼          ▼           ▼
+   Audio     Logger  ChangeLang Update   StartUp     TrayIcon ← App only
+      └──────►  └──────┴─────┴──────────┘
+                  (base — no outbound edges)
 ```
+
+**The core is WPF-free.** `SoundMeeter.Core` does not set `UseWPF`, and
+`CoreWpfFreeTests` rejects `PresentationFramework`, `PresentationCore`, `WindowsBase` and
+`System.Xaml` anywhere in its reference graph. The core test project therefore runs
+without a UI thread, without an `Application` and without a window.
+
+Getting there meant pushing five WPF dependencies behind interfaces:
+
+| Was in the core | Now |
+|---|---|
+| `BitmapImage`/`ImageSource` icons, `SHGetFileInfo` P/Invoke duplicated in three ViewModels | `FileIconConverter` / `ProcessIconConverter` + one `ShellIcons` copy on the UI side; the core exposes only a path or a PID |
+| `IAudioService.GetAppIcon(uint) → BitmapImage` (never called by anything) | deleted, together with its icon cache and `System.Drawing` |
+| `Application.Current.Dispatcher` in `LocalizedViewModel` | `IDispatcherService` (`Post` + `HasThreadAccess`), used where events really come from a background thread — MIDI and OBS dock commands |
+| `DispatcherTimer` for the meters | `IUiTimer`, implemented by `DispatcherTimerAdapter` in the application |
+| `ICollectionView` with a `Filter` for the installed-apps search | a plain `ObservableCollection` rebuilt on demand |
+| `Clipboard.SetText` in two ViewModels | `IClipboardService` |
+
+Namespaces stayed the same (`SoundMeeter.ViewModels`, `SoundMeeter.Services`,
+`SoundMeeter.Views.Controls`): the split moves assemblies, not namespaces, so no `using`
+and no XAML `clr-namespace` had to change.
 
 ---
 
@@ -291,7 +309,7 @@ and so cannot keep the dry and denoised signals time-aligned.
 - **No LICENSE file.** This must be added before the repository is meaningfully published.
 - **No CI.** Tests are manual only.
 - **No user manual.** Usage is undocumented beyond this file.
-- **Version inconsistency.** `SoundMeeter.csproj` says `0.0.1`, `app.manifest` hardcodes
+- **Version inconsistency.** `SoundMeeter.App.csproj` says `0.0.1`, `app.manifest` hardcodes
   `1.0.0.0`, and the notes say `1.0.0` was intended. The manifest is embedded as-is by the
   SDK, so do *not* try to inject an MSBuild property into it — Windows will refuse to start
   the executable.
@@ -301,8 +319,9 @@ and so cannot keep the dry and denoised signals time-aligned.
   ViewModel testability.
 - **Auto-update is hard-wired** to `IDerkBot/SoundMeeter` as compile-time constants, and
   depends on a GitHub Release having been published.
-- `src/SoundMeeter/Audio/` and `src/SoundMeeter/Models/` are empty leftovers from the
-  module extraction.
+- **Icon loading is untestable at the ViewModel level** — and no longer needs to be:
+  icons live in the UI converters (`AppIconTests` covers them), while the core only knows
+  paths and PIDs.
 
 `Obsidian/StreamerTools/` holds the author's working notes (architecture map, a
 `LAST_ACTION` log, backlog, and a NAudio gotchas list) in Russian. Useful, but not

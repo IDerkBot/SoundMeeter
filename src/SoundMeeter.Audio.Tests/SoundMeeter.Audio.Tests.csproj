@@ -13,8 +13,9 @@
       PresentationFramework», а «смог ли кто-то протащить UI в ядро». Попытка
       позвать что-то из System.Windows здесь не соберётся.
 
-      UI-тесты (разметка, попапы, привязки) живут в SoundMeeter.Tests — там
-      поднимается настоящий Application.
+      UI-тесты (разметка, попапы, привязки) живут в SoundMeeter.App.Tests — там
+      поднимается настоящий Application. Логика ядра без UI — в
+      SoundMeeter.Core.Tests.
     -->
     <NoWarn>$(NoWarn);CS0618</NoWarn>
   </PropertyGroup>

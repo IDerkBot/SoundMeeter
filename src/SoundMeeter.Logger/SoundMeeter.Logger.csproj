@@ -20,6 +20,9 @@
     <InternalsVisibleTo Include="SoundMeeter.Update" />
     <InternalsVisibleTo Include="SoundMeeter.StartUp" />
     <InternalsVisibleTo Include="SoundMeeter.TrayIcon" />
+    <!-- SoundMeeter — это имя сборки приложения (SoundMeeter.App.csproj),
+         SoundMeeter.Core — новый слой с ViewModels и сервисами. -->
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
     <InternalsVisibleTo Include="SoundMeeter" />
   </ItemGroup>
 

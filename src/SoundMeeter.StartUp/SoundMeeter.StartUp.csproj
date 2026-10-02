@@ -19,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- SoundMeeter — сборка приложения (MainWindow), SoundMeeter.Core —
+         MainViewModel.Behaviour.cs. -->
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
     <InternalsVisibleTo Include="SoundMeeter" />
     <InternalsVisibleTo Include="SoundMeeter.StartUp.Tests" />
   </ItemGroup>

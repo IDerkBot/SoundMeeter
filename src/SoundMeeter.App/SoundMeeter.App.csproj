@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      Имя сборки — SoundMeeter, а не SoundMeeter.App, и это не опечатка: имя
+      исполняемого файла входит в контракт релиза.
+        * UpdateApplier ищет в portable-архиве SoundMeeter.exe и жёстко зашит на
+          него (MainExecutableName), а перезапуск делает Start-Process этого же
+          имени;
+        * автозапуск (HKCU\...\Run → "SoundMeeter") пишет путь к текущему процессу,
+          но у пользователя уже стоит portable-сборка с этим именем — переименование
+          exe превратило бы каждое обновление в «файл занят» или в два ярлыка;
+        * AppVersion.Current читает Assembly.GetEntryAssembly(), то есть exe.
+
+      Переименование сборки — отдельная задача, и она должна начинаться с
+      UpdateApplier (вынести имя в ресурс/константу общего модуля), а не с csproj.
+    -->
+    <AssemblyName>SoundMeeter</AssemblyName>
+    <RootNamespace>SoundMeeter</RootNamespace>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current
+         читает informational version ИМЕННО входной сборки, поэтому <Version>
+         должен остаться здесь, в WinExe, а не в Core). -->
+    <Version>0.0.1</Version>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <!-- ILogger внедряется через DI, а уровень журнала ставится в App.OnStartup. -->
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
+    <!--
+      NAudio и YellowDogMan.RRNoise.NET нужны приложению НЕ для кода: после
+      разделения ни одна строка в SoundMeeter.App не обращается к NAudio, всё
+      (WasapiAudioEngine, AudioService, MidiService, денойзер) уехало в Core.
+      Оставлены как публикационный контракт: portable-сборка собирается
+      PublishSingleFile, и rnnoise.dll с нативными сборками NAudio обязаны попасть
+      в неё. Нативный ассет едет по цепочке ссылок, а не «напрямую», поэтому
+      пакет объявлен и здесь.
+
+      Убрать эти две ссылки можно только вместе с проверкой portable-публикации:
+      дешевле оставить и не ловить денойзер, молчащий у пользователя.
+    -->
+    <PackageReference Include="NAudio" Version="3.1.0" />
+    <PackageReference Include="YellowDogMan.RRNoise.NET" Version="0.1.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Приложение — тонкий слой поверх ядра. Здесь и только здесь живут XAML,
+      Composition Root (App.OnStartup), значок в трее и подключение словаря
+      локализации к Application.Resources (LocResources).
+
+      Core ссылается на модули (Audio, Logger, ChangeLanguage, Update, StartUp), а
+      приложение — на Core и на UI-модули. Обратного ребра нет: ни один модуль и
+      ни ядро не знают про SoundMeeter.App, и это проверяется тестом
+      (ModuleBoundaryTests), а не договорённостью.
+    -->
+    <ProjectReference Include="..\SoundMeeter.Core\SoundMeeter.Core.csproj" />
+    <ProjectReference Include="..\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.csproj" />
+    <ProjectReference Include="..\StreamerTools.Style\StreamerTools.Style.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      RID держим из-за нативных ассетов NAudio/RNNoise: без него WasapiCapture и
+      MmDevice не видны, и API-тесты пресета не запустятся.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      UseWPF ЗДЕСЬ БОЛЬШЕ НЕТ, и это проверяемая часть цели: тесты ядра поднимают
+      настоящие ViewModel-ы без STA-хоста, без Application и без окна. Пока ядро
+      тянуло WPF, здесь стоял UseWPF «чтобы тесты вообще запускались» — и тесты
+      молча разучивались проверять то, что должна проверять граница.
+
+      Второй эффект, важнее: если что-то в ядре снова попросит System.Windows,
+      этот проект просто не соберётся — компилятор откажет раньше, чем доскажет
+      тест CoreWpfFreeTests. Ставить UseWPF «на всякий случай» нельзя.
+    -->
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Ядро, а не приложение: тесты этого проекта не строят ни одного окна и не
+      трогают XAML, поэтому видеть UI им не нужно. Обратная ссылка (Core → App)
+      запрещена и проверяется тестом, так что случайно подтянуть сюда
+      SoundMeeter.App не получится.
+    -->
+    <ProjectReference Include="..\SoundMeeter.Core\SoundMeeter.Core.csproj" />
+  </ItemGroup>
+
+</Project>

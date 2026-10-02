@@ -89,50 +89,35 @@ cable ┘                                             └─► Шина 2 ─�
 dotnet build src\SoundMeeter.slnx -c Release
 
 # или только приложение
-dotnet build src\SoundMeeter\SoundMeeter.csproj -c Release
+dotnet build src\SoundMeeter.App\SoundMeeter.App.csproj -c Release
 ```
 
 Решение использует новый XML-формат `.slnx`, поэтому нужен свежий SDK
 (разрабатывалось на 10.0.401).
 
+Общая библиотека стилей `StreamerTools.Style` — это git-сабмодуль в
+`src/StreamerTools.Style`. Перед первой сборкой его нужно инициализировать:
+
+```powershell
+git submodule update --init
+```
+
 ### Запуск
 
 ```powershell
-dotnet run --project src\SoundMeeter\SoundMeeter.csproj
+dotnet run --project src\SoundMeeter.App\SoundMeeter.App.csproj
 ```
 
 или запустите готовый исполняемый файл напрямую (он запросит повышение прав):
 
 ```
-src\SoundMeeter\bin\Release\net10.0-windows\win-x64\SoundMeeter.exe
+src\SoundMeeter.App\bin\Release\net10.0-windows\win-x64\SoundMeeter.exe
 ```
 
-### Известная проблема: отсутствует ссылка на `StreamerTools.Style`
-
-**Чистый клон этого репозитория не собирается.**
-
-В `src/SoundMeeter/SoundMeeter.csproj:64` указано:
-
-```xml
-<ProjectReference Include="..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
-```
-
-От каталога `src/SoundMeeter/` путь `..\..\` указывает в корень репозитория, но
-`StreamerTools.Style/` здесь отсутствует — общая библиотека стилей лежит в отдельном
-репозитории. Путь был корректен, пока модуль находился по адресу
-`StreamerTools\StreamerTools\Modules\SoundMeeter\`, и сломался после переноса проектов
-в этот репозиторий (коммит `d08c1f3 decomposit project`).
-
-Та же сборка используется в двух файлах XAML:
-
-- `App.xaml:9` — `/StreamerTools.Style;component/Themes/DarkTheme.xaml`
-- `Views/MixerToolbarView.xaml:7-8` — `StreamerTools.Style.Controls.Icon`,
-  `StreamerTools.Style.AttachedProperties.Button.LeftIcon`
-
-Чтобы собрать проект, либо разместите его по пути `StreamerTools.Style/` в корне
-репозитория, либо перенаправьте `ProjectReference` туда, где он лежит на самом деле.
-До этого при сборке приложения будут ошибки разрешения пути вроде MSB3202; остальные
-проекты собираются нормально.
+Проект называется `SoundMeeter.App`, но имя сборки и исполняемого файла — `SoundMeeter`:
+имя exe входит в контракт релиза (обновление ищет `SoundMeeter.exe` внутри portable-архива
+и перезапускает процесс именно по этому имени), поэтому переименование — отдельная
+задача, и начинать её надо с `UpdateApplier`, а не с csproj.
 
 ---
 
@@ -142,17 +127,18 @@ src\SoundMeeter\bin\Release\net10.0-windows\win-x64\SoundMeeter.exe
 dotnet test src\SoundMeeter.slnx
 ```
 
-95 тестов на xUnit в четырёх проектах; аудиооборудование не требуется:
+120 тестов на xUnit в шести проектах; аудиооборудование не требуется:
 
 | Проект | Тестов | Что проверяет |
 |---|---|---|
-| `SoundMeeter.Tests` | 48 | ViewModel, сервис настроек, сервер док-панели OBS, границы модулей, UI (STA-хост) |
+| `SoundMeeter.App.Tests` | 54 | Представления и элементы WPF (STA-хост), сброс параметров, попапы эффектов, значки приложений, границы модулей и слоёв |
+| `SoundMeeter.Core.Tests` | 11 | ViewModel, MIDI-привязки, восстановление пресета через движок, «ядро остаётся без WPF» |
 | `SoundMeeter.Audio.Tests` | 31 | Блоки DSP, кольцевой буфер, мигратор настроек, отсутствие WPF в аудиомодуле |
-| `SoundMeeter.Update.Tests` | 10 | Сравнение семантических версий и выбор файла релиза |
+| `SoundMeeter.Update.Tests` | 18 | Сравнение семантических версий и выбор файла релиза |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | Что все ключи локализации находятся и все языковые файлы полны |
 
 xUnit v2 не умеет запускать STA-поток, поэтому UI-тесты идут через
-`SoundMeeter.Tests/Infrastructure/UiHost.cs`, который поднимает один STA-поток с
+`SoundMeeter.App.Tests/Infrastructure/UiHost.cs`, который поднимает один STA-поток с
 настоящим `Application` и установленной локализацией.
 
 CI-конвейера нет — тесты запускаются вручную. Это зафиксированная известная пробел.
@@ -163,15 +149,19 @@ CI-конвейера нет — тесты запускаются вручну�
 
 ```
 src/
-├── SoundMeeter/                  приложение WPF (WinExe)
+├── SoundMeeter.App/              оболочка WPF (WinExe, сборка «SoundMeeter»)
 │   ├── App.xaml.cs               точка сборки зависимостей, порядок запуска
-│   ├── Services/                 аудиодвижок, настройки, MIDI, сервер док-панели, COM-политика аудио
-│   ├── ViewModels/               MainViewModel разбит на 6 partial + VM отдельных полос
-│   ├── Views/                    MainView разбит на UserControl'ы
+│   ├── Views/                    MainView разбит на UserControl'ы + окна
+│   ├── Views/Controls/           представления полос, словарь ресурсов MixerTheme
 │   ├── Controls/                 SegmentedMeter, GainKnob, HorizontalFillPanel
 │   ├── Converters/               конвертеры значений
+│   ├── Services/LocResources.cs  подключение строк локализации к Application.Resources
+│   └── Resources/                значок приложения
+├── SoundMeeter.Core/             ViewModel + сервисы (слой логики, без WPF)
+│   ├── ViewModels/               MainViewModel разбит на 6 partial + VM отдельных полос
+│   ├── Services/                 аудиодвижок, настройки, MIDI, сервер док-панели
 │   ├── AudioPolicy/              interop с недокументированным AudioPolicyConfig
-│   └── Resources/                значок, фильтр приложений, встроенные ресурсы док-панели
+│   └── Resources/                фильтр приложений (копируется в выход), встроенные ресурсы док-панели
 ├── SoundMeeter.Audio/            ядро звука + модели (без WPF)
 │   ├── Audio/                    захват, кольцевой буфер, отводы, цепочка DSP, RNNoise
 │   └── Models/                   схема настроек, мигратор (v0 → v5)
@@ -180,31 +170,58 @@ src/
 ├── SoundMeeter.Update/           автообновление с GitHub Releases
 ├── SoundMeeter.StartUp/          автозапуск + единственный экземпляр
 ├── SoundMeeter.TrayIcon/         NotifyIcon
-└── *.Tests/                      четыре тестовых проекта
+└── *.Tests/                      шесть тестовых проектов
 ```
 
 ### Правила модулей
 
 Зависимости направлены только в одну сторону, и это проверяется тестами, а не
-соглашением (`ModuleBoundaryTests`, `AudioModuleBoundaryTests` анализируют
-`Assembly.GetReferencedAssemblies()`):
+соглашением (`ModuleBoundaryTests`, `AudioModuleBoundaryTests`, `CoreWpfFreeTests`
+анализируют `Assembly.GetReferencedAssemblies()`):
 
 - Ни один функциональный модуль не ссылается на другой функциональный модуль
+- Ни один модуль не ссылается ни на ядро, ни на приложение
 - `SoundMeeter.Logger` и `SoundMeeter.ChangeLanguage` — базовый слой и не ссылаются ни на что своё
-- Ни один модуль не ссылается на приложение
-- **`SoundMeeter.Audio` не должен тянуть WPF** — `PresentationFramework`,
+- Ядро не ссылается на приложение, а приложение ссылается на ядро
+- Ядро не ссылается на UI-модули (`SoundMeeter.TrayIcon`, `StreamerTools.Style`)
+- **Ни ядро, ни `SoundMeeter.Audio` не должны тянуть WPF** — `PresentationFramework`,
   `PresentationCore`, `WindowsBase` и `System.Xaml` запрещены даже транзитивно
+  (`CoreWpfFreeTests`, `AudioModuleBoundaryTests`)
+
 
 ```
               ┌──────────────────────────┐
-              │      SoundMeeter (App)  │  WPF, WinExe
+              │ SoundMeeter.App (WPF)    │  WinExe, сборка «SoundMeeter»
+              └───────┬──────────┬───────┘
+                      ▼          │
+              ┌──────────────────────────┐
+              │     SoundMeeter.Core    │  ViewModel + сервисы
               └────────┬─────────────────┘
-     ┌─────────┬───────┼────────┬──────────┬────────────┐
-     ▼         ▼       ▼        ▼          ▼            ▼
-  Audio     Logger  ChangeLang Update   StartUp     TrayIcon
-     └──────►  └──────┴─────┴──────────┘
-                 (базовый слой — без исходящих связей)
+      ┌─────────┬───────┼────────┬──────────┬───────────┐
+      ▼         ▼       ▼        ▼          ▼           ▼
+   Audio     Logger  ChangeLang Update   StartUp     TrayIcon ← только App
+      └──────►  └──────┴─────┴──────────┘
+                  (базовый слой — без исходящих связей)
 ```
+
+**Ядро свободно от WPF.** `SoundMeeter.Core` не объявляет `UseWPF`, а `CoreWpfFreeTests`
+запрещает `PresentationFramework`, `PresentationCore`, `WindowsBase` и `System.Xaml` в любом
+месте графа ссылок ядра. Поэтому тесты ядра идут без UI-потока, без `Application` и без окна.
+
+Дорога к этому — пять зависимостей от WPF, закрытые интерфейсами:
+
+| Было в ядре | Стало |
+|---|---|
+| `BitmapImage`/`ImageSource` для значков и P/Invoke `SHGetFileInfo`, продублированный в трёх ViewModel | `FileIconConverter` / `ProcessIconConverter` и одна копия в `ShellIcons` на стороне UI; ядро отдаёт только путь или PID |
+| `IAudioService.GetAppIcon(uint) → BitmapImage` (не вызывался никем) | удалён вместе с кэшем значков и `System.Drawing` |
+| `Application.Current.Dispatcher` в `LocalizedViewModel` | `IDispatcherService` (`Post` + `HasThreadAccess`) там, где события действительно фоновые: MIDI и команды дока OBS |
+| `DispatcherTimer` метров | `IUiTimer`, реализация `DispatcherTimerAdapter` в приложении |
+| `ICollectionView` с `Filter` для поиска по установленным программам | обычный `ObservableCollection`, пересобирается явно |
+| `Clipboard.SetText` в двух ViewModel | `IClipboardService` |
+
+Пространства имён остались прежними (`SoundMeeter.ViewModels`, `SoundMeeter.Services`,
+`SoundMeeter.Views.Controls`): разделение меняет сборки, а не пространства имён, поэтому ни
+один `using` и ни одна `clr-namespace` в XAML не менялись.
 
 ---
 
@@ -303,7 +320,7 @@ RNNoise вызывается через собственный P/Invoke (`RnNois
 - **Нет файла LICENSE.** Его нужно добавить до публикации репозитория.
 - **Нет CI.** Тесты запускаются только вручную.
 - **Нет руководства пользователя.** Использование нигде не описано, кроме этого файла.
-- **Расхождение версий.** `SoundMeeter.csproj` объявляет `0.0.1`, `app.manifest`
+- **Расхождение версий.** `SoundMeeter.App.csproj` объявляет `0.0.1`, `app.manifest`
   жёстко содержит `1.0.0.0`, а в заметках первым релизом задумывалась `1.0.0`. Манифест
   встраивается SDK как есть, поэтому **не** пытайтесь подставить в него свойство MSBuild —
   Windows откажется запускать файл.
@@ -313,8 +330,8 @@ RNNoise вызывается через собственный P/Invoke (`RnNois
   тестировать ViewModel'ы.
 - **Автообновление жёстко привязано** к `IDerkBot/SoundMeeter` константами времени
   компиляции и требует опубликованного релиза на GitHub.
-- Каталоги `src/SoundMeeter/Audio/` и `src/SoundMeeter/Models/` пусты — остатки после
-  выноса модулей.
+- **Значки не проверяются на уровне ViewModel** — и не должны: они живут в конвертерах
+  UI (их покрывает `AppIconTests`), а ядро знает только путь и PID.
 
 В `Obsidian/StreamerTools/` лежат рабочие заметки автора (карта архитектуры, журнал
 `LAST_ACTION`, бэклог и список граблей NAudio) на русском языке. Полезно, но не

@@ -1,14 +1,16 @@
 <Solution>
+  <Project Path="SoundMeeter.App.Tests/SoundMeeter.App.Tests.csproj" />
+  <Project Path="SoundMeeter.App/SoundMeeter.App.csproj" />
   <Project Path="SoundMeeter.Audio.Tests/SoundMeeter.Audio.Tests.csproj" />
   <Project Path="SoundMeeter.Audio/SoundMeeter.Audio.csproj" />
   <Project Path="SoundMeeter.ChangeLanguage.Tests/SoundMeeter.ChangeLanguage.Tests.csproj" />
   <Project Path="SoundMeeter.ChangeLanguage/SoundMeeter.ChangeLanguage.csproj" />
+  <Project Path="SoundMeeter.Core.Tests/SoundMeeter.Core.Tests.csproj" />
+  <Project Path="SoundMeeter.Core/SoundMeeter.Core.csproj" />
   <Project Path="SoundMeeter.Logger/SoundMeeter.Logger.csproj" />
   <Project Path="SoundMeeter.StartUp/SoundMeeter.StartUp.csproj" />
-  <Project Path="SoundMeeter.Tests/SoundMeeter.Tests.csproj" />
   <Project Path="SoundMeeter.TrayIcon/SoundMeeter.TrayIcon.csproj" />
   <Project Path="SoundMeeter.Update.Tests/SoundMeeter.Update.Tests.csproj" />
   <Project Path="SoundMeeter.Update/SoundMeeter.Update.csproj" />
-  <Project Path="SoundMeeter/SoundMeeter.csproj" />
   <Project Path="StreamerTools.Style/StreamerTools.Style.csproj" />
 </Solution>

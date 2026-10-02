@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
     <InternalsVisibleTo Include="SoundMeeter" />
     <InternalsVisibleTo Include="SoundMeeter.Update.Tests" />
   </ItemGroup>
