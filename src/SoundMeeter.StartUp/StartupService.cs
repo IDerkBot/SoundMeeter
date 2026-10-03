@@ -5,111 +5,107 @@ using SoundMeeter.Services.Logging;
 namespace SoundMeeter.Services;
 
 /// <summary>
-/// Автозапуск вместе с Windows (SM-D01).
-///
-/// Способ — ключ <c>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</c>:
-/// запись в ветку пользователя, поэтому установка не требует прав администратора
-/// (в отличие от <c>HKLM</c> и папки «Автозагрузка» в Program Files, куда
-/// portable-сборке писать нельзя).
-///
-/// Ключ <c>Run</c> вместо задачи в планировщике или папки Startup выбран потому,
-/// что запись переживает обновление приложения на месте: путь в ней абсолютный,
-/// а значит при автообновлении на тот же путь он остаётся верным. Автообновление
-/// подставляет новые файлы в каталог установки (SM-A06), поэтому путь не меняется.
-/// </summary>
-public interface IStartupService
-{
-    /// <summary>Включён ли автозапуск по факту состояния системы.</summary>
-    bool IsEnabled { get; }
-
-    /// <summary>
-    /// Включает или выключает автозапуск. Возвращает итоговое состояние: если
-    /// запись в реестр не удалась, возвращается то, что получилось, а не
-    /// желаемое — иначе переключатель в интерфейсе показывал бы неправду.
-    /// </summary>
-    bool SetEnabled(bool enabled);
-}
-
-/// <summary>
-/// Реализация <see cref="IStartupService"/> поверх реестра. Ключ и имя значения
-/// вынесены в константы, чтобы тесты проверяли ровно то место, куда пишет
-/// приложение.
+/// Реализация <see cref="IStartupService"/> поверх планировщика задач Windows.
+/// Ключ и имя значения из <c>HKCU\...\Run</c> вынесены в константы: там может
+/// остаться запись предыдущих сборок, и её нужно находить и удалять.
 /// </summary>
 public sealed class StartupService : IStartupService
 {
+    /// <summary>Ветка, в которой автозапуск жил до перехода на задачу планировщика.</summary>
     internal const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+
     internal const string ValueName = "SoundMeeter";
 
     private readonly ILogger _logger = AppLog.For<StartupService>();
 
-    /// <summary>
-    /// Текущее состояние ключа. Ключ может отсутствовать (не настроен) — это не
-    /// ошибка, а обычное «выключено».
-    /// </summary>
-    public bool IsEnabled
+    /// <inheritdoc />
+    public bool IsEnabled => ReadState(migrateLegacyEntry: true);
+
+    /// <inheritdoc />
+    public bool SetEnabled(bool enabled)
     {
-        get
+        if (enabled)
         {
-            try
+            string? executable = ExecutablePath();
+            if (executable is null)
             {
-                using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: false);
-                if (key?.GetValue(ValueName) is string value && !string.IsNullOrWhiteSpace(value))
-                    return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Не удалось прочитать состояние автозапуска: {Message}", ex.Message);
+                _logger.LogWarning(
+                    "Автозапуск не включён: не найден исполняемый файл приложения");
+                return ReadState(migrateLegacyEntry: false);
             }
 
+            if (TaskSchedulerClient.TryCreateOrUpdate(executable))
+            {
+                RemoveLegacyEntry();
+                _logger.LogInformation("Автозапуск включён: {Path}", executable);
+            }
+        }
+        else
+        {
+            RemoveLegacyEntry();
+            TaskSchedulerClient.Delete();
+        }
+
+        // Миграция при чтении состояния здесь была бы вредной: после неудачного
+        // выключения она вернула бы задачу, которую только что удалили.
+        return ReadState(migrateLegacyEntry: false);
+    }
+
+    /// <summary>
+    /// Что система считает включённым. Задача — источник истины; запись в ключе
+    /// <c>Run</c> тоже означает включённый автозапуск, поэтому на время перехода
+    /// она учитывается и по возможности переносится в задачу (см.
+    /// <see cref="IStartupService.IsEnabled"/>).
+    /// </summary>
+    private bool ReadState(bool migrateLegacyEntry)
+    {
+        if (TaskSchedulerClient.Exists()) return true;
+        if (!HasLegacyEntry()) return false;
+
+        string? executable = ExecutablePath();
+        if (migrateLegacyEntry &&
+            executable is not null &&
+            TaskSchedulerClient.TryCreateOrUpdate(executable))
+        {
+            RemoveLegacyEntry();
+        }
+
+        return true;
+    }
+
+    private bool HasLegacyEntry()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: false);
+            return key?.GetValue(ValueName) is string value && !string.IsNullOrWhiteSpace(value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Не удалось прочитать состояние автозапуска: {Message}", ex.Message);
             return false;
         }
     }
 
-    public bool SetEnabled(bool enabled)
+    /// <summary>
+    /// Убирает запись из ключа <c>Run</c>: пока она есть, автозапуск отработает
+    /// ещё и с запросом UAC, то есть ровно то, ради чего задача и заводилась.
+    /// </summary>
+    private void RemoveLegacyEntry()
     {
         try
         {
-            if (enabled)
+            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true);
+            if (key?.GetValue(ValueName) is not null)
             {
-                // Отдельно проверяем, что запускать: без этого в реестр попадёт
-                // пустая строка, и автозапуск «включился», но не срабатывал бы.
-                string? executable = ExecutablePath();
-                if (executable is null)
-                {
-                    _logger.LogWarning(
-                        "Автозапуск не включён: не найден исполняемый файл приложения");
-                    return IsEnabled;
-                }
-
-                using var key = Registry.CurrentUser.CreateSubKey(RunKeyPath, writable: true);
-                if (key is null)
-                {
-                    _logger.LogWarning("Автозапуск не включён: ключ реестра не создан");
-                    return IsEnabled;
-                }
-
-                key.SetValue(ValueName, $"\"{executable}\"");
-                _logger.LogInformation("Автозапуск включён: {Path}", executable);
-            }
-            else
-            {
-                using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true);
-                if (key?.GetValue(ValueName) is not null)
-                {
-                    key.DeleteValue(ValueName, throwOnMissingValue: false);
-                    _logger.LogInformation("Автозапуск выключен");
-                }
+                key.DeleteValue(ValueName, throwOnMissingValue: false);
+                _logger.LogInformation("Запись автозапуска из ключа Run удалена");
             }
         }
         catch (Exception ex)
         {
-            // Реестр может оказаться недоступен (политика, отказ профиля).
-            // Проверка прав администратора и объяснений пользователю здесь были бы
-            // лишними: HKCU доступен обычному приложению почти всегда.
-            _logger.LogWarning(ex, "Не удалось изменить автозапуск: {Message}", ex.Message);
+            _logger.LogWarning(ex, "Не удалось удалить запись из ключа Run: {Message}", ex.Message);
         }
-
-        return IsEnabled;
     }
 
     /// <summary>
