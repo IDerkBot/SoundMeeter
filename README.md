@@ -52,7 +52,7 @@ cable ┘                                            └─► Bus 2 ─► stre
 **Application**
 
 - System tray icon, optional minimize-to-tray
-- Run at startup (HKCU, no admin needed) and single-instance guard
+- Run at startup with administrator rights (scheduled task, no UAC prompt at logon) and single-instance guard
 - English and Russian UI
 - Log viewer with a rotating file log
 
@@ -257,7 +257,7 @@ All configuration is on disk; no environment variables are read anywhere in the 
 |---|---|
 | Settings | `%APPDATA%\SoundMeeter\settings.json` |
 | Logs | `%LOCALAPPDATA%\SoundMeeter\logs\` (rotating) |
-| Run at startup | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` → `SoundMeeter` |
+| Run at startup | Scheduled task `\SoundMeeter` (logon trigger, `RunLevel=Highest`; a leftover `HKCU\...\Run` record is migrated to it) |
 | OBS dock registration | `%APPDATA%\obs-studio\user.ini` → `[BasicWindow] ExtraBrowserDocks` |
 | App filter keywords | `Resources/system_apps_filter.json` (copied to output) |
 | Single instance | `Local\SoundMeeter.SingleInstance.<user>` mutex + show-window event |

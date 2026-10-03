@@ -60,7 +60,7 @@ cable ┘                                             └─► Шина 2 ─�
 **Приложение**
 
 - Значок в системном лотке, при желании сворачивание в трей
-- Автозапуск вместе с Windows (HKCU, без прав администратора) и защита от второго экземпляра
+- Автозапуск вместе с Windows с правами администратора (задача планировщика, без запроса UAC при входе) и защита от второго экземпляра
 - Интерфейс на английском и русском
 - Просмотр журнала с ротацией файлов
 
@@ -267,7 +267,7 @@ InputSource (WasapiCapture | WasapiLoopbackCapture)
 |---|---|
 | Настройки | `%APPDATA%\SoundMeeter\settings.json` |
 | Журналы | `%LOCALAPPDATA%\SoundMeeter\logs\` (с ротацией) |
-| Автозапуск | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` → `SoundMeeter` |
+| Автозапуск | Задача планировщика `\SoundMeeter` (триггер «вход в систему», `RunLevel=Highest`; оставшаяся запись в `HKCU\...\Run` переносится в неё) |
 | Регистрация док-панели | `%APPDATA%\obs-studio\user.ini` → `[BasicWindow] ExtraBrowserDocks` |
 | Ключевые слова фильтра | `Resources/system_apps_filter.json` (копируется в вывод) |
 | Единственный экземпляр | Мьютекс `Local\SoundMeeter.SingleInstance.<user>` + событие показа окна |
