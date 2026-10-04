@@ -222,7 +222,7 @@ and no XAML `clr-namespace` had to change.
 ## Audio signal path
 
 ```
-InputSource (WasapiCapture | WasapiLoopbackCapture)
+InputSource (WasapiRecorder: loopback capture | mic capture)
   → decode PCM16/24/32/float → downmix to stereo 48 kHz → optional mono fold
   → DenoiserDsp (RNNoise) → StripDsp (compressor → gain → delay → reverb)
   → SampleRingBuffer.Write()                     [1 s ring, 48 kHz × 2 ch]
@@ -235,8 +235,24 @@ InputSource (WasapiCapture | WasapiLoopbackCapture)
         ▼
   BusDsp : ISampleProvider (wraps MixingSampleProvider)
         ▼
-  WasapiOut (Shared, event-driven, ~100 ms latency) → physical device
+  WasapiPlayer (Shared, event-driven, MMCSS) → physical device
 ```
+
+Latency is set by the two WASAPI endpoint buffers. The budgets live in
+`AudioEngineDefaults` (`InputBufferMilliseconds` 20, `OutputBufferMilliseconds` 25, plus
+an IAudioClient3 low-latency request on the output with a soft fallback). NAudio reports
+only what the driver actually granted, so every strip and bus logs its effective latency
+**once, when it opens** — `latency requested=…, actual=…, lowLatency=…`.
+
+The ring contributes nothing *provided* it stays demand-driven: it hands out exactly what
+the bus asks for and pads the rest with silence. Two rules keep it that way:
+
+- **A new `RingCursor` starts at the ring's live edge** (`TotalWritten`), not at 0.
+  Position 0 is the ring's creation, so on an already-wrapped ring it would resolve to
+  `written − Capacity` — a cursor would silently replay a second of stale audio and stay a
+  second behind forever.
+- `RingCursor.BufferedFrames` / `SkippedFrames` exist to assert that in tests; there is
+  deliberately no periodic latency logging, it floods the log at Info level.
 
 Non-obvious constraints worth knowing before changing the engine:
 
@@ -244,10 +260,16 @@ Non-obvious constraints worth knowing before changing the engine:
   silently *removes* any source that returns fewer samples than requested, so a short read
   makes a strip vanish from the mix rather than just going quiet.
 - **Never loopback-capture the engine's own output** — instant feedback loop.
-- `WasapiOut.Init` needs an explicit `new SampleToWaveProvider(dsp)`; NAudio 3.1.0 has no
+- `WasapiPlayer.Init` needs an explicit `new SampleToWaveProvider(dsp)`; NAudio 3.1.0 has no
   implicit conversion.
+- **A silent capture packet must still be run through the DSP chain.** The whole point of a
+  `Silent` packet is that the pipeline advances over zeros; skipping it freezes the delay /
+  reverb tails and the compressor envelope until the next non-empty packet.
 - `MMDevice` instances must be explicitly disposed in `RefreshDevices` or COM leaks accumulate.
-- Per-route `GainDb` is *not* applied in the audio path — strip volume is the only gain source.
+  The one exception is the device a `WasapiPlayer` is built from: it stays owned by that bus
+  until it closes.
+- Per-route `GainDb` is applied in the audio path by `BusTap` (read live from `BusRouting`),
+  multiplied into the strip volume.
 
 ---
 

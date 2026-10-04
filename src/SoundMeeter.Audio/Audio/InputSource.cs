@@ -3,6 +3,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using SoundMeeter.Models;
 using SoundMeeter.Services.Logging;
+using System.Runtime.InteropServices;
 
 namespace SoundMeeter.Audio;
 
@@ -16,7 +17,7 @@ public sealed class InputSource
 {
     public const int SampleRate = 48000;
     public const int Channels = 2;
-    private const int BufferSeconds = 1;
+    private const int BufferSeconds = AudioEngineDefaults.RingBufferMilliseconds / 1000;
     public static readonly WaveFormat OutputFormat = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, Channels);
 
     private readonly InputChannelModel _model;
@@ -31,7 +32,7 @@ public sealed class InputSource
     private readonly StripDsp _effects;
 
     private readonly ILogger _logger = AppLog.For<InputSource>();
-    private IWaveIn? _waveIn;
+    private WasapiRecorder? _recorder;
 
     /// <summary>
     /// Ресемплер на случай, если устройство отдаёт не 48 кГц. Пересоздаётся при
@@ -83,80 +84,103 @@ public sealed class InputSource
         }
     }
 
-    public bool IsRunning => _waveIn != null;
+    public bool IsRunning => _recorder != null;
 
     public RingCursor OpenCursor() => _ring.OpenCursor();
 
     /// <summary>
     /// Стартует захват устройства.
+    ///
+    /// Здесь и раньше была причина половины задержки микшера. У
+    /// <c>WasapiCapture</c>/<c>WasapiLoopbackCapture</c> в NAudio 3.1 нет
+    /// конструктора с параметрами: единственная доступная цепочка ведёт в
+    /// <c>(device, useEventSync: false, 100)</c>, то есть <b>100 мс буфера и
+    /// опрос потока по таймеру</b> вместо события. У loopback-варианта другого
+    /// конструктора не существует вообще — то есть уменьшить задержку входа
+    /// через него было физически нечем. <c>WasapiRecorderBuilder</c> даёт и то и
+    /// другое, плюс MMCSS-приоритет потока и готовые счётчики латентности.
     /// </summary>
     public void Start()
     {
-        if (_waveIn != null) return;
+        if (_recorder != null) return;
 
         // MMDevice — COM-обёртка над IMMDevice, финализатора у неё нет (SM-A08):
         // без Dispose ссылка на устройство не отпускается никогда, а Start()
-        // зовётся при каждой пересборке роутинга. WasapiCapture и
-        // WasapiLoopbackCapture устройство не удерживают (в WasapiCapture
-        // остаётся только IAudioClient), поэтому освобождать его здесь безопасно.
+        // зовётся при каждой пересборке роутинга. WasapiRecorder устройство не
+        // удерживает (внутри остаётся только IAudioClient), поэтому освобождать
+        // его здесь безопасно.
         using var enumerator = new MMDeviceEnumerator();
         using var device = enumerator.GetDevice(_model.DeviceId);
         if (device == null) throw new InvalidOperationException($"Device not found: {_model.DeviceId}");
 
-        // Описание формата читаем здесь, а не в обработчике пакета:
-        // WasapiCapture.WaveFormat каждый раз проходит через
-        // AsStandardWaveFormat(), и на пакетах лишних обращений быть не должно.
-        WaveFormat actualFormat;
+        var builder = new WasapiRecorderBuilder()
+            .WithDevice(device)
+            .WithSharedMode()
+            // По событию, а не по таймеру: опрос добавлял к задержке до половины
+            // периода «дрожания» и ровнял пакеты по пачкам.
+            .WithEventSync()
+            .WithBufferLength(AudioEngineDefaults.InputBufferMilliseconds)
+            // Поток захвата должен обгонять поток рендера, иначе сборщик мусора
+            // и любой посторонний поток выбивают у него пакеты — и тогда в звуке
+            // не задержка, а разрывы.
+            .WithMmcssThreadPriority("Pro Audio")
+            .WithFormat(OutputFormat);
 
-        if (_model.IsMicrophone)
+        if (!_model.IsMicrophone) builder = builder.WithLoopbackCapture();
+
+        var recorder = builder.Build();
+
+        // Формат известен до старта, поэтому выставляем его ДО StartRecording():
+        // обработчик пакета на запускающем потоке не должен увидеть пустое
+        // поле и выбросить первый пакет (SM: гонка старта).
+        _waveFormat = recorder.WaveFormat;
+        _bytesPerFrame = Math.Max(1, _waveFormat.BlockAlign);
+
+        recorder.DataAvailable += OnDataAvailable;
+        _recorder = recorder;
+
+        try
         {
-            var capture = new WasapiCapture(device)
-            {
-                WaveFormat = OutputFormat,
-                ShareMode = AudioClientShareMode.Shared
-            };
-            capture.DataAvailable += OnDataAvailable;
-            capture.StartRecording();
-            _waveIn = capture;
-            actualFormat = capture.WaveFormat;
+            recorder.StartRecording();
         }
-        else
+        catch
         {
-            var loopback = new WasapiLoopbackCapture(device)
-            {
-                WaveFormat = OutputFormat
-            };
-            loopback.DataAvailable += OnDataAvailable;
-            loopback.StartRecording();
-            _waveIn = loopback;
-            actualFormat = loopback.WaveFormat;
+            recorder.DataAvailable -= OnDataAvailable;
+            _recorder = null;
+            recorder.Dispose();
+            throw;
         }
 
-        _waveFormat = actualFormat;
-        _bytesPerFrame = Math.Max(1, actualFormat.Channels * actualFormat.BitsPerSample / 8);
-
+// LatencyMilliseconds здесь — НЕ измерение: в стандартном пути WasapiRecorder
+        // присваивает ему буфер, который запросили мы (WasapiRecorder.cs:331), и
+        // перезаписывает только в низколатентном режиме IAudioClient3. Поэтому
+        // пишем его как запрос, а настоящую величину берём из CurrentLatency —
+        // она считается через GetCurrentPadding, то есть это реальная глубина
+        // буфера устройства (см. LatencyDiagnostics в WasapiAudioEngine).
         _logger.LogInformation(
-            "Strip «{Strip}» opened: device={Device} mic={IsMic} requested={Rate} Hz/{Channels} ch, actual={Actual}",
-            _model.Name, _model.DeviceId, _model.IsMicrophone, SampleRate, Channels,
-            Describe(actualFormat));
+            "Strip «{Strip}» opened: device={Device} mic={IsMic} format={Format}, " +
+            "requested latency={Requested} ms",
+            _model.Name, _model.DeviceId, _model.IsMicrophone, Describe(_waveFormat),
+            AudioEngineDefaults.InputBufferMilliseconds);
     }
 
     public void Stop()
     {
-        var waveIn = _waveIn;
-        _waveIn = null;
-        if (waveIn == null) return;
+        var recorder = _recorder;
+        _recorder = null;
+        if (recorder == null) return;
 
         try
         {
-            waveIn.DataAvailable -= OnDataAvailable;
-            waveIn.StopRecording();
+            recorder.DataAvailable -= OnDataAvailable;
+            recorder.StopRecording();
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Остановка захвата «{Strip}» не удалась: {Message}", _model.Name, ex.Message);
         }
-        waveIn.Dispose();
+        // Dispose дожидается потока захвата и освобождает IAudioClient.
+        recorder.Dispose();
 
         _resampler = null;
         _resamplerRate = 0;
@@ -201,28 +225,38 @@ public sealed class InputSource
         _denoiser?.Dispose();
     }
 
-    private void OnDataAvailable(object? sender, WaveInEventArgs e)
+    /// <summary>
+    /// Пакет от <see cref="WasapiRecorder"/>. Буфер — <c>ReadOnlySpan</c> без
+    /// копирования, и он действителен только внутри этого вызова, поэтому всё
+    /// ниже сразу разбирается в переиспользуемые массивы источника и нигде не
+    /// сохраняется. Флаг <c>Silent</c> означает настоящую тишину в буфере, а не
+    /// «устройство ничего не отдало»: конвейер всё равно нужно прогнать на
+    /// нулях, иначе затухающие хвосты задержки, реверберации и огибающая
+    /// компрессора замрут и «застрянут» до следующего непустого пакета.
+    /// </summary>
+    private void OnDataAvailable(ReadOnlySpan<byte> packet, AudioClientBufferFlags flags,
+        long devicePosition, long qpcPosition)
     {
-        if (e.BytesRecorded <= 0) return;
+        int bytesRecorded = packet.Length;
+        if (bytesRecorded <= 0) return;
 
-        // Формат читаем из кэша, а не у отправителя: WasapiCapture.WaveFormat
-        // каждый раз конструирует новый объект через AsStandardWaveFormat(),
-        // а это ~100 вызовов в секунду на источник лишней работы в аудиопотоке.
+        // Формат читаем из кэша, а не у отправителя: обращение к свойству
+        // отправителя в самом горячем потоке стоит лишнего вызова.
         var fmt = _waveFormat;
         if (fmt == null) return;
 
-        TrackPacketSize(e.BytesRecorded);
+        TrackPacketSize(bytesRecorded);
 
         try
         {
             int bytesPerSample = Math.Max(1, fmt.BitsPerSample / 8);
-            int frames = e.BytesRecorded / (fmt.Channels * bytesPerSample);
+            int frames = bytesRecorded / (fmt.Channels * bytesPerSample);
             if (frames == 0) return;
 
             // 1) Байты -> float (межленточные сэмплы в исходном формате)
             if (_decoded.Length < frames * fmt.Channels)
                 _decoded = new float[frames * fmt.Channels];
-            DecodeToFloat(e.Buffer, e.BytesRecorded, fmt, _decoded, frames);
+            DecodeToFloat(packet, fmt, _decoded, frames);
 
             // 2) Каналы -> стерео (2 канала)
             if (_stereo.Length < frames * 2)
@@ -342,42 +376,54 @@ public sealed class InputSource
     /// <summary>
     /// Следит за размером пакета и предупреждает о коплении.
     ///
-    /// NAudio 3.x выделяет <c>new byte[bytesAvailable]</c> на каждый пакет и
-    /// вычитывает буфер WASAPI целиком, пока тот не опустеет. Пока поток успевает,
-    /// пакет — это 10 мс (несколько килобайт, gen0, сборщик его убирает). Но если
-    /// обработка хоть раз отстала, пакет растёт; за 85 КБ он уезжает в LOH, а LOH
-    /// собирается только в gen2 и не уплотняется — рабочая память растёт часами
-    /// без видимой причины.
+    /// Пакет — это всё, что накопилось в буфере WASAPI к моменту пробуждения
+    /// потока, поэтому в норме он равен периоду устройства (сейчас это буфер
+    /// <see cref="AudioEngineDefaults.InputBufferMilliseconds"/> мс), а не 10 мс.
+    /// Если обработка хоть раз отстала, пакет растёт — и это уже не задержка, а
+    /// разрыв: часть звука уходит в следующий пакет позже, чем остальная.
     ///
-    /// Поэтому размер и «просрочка» пишутся в журнал: по этим числам видно, был
-    /// ли захват реально перегружен, а не просто много аллоцирует gen0.
+    /// Проверка нужна ещё и потому, что раньше NAudio на каждый пакет выделял
+    /// <c>new byte[bytesAvailable]</c>, и такой пакет за 85 КБ уезжал в LOH,
+    /// который собирается только в gen2. Сейчас буфер отдаётся без копирования,
+    /// но сам факт отставания потока никуда не делся и должен быть виден.
     /// </summary>
     private void TrackPacketSize(int bytes)
     {
+        // Нормальный пакет = буфер, который мы запросили у устройства.
+        int periodBytes = (int)Math.Max(1L,
+            _bytesPerFrame * (long)AudioEngineDefaults.InputBufferMilliseconds * SampleRate / 1000);
+        double bytesPerMs = _bytesPerFrame * (double)SampleRate / 1000.0;
+
+        if (bytes <= periodBytes * 2)
+        {
+            // Пакет в норме. Сбрасываем и максимум, и флаг просрочки: иначе
+            // предупреждение о всплеске больше не сработает до конца работы
+            // источника, а первый же пакет (он всегда «новый максимум») ругался бы
+            // на нормальный размер.
+            _maxPacketBytes = bytes;
+            _warnedBacklog = false;
+            return;
+        }
+
         if (bytes > _maxPacketBytes)
         {
             _maxPacketBytes = bytes;
             _logger.LogWarning(
-                "Strip «{Strip}»: пакет {Bytes} байт ({Ms:F1} мс) — заметно больше 10 мс, " +
-                "поток захвата отстаёт; такие пакеты уходят в LOH",
-                _model.Name, bytes, bytes * 1000.0 / Math.Max(1, _bytesPerFrame * SampleRate));
+                "Strip «{Strip}»: пакет {Bytes} байт ({Ms:F1} мс) при норме {Period:F1} мс — " +
+                "поток захвата отстаёт",
+                _model.Name, bytes, bytes / bytesPerMs, periodBytes / bytesPerMs);
         }
 
-        // Просрочка: сколько данных скопилось в буфере WASAPI сверх положенного.
-        // WASAPI отдаёт это в GetCurrentPadding, но он же требует лишнего вызова
+        // Просрочка: во сколько раз пакет больше того, что движок отдаёт за раз.
+        // WASAPI сообщает накопление точнее (GetCurrentPadding), но это лишний вызов
         // в аудиопотоке, поэтому грубая оценка по размеру пакета достаточна.
-        int normal = _bytesPerFrame * 480;   // 10 мс при 48 кГц
-        if (normal > 0 && bytes > normal * 4 && !_warnedBacklog)
+        if (bytes > periodBytes * 4 && !_warnedBacklog)
         {
             _warnedBacklog = true;
             _logger.LogWarning(
                 "Strip «{Strip}»: пакет вырос до {Bytes} байт (норма {Normal}) — " +
-                "буфер WASAPI не успевает опустошаться, звук уже отстаёт",
-                _model.Name, bytes, normal);
-        }
-        else if (bytes <= normal * 2)
-        {
-            _warnedBacklog = false;
+                "буфер WASAPI не успевает опустошаться, в звуке будут разрывы",
+                _model.Name, bytes, periodBytes);
         }
     }
 
@@ -390,16 +436,17 @@ public sealed class InputSource
     /// ограничены длиной пакета: лишние «хвостовые» байты (их не бывает у WASAPI,
     /// но бывает у программных источников) игнорируются, а не портят соседние сэмплы.
     /// </summary>
-    private static void DecodeToFloat(byte[] src, int byteCount, WaveFormat fmt, float[] dst, int frames)
+    private static void DecodeToFloat(ReadOnlySpan<byte> src, WaveFormat fmt, float[] dst, int frames)
     {
         int channels = fmt.Channels;
+        int byteCount = src.Length;
         int total = frames * channels;
         if (total > dst.Length) total = dst.Length;
 
         if (fmt.Encoding == WaveFormatEncoding.IeeeFloat && fmt.BitsPerSample == 32)
         {
             int samples = Math.Min(total, byteCount / 4);
-            if (samples > 0) Buffer.BlockCopy(src, 0, dst, 0, samples * 4);
+            if (samples > 0) src.Slice(0, samples * 4).CopyTo(MemoryMarshal.AsBytes(dst.AsSpan(0, samples)));
             if (samples < total) Array.Clear(dst, samples, total - samples);
             return;
         }
@@ -410,7 +457,7 @@ public sealed class InputSource
             {
                 int samples = Math.Min(total, byteCount / 2);
                 for (int i = 0; i < samples; i++)
-                    dst[i] = BitConverter.ToInt16(src, i * 2) / 32768f;
+                    dst[i] = BitConverter.ToInt16(src.Slice(i * 2, 2)) / 32768f;
                 if (samples < total) Array.Clear(dst, samples, total - samples);
                 break;
             }
@@ -435,7 +482,7 @@ public sealed class InputSource
             {
                 int samples = Math.Min(total, byteCount / 4);
                 for (int i = 0; i < samples; i++)
-                    dst[i] = BitConverter.ToInt32(src, i * 4) / 2147483648f;
+                    dst[i] = BitConverter.ToInt32(src.Slice(i * 4, 4)) / 2147483648f;
                 if (samples < total) Array.Clear(dst, samples, total - samples);
                 break;
             }

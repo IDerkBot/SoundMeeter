@@ -550,12 +550,12 @@ public interface ILoc {
 ### Аудио
 
 - **Нет лимитера на шине.** Бюджет усиления до +96 дБ (input +60 × fx +24 × bus +12 × send ×4). `MixingSampleProvider` суммирует 3-4 полосы → хард-клиппинг. `BusDsp.cs:72` `MathF.Pow(10f, db/20f)` без проверки на конечность — NaN проходит в render-клиент
-- **Переполнение кольца молчаливое** — `SampleRingBuffer.cs:81` теряет сэмплы без счётчика и без лога
+- ~~**Переполнение кольца молчаливое**~~ **Исправлено.** `RingCursor` теперь считает перешагнутое в `SkippedFrames`, а текущую глубину очереди отдаёт в `BufferedFrames` — «пропал звук на стрипе» и «звук отстаёт» больше не приходится угадывать
 - **Нет контроля denormal вне денойзера** — `DelayDsp._lowPass/_buffer`, `ReverbDsp.Comb._store`, `Allpass._buffer` затухают геометрически и **секунды** после reverb-хвоста гоняют subnormal-арифметику на захватывающем потоке. Единственный flush-to-zero в проекте — `DenoiserDsp.cs:381`
 - **Всё в LOH и переаллоцируется.** ~1.26 MB на input-полосу (`SampleRingBuffer` 384 KB + 2×`DelayLine` по 384 KB + reverb 103 KB), **всё > 85 KB**, и пересоздаётся на каждом `(re)start` источника, то есть на каждом `Start`/`Stop` и при каждом демонтаже устройства
 - **Формат сэмплируется один раз и не перепроверяется** — `InputSource.cs:129-130`; при реконфигурации эндпоинта `frames = e.BytesRecorded / (...)` будет читать байты в шум
-- **Гонка в `InputSource.Start`** — `_waveFormat` ставится **после** `StartRecording()` (`:124` → `:129`), поток C успевает войти и потерять пакет; при исключении `capture` не попадает в `_waveIn` → `AudioClient` утекает
-- **100 мс / 100 мс латентности, настройки нет.** `WasapiAudioEngine.cs:697` `new WasapiOut(device, Shared, true, 100)`. Сквозная микрофон→шина ≈ 200 мс+, и **изменять это нечем** — ни `SetLatency`, ни буфер-сайза в `IAudioEngine`
+- ~~**Гонка в `InputSource.Start`**~~ **Исправлено.** `_waveFormat` и `_bytesPerFrame` выставляются **до** `StartRecording()`, обработчик подписан до старта, а при исключении подписка снимается и recorder освобождается — `AudioClient` больше не течёт
+- ~~**100 мс / 100 мс латентности, настройки нет.**~~ **Исправлено.** `WasapiAudioEngine.cs:697` `new WasapiOut(device, Shared, true, 100)` давал латентность ≈ 200 мс+, причём её нельзя было ни изменить, ни увидеть: NAudio отдаёт наружу только *запрос*, а играл он по `audioClient.BufferSize`. Заменено на `WasapiPlayerBuilder` с бюджетами в `AudioEngineDefaults` (20/25 мс), MMCSS и запросом IAudioClient3-низкой латентности; фактическая величина пишется в журнал при открытии каждой полосы и шины
 - **`OpenAllBusesUnlocked` (`:665-667`) чистит карту шин без диспоза** — сейчас недостижимо, но мина на будущее
 - **`Catalog` — неживая view без блокировки** (`:29`): `new ReadOnlyCollection<DeviceInfo>(_catalog)` отдаётся каждой полосе
 - **`CompressorDsp` считает `MathF.Log10` + `MathF.Pow` на каждый сэмпл** (`:74`, `:91`) — таблица или envelope по блоку бесплатны
@@ -565,8 +565,8 @@ public interface ILoc {
 
 - **`lock` в обоих аудиоколбэках** — `SampleRingBuffer.cs:35` (Write) и `:77` (Read). Если поток C приостановлен GC во время удержания `_sync`, поток R блокируется → underrun → щелчок
 - **Логирование с диском внутри колбэка захвата.** `InputSource.cs:256,299,329,342` → `RotatingFileLoggerProvider.Write` (`RotatingFileLoggerProvider.cs:71-100`) = `DateTime.Now` + `StringBuilder` + `lock` + `WriteLine` с `AutoFlush = true` (`:162-165`) — реальный системный вызов **на потоке аудио**. «Мы зафиксировали перегрузку» само является перегрузкой, и срабатывает именно когда поток отстаёт
-- **Аллокации в горячем пути:** `BusTap.cs:56-57` (`new float[requested]` на рендер-потоке), `InputSource.cs:194-195,199-200,304-306`, `PolyphaseResampler.cs:195` и `:300` (по `float[Taps]` на фазу)
-- **`RingCursor.Read:95` — `% Capacity` на каждый сэмпл** — аппаратный `idiv` на рендер-потоке; заменяется на два `Span.CopyTo`
+- **Аллокации в горячем пути:** `InputSource.cs:194-195,199-200,304-306`, `PolyphaseResampler.cs:195` и `:300` (по `float[Taps]` на фазу). ~~`BusTap.cs:56-57` (`new float[requested]` на рендер-потоке)~~ — **исправлено**: `scratch` аллоцируется один раз, а запросы длиннее блока читаются блоками
+- ~~**`RingCursor.Read:95` — `% Capacity` на каждый сэмпл**~~ — **исправлено**: кольцо замкнуто, участок разбит максимум на два отрезка и копируется `Array.Copy`
 - **`IAudioPolicyConfig` — неподдерживаемый интерфейс, глотает всё.** `AppRouter.cs:70-82` `catch { return ""; }` → вся переадресация молча деградирует без единой ошибки. Плюс полный `RoGetActivationFactory` **раз в 2 с на процесс** (`AudioService.cs:127`)
 - **Обычные (не volatile) поля модели читаются аудио-потоками.** `SoloState` сделан правильно, а `VolumeDb`/`IsMuted`/`IsSolo`/`GainDb`/`PeakLevel` и все параметры эффектов — нет. Формально видимость не определена
 
@@ -892,7 +892,7 @@ private static bool GetButtonState(InputChannelViewModel vm, string parameter) =
 - [ ] **Развязать аудиопотоки.** Убрать `lock` из `SampleRingBuffer` (SPSC-кольцо на `Interlocked`), вынести логирование с аудиопотока в фонового писателя (C-2 раздела аудио, «логирование с диском в колбэке»)
 - [ ] **Восстановление устройств.** Подписки на `PlaybackStopped`/`RecordingStopped` + `RegisterEndpointNotificationCallback` + один путь `ReopenBus/ReopenSource` (C-5)
 - [ ] **Адаптация формата.** `IsFormatSupported` + подстройка числа каналов (C-7)
-- [ ] **Латентность — настройка.** `WasapiCapture(device, true, 20)`, `WasapiOut` 20-30 мс, иначе 200 мс сквозных (H-«100 мс / 100 мс»)
+- [x] **Латентность — настройка.** `WasapiRecorderBuilder.WithBufferLength(20)` на входе, `WasapiPlayerBuilder.WithLatency(25)` + `WithLowLatency()` на выходе вместо 200 мс сквозных (H-«100 мс / 100 мс»); бюджеты вынесены в `AudioEngineDefaults`, фактическая латентность пишется в журнал
 - [ ] **Лимитер на шине** + счётчик клиппинга, FTZ/DAZ в хвостах delay/reverb
 - [ ] **Кольцо и LOH.** Переиспользовать per-strip буферы между рестартами источника, размер кольца от согласованного буфера
 
@@ -944,7 +944,7 @@ private static bool GetButtonState(InputChannelViewModel vm, string parameter) =
 - [ ] **`Revision` на маршрутизацию** — фиксировать версию снимка в момент drag-start (снимает смешанные подсказки в статусе)
 - [ ] **Убрать дубли состояния** — `AppSourceDeviceId` readonly, `DockUrl` без `PropertyChanged`, двойной интервал метра
 - [ ] **Правильный semver** для пререлиза + обрезка `+build` до пререлиза (иначе бесконечный баннер) + громкое логирование `0.0.0`
-- [ ] **Поднять NAudio на замену `WasapiOut`/`WasapiCapture`** — там MMCSS, которого нет у Obsolete-классов, и он снимет часть C-1/C-2 раздела аудио
+- [x] **Поднять NAudio на замену `WasapiOut`/`WasapiCapture`** — там MMCSS, которого нет у Obsolete-классов, и он снимет часть C-1/C-2 раздела аудио. Сделано: `InputSource` работает через `WasapiRecorderBuilder`, шины — через `WasapiPlayerBuilder`; заодно ушли per-packet `new byte[]` в LOH (ноль-копи буфер) и опрос потока захвата по таймеру
 
 ---
 

@@ -45,7 +45,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
     {
         public required OutputBusModel Model;
         public required BusDsp Dsp;
-        public required WasapiOut Out;
+        public required WasapiPlayer Out;
         public bool Active;
     }
 
@@ -685,24 +685,58 @@ public sealed class WasapiAudioEngine : IAudioEngine
             using var enumerator = new MMDeviceEnumerator();
 
             // ВНИМАНИЕ: device здесь намеренно НЕ освобождается через using.
-            // WasapiOut хранит его в поле (`private readonly MMDevice mmDevice`)
-            // и пользуется до самого закрытия шины — Dispose здесь сделал бы
-            // use-after-dispose. Владение переходит к WasapiOut вместе с
-            // объектом шины. WasapiCapture и WasapiLoopbackCapture устройство,
-            // наоборот, не удерживают (см. InputSource.Start).
+            // WasapiPlayer хранит его в поле и пользуется до самого закрытия
+            // шины — Dispose здесь сделал бы use-after-dispose. Владение переходит
+            // к WasapiPlayer вместе с объектом шины. WasapiRecorder устройство,
+            // наоборот, не удерживает (см. InputSource.Start).
             var device = enumerator.GetDevice(bus.DeviceId);
             if (device == null) throw new InvalidOperationException($"Device {bus.DeviceId} not found");
 
             var dsp = new BusDsp(bus, _soloState);
-            var output = new WasapiOut(device, AudioClientShareMode.Shared, true, 100);
-            output.Init(new SampleToWaveProvider(dsp));
-            output.Play();
 
-            var busOutput = new BusOutput { Model = bus, Dsp = dsp, Out = output, Active = true };
+            // Латентность выхода — вторая половина задержки микшера, и раньше она
+            // была задана одним числом в конструкторе WasapiOut, которое тот
+            // передавал в Initialize только как пожелание. Реальную величину
+            // выбирал драйвер, WasapiOut держал буфер постоянно полным, и на
+            // некоторых устройствах это доходило до секунды: после остановки
+            // воспроизведения возобновлённый звук попадал в конец очереди и
+            // становился слышен, только когда она целиком вытеснялась.
+            //
+            // WasapiPlayer даёт три вещи, которых не было: IAudioClient3-низкую
+            // латентность (SoftFailsafe — если движок не даёт, едем как
+            // раньше), MMCSS-приоритет потока рендера и ЧЕСТНОЕ значение
+            // LatencyMilliseconds, которое пишется в журнал.
+            var player = new WasapiPlayerBuilder()
+                .WithDevice(device)
+                .WithSharedMode()
+                .WithEventSync()
+                .WithLatency(AudioEngineDefaults.OutputBufferMilliseconds)
+                .WithMmcssThreadPriority("Pro Audio")
+                .WithLowLatency(required: false)
+                .Build();
+
+            player.Init(new SampleToWaveProvider(dsp));
+            player.Play();
+
+            var busOutput = new BusOutput { Model = bus, Dsp = dsp, Out = player, Active = true };
             _openBuses[bus.Id] = busOutput;
             bus.IsAvailable = true;
-            _logger.LogInformation("Bus «{Bus}» opened: device={Device}, «{DeviceName}», формат {Format}",
-                bus.Name, bus.DeviceId, device.FriendlyName, dsp.WaveFormat);
+
+            // LowLatencyUnavailableReason — не пустое место для гадания: если
+            // движок отказал, в журнале будет сказано почему. Чаще всего причина
+            // одна — частота mix-формата устройства не 48 кГц, а наш источник
+            // жёстко 48 кГц (её требует RNNoise), и IAudioClient3 не умеет
+            // ресемплить. Поэтому mix-формат печатается рядом с латентностью.
+            _logger.LogInformation(
+                "Bus «{Bus}» opened: device={Device}, «{DeviceName}», формат {Format}, mix устройства {Mix}; " +
+                "latency requested={Requested} ms, actual={Actual} ms, lowLatency={LowLatency}{Reason}",
+                bus.Name, bus.DeviceId, device.FriendlyName, dsp.WaveFormat,
+                player.DeviceMixFormat,
+                AudioEngineDefaults.OutputBufferMilliseconds, player.LatencyMilliseconds,
+                player.LowLatencyActive,
+                string.IsNullOrEmpty(player.LowLatencyUnavailableReason)
+                    ? ""
+                    : $" ({player.LowLatencyUnavailableReason})");
         }
         catch (Exception ex)
         {

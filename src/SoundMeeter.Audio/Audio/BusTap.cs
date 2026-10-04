@@ -35,7 +35,7 @@ public sealed class BusTap : ISampleProvider
     private readonly BusRouting _routing;
     private readonly SoloState _solo;
     private readonly RingCursor _cursor;
-    private float[] _scratch;
+    private readonly float[] _scratch;
 
     public BusTap(RingCursor cursor, InputChannelModel input, BusRouting routing, SoloState solo,
         int readBlockSize = 4096)
@@ -53,13 +53,37 @@ public sealed class BusTap : ISampleProvider
     {
         int requested = buffer.Length;
 
-        if (_scratch.Length < requested)
-            _scratch = new float[requested];
+        // Читаем из кольца блоками не длиннее scratch: так длина чтения не влияет
+        // на память. Раньше scratch разрастался под первый же запрос, а его длина
+        // задаётся шириной буфера устройства — на некоторых драйверах это десятки
+        // тысяч кадров, и выделение уходило в LOH прямо на потоке рендера.
+        // Разбиение безопасно и с точки зрения кадров: scratch всегда кратен
+        // размеру кадра (4096), поэтому блоки не режут стереопару пополам.
+        if (requested <= _scratch.Length)
+        {
+            ReadInto(buffer, requested);
+            return requested;
+        }
 
+        for (int offset = 0; offset < requested; offset += _scratch.Length)
+        {
+            int chunk = Math.Min(_scratch.Length, requested - offset);
+            ReadInto(buffer.Slice(offset, chunk), chunk);
+        }
+        return requested;
+    }
+
+    /// <summary>
+    /// Один блок чтения: кольцо → scratch → gain → <paramref name="target"/>.
+    /// </summary>
+    private void ReadInto(Span<float> target, int count)
+    {
         // Читаем из кольца столько, сколько есть; остальное — тишина.
-        int read = _cursor.Read(_scratch, requested);
-        if (read < requested)
-            Array.Clear(_scratch, read, requested - read);
+        int read = _cursor.Read(_scratch, count);
+        if (read < count)
+            Array.Clear(_scratch, read, count - read);
+
+        var source = _scratch.AsSpan(0, count);
 
         bool blockedBySolo = _solo.AnyInputSolo && !_input.IsSolo;
         bool muted = _input.IsMuted || blockedBySolo;
@@ -77,18 +101,17 @@ public sealed class BusTap : ISampleProvider
 
         // Всегда перезаписываем буфер целиком — микшер суммирует входы сам.
         float peak = 0f;
-        for (int i = 0; i < requested; i++)
+        for (int i = 0; i < count; i++)
         {
-            float s = _scratch[i] * gain;
+            float s = source[i] * gain;
             if (!float.IsFinite(s)) s = 0f;
-            buffer[i] = s;
+            target[i] = s;
             float abs = MathF.Abs(s);
             if (abs > peak) peak = abs;
         }
 
         // VU-уровень входа (обновляется аудио-потоком, читается UI)
         _input.PeakLevel = peak;
-        return requested;
     }
 
     /// <summary>дБ -> линейный коэффициент с защитой от нечисловых значений.</summary>
