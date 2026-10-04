@@ -559,7 +559,7 @@
     <value>Уровень:</value>
   </data>
   <data name="Sm.Log.LevelTip" xml:space="preserve">
-    <value>Детализация журнала. Применяется сразу, сохраняется в настройках</value>
+    <value>Уровень журнала: применяется сразу, сохраняется в настройках. Также фильтрует просмотр — показываются только записи этого уровня и выше</value>
   </data>
   <data name="Sm.Log.File" xml:space="preserve">
     <value>Файл:</value>

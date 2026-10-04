@@ -58,6 +58,11 @@ public partial class LogViewModel : LocalizedViewModel
     /// <summary>
     /// Уровень детализации. Переключается на лету: провайдер проверяет порог
     /// при каждой записи, перезапускать приложение не нужно.
+    ///
+    /// Это же значение фильтрует просмотр (<see cref="Refresh"/>): показываются
+    /// записи выбранного уровня и выше. Одно поле на оба смысла, а не два, —
+    /// иначе «уровень» в одном месте влиял бы на запись, а в другом на вид, и
+    /// пользователь гадал бы, почему переключение ничего не меняет.
     /// </summary>
     [ObservableProperty]
     private string _selectedLogLevel;
@@ -85,9 +90,12 @@ public partial class LogViewModel : LocalizedViewModel
         try
         {
             var file = SelectedFile == null ? new LogFile(AppLog.CurrentFilePath) : SelectedFile;
+            // Фильтр по уровню обязателен здесь, а не только в провайдере: файл
+            // на диске уже полон записей, и переключатель уровня обязан менять то,
+            // что пользователь видит, — иначе он выглядит как нерабочий.
             Content = string.IsNullOrEmpty(file.Fullname) || !File.Exists(file.Fullname)
                 ? Loc.Get("Sm.Log.NotCreated")
-                : AppLog.ReadLog(file.Fullname);
+                : AppLog.ReadLog(file.Fullname, minimumLevel: AppLog.Level);
             Status = Loc.Get("Sm.Log.Status.Size", Path.GetFileName(file.Fullname), Content.Length);
         }
         finally

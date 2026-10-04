@@ -27,7 +27,7 @@
     <!-- Версия, которую сравниваем с тегом GitHub Releases (AppVersion.Current
          читает informational version ИМЕННО входной сборки, поэтому <Version>
          должен остаться здесь, в WinExe, а не в Core). -->
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
 

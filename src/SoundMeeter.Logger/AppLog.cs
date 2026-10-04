@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text;
 
 namespace SoundMeeter.Services.Logging;
 
@@ -127,8 +128,15 @@ public static class AppLog
     /// <summary>
     /// Читает файл журнала для окна просмотра. Файл открыт провайдером на запись,
     /// поэтому читаем с FileShare.ReadWrite.
+    ///
+    /// <paramref name="minimumLevel"/> отбрасывает записи ниже порога — чтобы
+    /// переключатель уровня в окне лога фильтровал не только будущие записи, но и
+    /// уже написанный файл. Раньше он менял только порог записи, и на файле,
+    /// набитом Info/Warning, переключение выглядело как «ничего не
+    /// происходит». Фильтрация построчная и не трогает строки без метки
+    /// уровня (продолжения многострочных сообщений, стектрейсы).
     /// </summary>
-    public static string ReadLog(string path, int maxBytes = 512 * 1024)
+    public static string ReadLog(string path, int maxBytes = 512 * 1024, LogLevel minimumLevel = LogLevel.Trace)
     {
         try
         {
@@ -137,13 +145,67 @@ public static class AppLog
             if (stream.Length > maxBytes) stream.Seek(-maxBytes, SeekOrigin.End);
 
             using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
+            var text = reader.ReadToEnd();
+
+            // Trace — это «показать всё», самый частый случай: не разбираем файл впустую.
+            return minimumLevel <= LogLevel.Trace ? text : FilterByLevel(text, minimumLevel);
         }
         catch (Exception ex)
         {
             return $"Не удалось прочитать журнал: {ex.Message}";
         }
     }
+
+    /// <summary>
+    /// Смещение метки уровня в строке журнала. Формат задаёт
+    /// <see cref="RotatingFileLoggerProvider"/>: <c>yyyy-MM-dd HH:mm:ss.fff</c>
+    /// (23 символа), пробел, <c>[</c>, сокращённый уровень (5 символов), <c>]</c>.
+    /// </summary>
+    private const int LevelTokenOffset = 25;
+    private const int LevelTokenLength = 5;
+    private const int LevelTokenEnd = LevelTokenOffset + LevelTokenLength;   // 30, индекс ']'
+
+    private static string FilterByLevel(string text, LogLevel minimumLevel)
+    {
+        var result = new StringBuilder(text.Length);
+        using var reader = new StringReader(text);
+
+        while (reader.ReadLine() is { } line)
+        {
+            if (PassesLevelFilter(line, minimumLevel)) result.AppendLine(line);
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Пропускает строку, если её уровень не ниже порога. Строка без метки
+    /// уровня пропускается всегда: иначе из отчёта об ошибке выпал бы
+    /// стектрейс и любой вывод, записанный без заголовка.
+    /// </summary>
+    private static bool PassesLevelFilter(string line, LogLevel minimumLevel)
+    {
+        if (line.Length <= LevelTokenEnd || line[LevelTokenOffset - 1] != '[' || line[LevelTokenEnd] != ']')
+            return true;
+
+        return ParseAbbreviatedLevel(line.Substring(LevelTokenOffset, LevelTokenLength)) >= minimumLevel;
+    }
+
+    /// <summary>
+    /// Разбирает сокращённый уровень из <c>RotatingFileLoggerProvider.Abbreviate</c>:
+    /// там не <c>Information</c>/<c>Warning</c>, а <c>Info </c>/<c>Warn </c> —
+    /// пять символов, чтобы колонка уровня не прыгала.
+    /// </summary>
+    private static LogLevel ParseAbbreviatedLevel(string token) => token.Trim() switch
+    {
+        "Trace" => LogLevel.Trace,
+        "Debug" => LogLevel.Debug,
+        "Info" => LogLevel.Information,
+        "Warn" => LogLevel.Warning,
+        "Error" => LogLevel.Error,
+        "Crit" => LogLevel.Critical,
+        _ => LogLevel.None
+    };
 
     /// <summary>
     /// Текст для «Скопировать диагностику»: версия, уровень, список устройств

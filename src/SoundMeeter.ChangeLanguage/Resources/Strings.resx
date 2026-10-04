@@ -559,7 +559,7 @@
     <value>Level:</value>
   </data>
   <data name="Sm.Log.LevelTip" xml:space="preserve">
-    <value>Log verbosity. Applied immediately, saved to settings</value>
+    <value>Log verbosity: applied immediately, saved to settings. Also filters the view - only records at this level and above are shown</value>
   </data>
   <data name="Sm.Log.File" xml:space="preserve">
     <value>File:</value>
