@@ -26,7 +26,7 @@ public partial class LogViewModel : LocalizedViewModel
     private string _status = "";
 
     [ObservableProperty]
-    private string _selectedFile = "";
+    private LogFile _selectedFile;
 
     [ObservableProperty]
     private bool _isRefreshing;
@@ -39,8 +39,8 @@ public partial class LogViewModel : LocalizedViewModel
         LogLevels = AppLog.AvailableLevels;
         SelectedLogLevel = AppLog.Level.ToString();
         Files = AppLog.LogFiles();
-        SelectedFile = AppLog.CurrentFilePath;
-        if (string.IsNullOrEmpty(SelectedFile) && Files.Count > 0) SelectedFile = Files[0];
+        SelectedFile = new LogFile(AppLog.CurrentFilePath);
+        if (SelectedFile == null && Files.Count > 0) SelectedFile = Files[0];
         Refresh();
     }
 
@@ -48,7 +48,7 @@ public partial class LogViewModel : LocalizedViewModel
 
     public IReadOnlyList<string> LogLevels { get; }
 
-    public IReadOnlyList<string> Files { get; }
+    public IReadOnlyList<LogFile> Files { get; }
 
     public string LogDirectory => AppLog.DirectoryPath;
 
@@ -72,9 +72,9 @@ public partial class LogViewModel : LocalizedViewModel
         Refresh();
     }
 
-    partial void OnSelectedFileChanged(string value)
+    partial void OnSelectedFileChanged(LogFile value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return;
+        if (value == null) return;
         Refresh();
     }
 
@@ -84,11 +84,11 @@ public partial class LogViewModel : LocalizedViewModel
         IsRefreshing = true;
         try
         {
-            var path = string.IsNullOrWhiteSpace(SelectedFile) ? AppLog.CurrentFilePath : SelectedFile;
-            Content = string.IsNullOrEmpty(path) || !File.Exists(path)
+            var file = SelectedFile == null ? new LogFile(AppLog.CurrentFilePath) : SelectedFile;
+            Content = string.IsNullOrEmpty(file.Fullname) || !File.Exists(file.Fullname)
                 ? Loc.Get("Sm.Log.NotCreated")
-                : AppLog.ReadLog(path);
-            Status = Loc.Get("Sm.Log.Status.Size", Path.GetFileName(path), Content.Length);
+                : AppLog.ReadLog(file.Fullname);
+            Status = Loc.Get("Sm.Log.Status.Size", Path.GetFileName(file.Fullname), Content.Length);
         }
         finally
         {

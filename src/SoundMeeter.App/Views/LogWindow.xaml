@@ -44,7 +44,7 @@
             <ComboBox
                 Width="230"
                 VerticalAlignment="Center"
-                DisplayMemberPath="{Binding}"
+                DisplayMemberPath="Name"
                 ItemsSource="{Binding Files}"
                 SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                 ToolTip="{DynamicResource Sm.Log.FileTip}" />

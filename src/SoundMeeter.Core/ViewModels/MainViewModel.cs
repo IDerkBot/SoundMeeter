@@ -89,6 +89,10 @@ public partial class MainViewModel : LocalizedViewModel
         _updateService = updateService;
         _engine = engine;
         _settings = settings;
+        // Импорт/экспорт настроек: нужен только SettingsService, поэтому собирается
+        // здесь, а не через DI — отдельный сервис в контейнере был бы лишней
+        // зависимостью ради двух методов над файлом.
+        _transfer = new SettingsTransferService(settings);
         _midi = midi;
         _dock = obsDock;
         _startup = startup;

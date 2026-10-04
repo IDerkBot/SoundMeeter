@@ -204,6 +204,51 @@
   <data name="Sm.Toolbar.StripCounts" xml:space="preserve">
     <value>{0} inputs / {1} buses</value>
   </data>
+  <data name="Sm.Transfer.Export" xml:space="preserve">
+    <value>Export settings…</value>
+  </data>
+  <data name="Sm.Transfer.ExportTip" xml:space="preserve">
+    <value>Save all settings to a file: strips, routing, effects, MIDI, app routes and OBS dock</value>
+  </data>
+  <data name="Sm.Transfer.Import" xml:space="preserve">
+    <value>Import settings…</value>
+  </data>
+  <data name="Sm.Transfer.ImportTip" xml:space="preserve">
+    <value>Replace the current settings with the ones from a file</value>
+  </data>
+  <data name="Sm.Transfer.ConfirmTitle" xml:space="preserve">
+    <value>Import settings</value>
+  </data>
+  <data name="Sm.Transfer.Confirm" xml:space="preserve">
+    <value>Replace all current settings with the ones from «{0}»? The current settings will be backed up first.</value>
+  </data>
+  <data name="Sm.Transfer.Exported" xml:space="preserve">
+    <value>Settings exported to {0}</value>
+  </data>
+  <data name="Sm.Transfer.ImportDone" xml:space="preserve">
+    <value>Settings imported from {0}</value>
+  </data>
+  <data name="Sm.Transfer.ImportDoneBackup" xml:space="preserve">
+    <value>Settings imported from {0}. The previous settings were saved as {1}.</value>
+  </data>
+  <data name="Sm.Transfer.Failed" xml:space="preserve">
+    <value>Settings could not be written: {0}</value>
+  </data>
+  <data name="Sm.Transfer.NoPath" xml:space="preserve">
+    <value>No file specified</value>
+  </data>
+  <data name="Sm.Transfer.NotFound" xml:space="preserve">
+    <value>File {0} not found</value>
+  </data>
+  <data name="Sm.Transfer.Unreadable" xml:space="preserve">
+    <value>The file is not readable as SoundMeeter settings: {0}</value>
+  </data>
+  <data name="Sm.Transfer.NewerSchema" xml:space="preserve">
+    <value>The file uses settings schema version {0}, but this build only understands {1} — nothing was changed</value>
+  </data>
+  <data name="Sm.Transfer.NoStrips" xml:space="preserve">
+    <value>The file contains no mixer strips — this is not a SoundMeeter settings file, nothing was changed</value>
+  </data>
   <data name="Sm.Mixer.Inputs" xml:space="preserve">
     <value>INPUTS</value>
   </data>

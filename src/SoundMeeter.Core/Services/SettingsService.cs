@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using SoundMeeter.Models;
 using SoundMeeter.Services.Logging;
 using System.IO;
+using System.Security;
 using System.Text.Json;
 
 namespace SoundMeeter.Services
@@ -64,6 +65,9 @@ namespace SoundMeeter.Services
         /// <summary>Путь к файлу настроек (%APPDATA%\SoundMeeter\settings.json).</summary>
         public string SettingsPath => _path;
 
+        /// <summary>Путь резервной копии рядом с оригиналом.</summary>
+        public string BackupPath => _path + ".bak";
+
         /// <summary>
         /// true, если settings.json записан более новой версией схемы, чем понимает
         /// сборка. В этом режиме фоновое сохранение выключено: файл принадлежит
@@ -101,8 +105,10 @@ namespace SoundMeeter.Services
         {
             if (settings == null) return;
 
-            var rules = Settings.PersistentRoutes;
-            lock (rules)
+            // Порядок захвата (список правил → запись) обязателен: AddPersistentRoute
+            // тоже держит список правил и зовёт Save() внутри, то есть запросы идут
+            // строго в этом порядке. Обратный дал бы взаимоблокировку.
+            lock (Settings.PersistentRoutes)
             lock (_writeLock)
             {
                 if (HasUnsupportedNewerSchema && !explicitSave)
@@ -113,33 +119,119 @@ namespace SoundMeeter.Services
                     return;
                 }
 
-                // Снимок движка не содержит правил приложений. Дополняем его актуальными данными.
-                settings.PersistentRoutes = rules.Select(r => new DeviceRouteRule
-                {
-                    ExecutablePath = r.ExecutablePath, DeviceId = r.DeviceId,
-                    AppName = r.AppName, IconPath = r.IconPath
-                }).ToList();
-                settings.HiddenDeviceIds = Settings.HiddenDeviceIds.ToList();
-                // Снимок движка про док ничего не знает, ровно как про маршруты
-                // приложений: переносим актуальные значения из Settings.
-                settings.ObsDock = CloneObsDock(Settings.ObsDock);
-                settings.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
-                settings.LogLevel = AppLog.Level.ToString();
-                // Снимок движка про язык не знает, ровно как про маршруты приложений
-                // и док: язык живёт в Loc, а на диск его кладёт только он сам.
-                settings.Language = Loc.RequestedLanguage;
-                // То же с поведением приложения (SM-D01/SM-D02): движок о них не
-                // знает, а без переноса первое же фоновое сохранение (через 5 с
-                // после старта) стёрло бы их, и настройки «откатывались» бы сами.
-                settings.TrayEnabled = Settings.TrayEnabled;
-                settings.RunAtStartup = Settings.RunAtStartup;
-
+                ApplyAppLevelFields(settings);
                 WriteAtomically(settings);
             }
 
             HasUnsupportedNewerSchema = false;
             LoadedSchemaVersion = SettingsMigrator.CurrentSchemaVersion;
         }
+
+        /// <summary>
+        /// Полный снимок всех настроек — ровно то, что уходит на диск, только без
+        /// записи. Основа экспорта: экспортировать <see cref="IAudioEngine.CreateSnapshot"/>
+        /// нельзя, движок не знает ни про маршруты приложений, ни про док, ни про
+        /// язык, ни про поведение приложения — такой экспорт потерял бы восемь
+        /// полей из тринадцати.
+        /// </summary>
+        public AppSettings CreateFullSnapshot()
+        {
+            var snapshot = _engine.CreateSnapshot();
+
+            lock (Settings.PersistentRoutes)
+            lock (_writeLock)
+            {
+                ApplyAppLevelFields(snapshot);
+            }
+
+            return snapshot;
+        }
+
+        /// <summary>
+        /// Резервная копия текущих настроек в <see cref="BackupPath"/>. Нужна перед
+        /// импортом: он заменяет всё разом, а откатить замену без копии нечем.
+        /// Возвращает путь или null, если записать не удалось — импорт при этом
+        /// не отменяется: пользователь о таком риске предупреждён заранее.
+        /// </summary>
+        public string? BackupCurrent()
+        {
+            var snapshot = CreateFullSnapshot();
+
+            lock (Settings.PersistentRoutes)
+            lock (_writeLock)
+            {
+                try
+                {
+                    var directory = Path.GetDirectoryName(_path)!;
+                    Directory.CreateDirectory(directory);
+                    File.WriteAllText(BackupPath, JsonSerializer.Serialize(snapshot, WriteOptions));
+                    _logger.LogInformation("Резервная копия настроек: {Path}", BackupPath);
+                    return BackupPath;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
+                                              or NotSupportedException or SecurityException)
+                {
+                    _logger.LogError(ex, "Резервная копия настроек не создана: {Message}", ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Переносит в живой снимок те поля, которых нет у снимка движка, —
+        /// зеркало <see cref="ApplyAppLevelFields"/> для импорта. Применяет только
+        /// данные: язык и уровень журнала живут в Loc и AppLog, а док и автозапуск
+        /// меняют состояние системы, поэтому их доведёт до конца вызывающий.
+        /// </summary>
+        public void AdoptAppLevelFields(AppSettings imported)
+        {
+            if (imported == null) return;
+
+            var live = Settings;
+            lock (live.PersistentRoutes)
+            {
+                live.PersistentRoutes = (imported.PersistentRoutes ?? new List<DeviceRouteRule>())
+                    .Select(CloneRoute).ToList();
+                live.HiddenDeviceIds = imported.HiddenDeviceIds?.ToList() ?? new List<string>();
+                live.ObsDock = CloneObsDock(imported.ObsDock);
+                live.Language = imported.Language ?? "";
+                live.TrayEnabled = imported.TrayEnabled;
+                live.RunAtStartup = imported.RunAtStartup;
+                live.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
+            }
+        }
+
+        /// <summary>
+        /// Дополняет снимок движка данными, которых движок не знает. Список
+        /// правил приложений общий с <see cref="AudioService"/>, который правит
+        /// его на своих потоках, поэтому вызывающий держит его под замком.
+        /// </summary>
+        private void ApplyAppLevelFields(AppSettings settings)
+        {
+            var live = Settings;
+
+            settings.PersistentRoutes = live.PersistentRoutes.Select(CloneRoute).ToList();
+            settings.HiddenDeviceIds = live.HiddenDeviceIds.ToList();
+            // Снимок движка про док ничего не знает, ровно как про маршруты
+            // приложений: переносим актуальные значения из Settings.
+            settings.ObsDock = CloneObsDock(live.ObsDock);
+            settings.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
+            settings.LogLevel = AppLog.Level.ToString();
+            // Снимок движка про язык не знает, ровно как про маршруты приложений
+            // и док: язык живёт в Loc, а на диск его кладёт только он сам.
+            settings.Language = Loc.RequestedLanguage;
+            // То же с поведением приложения (SM-D01/SM-D02): движок о них не
+            // знает, а без переноса первое же фоновое сохранение (через 5 с
+            // после старта) стёрло бы их, и настройки «откатывались» бы сами.
+            settings.TrayEnabled = live.TrayEnabled;
+            settings.RunAtStartup = live.RunAtStartup;
+        }
+
+        private static DeviceRouteRule CloneRoute(DeviceRouteRule rule) => new()
+        {
+            ExecutablePath = rule.ExecutablePath, DeviceId = rule.DeviceId,
+            AppName = rule.AppName, IconPath = rule.IconPath
+        };
 
         public Task SaveAsync(AppSettings settings) => Task.Run(() => SaveSync(settings, explicitSave: false));
 

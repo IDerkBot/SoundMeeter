@@ -107,20 +107,20 @@ public static class AppLog
         Loggers.GetOrAdd(category, name => _factory?.CreateLogger(name) ?? (ILogger)NullLogger.Instance);
 
     /// <summary>Список файлов журнала, свежие сверху (для окна просмотра и диагностики).</summary>
-    public static IReadOnlyList<string> LogFiles()
+    public static IReadOnlyList<LogFile> LogFiles()
     {
         try
         {
-            if (!Directory.Exists(DirectoryPath)) return Array.Empty<string>();
+            if (!Directory.Exists(DirectoryPath)) return Array.Empty<LogFile>();
             return new DirectoryInfo(DirectoryPath)
                 .GetFiles("soundmeeter-*.log")
                 .OrderByDescending(f => f.LastWriteTimeUtc)
-                .Select(f => f.FullName)
+                .Select(file => new LogFile(file.FullName))
                 .ToList();
         }
         catch
         {
-            return Array.Empty<string>();
+            return Array.Empty<LogFile>();
         }
     }
 

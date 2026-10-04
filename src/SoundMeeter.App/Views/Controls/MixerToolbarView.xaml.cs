@@ -87,6 +87,85 @@ namespace SoundMeeter.Views.Controls
             new LogWindow { Owner = owner }.Show();
         }
 
+        /// <summary>
+        /// Импорт и экспорт всех настроек одним файлом (SM-C09). Диалоги выбора
+        /// файла — здесь, в слое представления: Core о WPF не знает, и знать не
+        /// должен (CoreWpfFreeTests). Сама работа с файлом — в VM.
+        /// </summary>
+        private void OnExportSettingsClick(object sender, RoutedEventArgs e)
+        {
+            SettingsPopup.IsOpen = false;
+
+            if (DataContext is not MainViewModel main) return;
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = Loc.Get("Sm.Transfer.Export"),
+                Filter = SettingsTransferService.FileFilter,
+                FileName = SettingsTransferService.SuggestFileName("export"),
+                DefaultExt = ".json",
+                AddExtension = true,
+                OverwritePrompt = true,
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+
+            if (dialog.ShowDialog(owner: Window.GetWindow(this)) != true) return;
+
+            var result = main.ExportSettings(dialog.FileName);
+            MessageBox.Show(Window.GetWindow(this), result.Message, Loc.Get("Sm.Transfer.Export"),
+                MessageBoxButton.OK,
+                result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
+        }
+
+        /// <summary>
+        /// Импорт заменяет настройки целиком, поэтому без подтверждения нельзя:
+        /// промахнувшийся файл откатывает микшер к состоянию, которого у
+        /// пользователя не было. Текущие настройки перед заменой копируются
+        /// (см. MainViewModel.ImportSettings), и путь к копии показывается в ответе.
+        /// </summary>
+        private void OnImportSettingsClick(object sender, RoutedEventArgs e)
+        {
+            SettingsPopup.IsOpen = false;
+
+            if (DataContext is not MainViewModel main) return;
+
+            var owner = Window.GetWindow(this);
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = Loc.Get("Sm.Transfer.Import"),
+                Filter = SettingsTransferService.FileFilter,
+                CheckFileExists = true,
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            };
+
+            if (dialog.ShowDialog(owner) != true) return;
+
+            string fileName = System.IO.Path.GetFileName(dialog.FileName);
+            var confirmed = MessageBox.Show(owner,
+                Loc.Get("Sm.Transfer.Confirm", fileName),
+                Loc.Get("Sm.Transfer.ConfirmTitle"),
+                MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+            if (confirmed != MessageBoxResult.Yes) return;
+
+            var result = main.ImportSettings(dialog.FileName);
+
+            if (!result.Success)
+            {
+                MessageBox.Show(owner, result.Message, Loc.Get("Sm.Transfer.Import"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Пустое сообщение — миграций не было; тогда показываем «импортировано».
+            var message = result.Message.Length > 0 ? result.Message
+                : result.BackupPath.Length > 0
+                    ? Loc.Get("Sm.Transfer.ImportDoneBackup", fileName, result.BackupPath)
+                    : Loc.Get("Sm.Transfer.ImportDone", fileName);
+
+            MessageBox.Show(owner, message, Loc.Get("Sm.Transfer.Import"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         /// <summary>Ручная проверка обновлений: сама проверка в VM, окно открываем здесь.</summary>
         private async void OnCheckUpdatesClick(object sender, RoutedEventArgs e)
         {

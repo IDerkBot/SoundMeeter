@@ -1,13 +1,13 @@
 ## Что появилось
 
-Тестов теперь шесть проектов, **153 теста, ~6 с, без аудиоустройств и без администратора**
+Тестов теперь шесть проектов, **187 тестов, ~13 с, без аудиоустройств и без администратора**
 (до разделения на Core/App был один проект `SoundMeeter.Tests` на 48 тестов):
 
 | Проект | Тестов | Файлы |
 |---|---|---|
 | `SoundMeeter.App.Tests` | 71 | `FuncButtonTests`, `StripEffectTests`, `EqualizerWindowTests`, `GainKnobTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
-| `SoundMeeter.Core.Tests` | 12 | `AudioEnginePresetTests`, `MidiBindingTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
-| `SoundMeeter.Audio.Tests` | 46 | `StripDspTests`, `EqualizerDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
+| `SoundMeeter.Core.Tests` | 22 | `AudioEnginePresetTests`, `MidiBindingTests`, `SettingsTransferTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
+| `SoundMeeter.Audio.Tests` | 70 | `StripDspTests`, `EqualizerDspTests`, `DenoiserDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
 | `SoundMeeter.Update.Tests` | 18 | `AppVersionTests`, выбор ассета релиза |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | все ключи локализации находятся, все языковые файлы полны |
 
@@ -21,6 +21,7 @@
 | `GainKnobTests` | линейная шкала по-прежнему в децибелах; логарифмическая проезжает 3…20 кГц за десяток щелчков и тратит диапазон равномерно; контроль с `Minimum = 0` |
 | `StripEffectTests` | крутилки, попап, раскладка колонки, клики, включение эффектов из пресета |
 | `MidiBindingTests` | дескрипторы Func и эффектов, Set/Get/Toggle через приватный диспетчер |
+| `SettingsTransferTests` | импорт/экспорт всех настроек: экспорт не теряет поля, которых нет у снимка движка (маршруты приложений, скрытые устройства, док, трей, автозапуск); круг экспорт→чтение; отказ на более новой схеме, на мусоре и на чужом JSON без стрипов; миграция старого файла; копия прежних настроек |
 | `ParamResetTests` | сброс всех пяти типов регуляторов, «повторный сброс не пачкает пресет» |
 | `ModuleBoundaryTests` | 9 проверок: модули не знают друг о друге, не знают про ядро и приложение, ядро не знает про приложение и UI-модули, приложение знает про ядро, точка входа только у приложения |
 | `AppIconTests` | значок по пути и по PID на настоящем файле Windows: непустой, замороженный, кэшируется, на мусоре и на мёртвом PID возвращает null, ConvertBack падает |

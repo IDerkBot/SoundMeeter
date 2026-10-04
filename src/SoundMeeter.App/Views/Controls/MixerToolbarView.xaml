@@ -142,6 +142,35 @@
                             </StackPanel>
                         </Button>
 
+                        <Button
+                            Click="OnExportSettingsClick"
+                            Style="{StaticResource MenuRow}"
+                            ToolTip="{DynamicResource Sm.Transfer.ExportTip}">
+                            <StackPanel Orientation="Horizontal">
+                                <icon:Icon
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,10,0"
+                                    Fill="#9A9A9A"
+                                    Kind="Export" />
+                                <TextBlock VerticalAlignment="Center" Text="{DynamicResource Sm.Transfer.Export}" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Click="OnImportSettingsClick"
+                            Style="{StaticResource MenuRow}"
+                            ToolTip="{DynamicResource Sm.Transfer.ImportTip}">
+                            <StackPanel Orientation="Horizontal">
+                                <icon:Icon
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,10,0"
+                                    Fill="#9A9A9A"
+                                    Kind="Import" />
+                                <TextBlock VerticalAlignment="Center" Text="{DynamicResource Sm.Transfer.Import}" />
+                            </StackPanel>
+                        </Button>
+
                         <!--
                             Переключатель языка (SM-C07). Отдельный подзаголовок, а
                             не шестой пункт меню: язык — настройка приложения, а не

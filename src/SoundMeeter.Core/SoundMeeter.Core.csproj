@@ -80,9 +80,18 @@
     <ProjectReference Include="..\SoundMeeter.StartUp\SoundMeeter.StartUp.csproj" />
   </ItemGroup>
 
+<ItemGroup>
+    <!--
+      SoundMeeter.Core.Tests ��?�� StylesService �� internal-конструктор с каталогом:
+      без него проверка писала бы в настоящий %APPDATA% пользователя. Так же, как
+      ��?��?�� Audio/ChangeLanguage/Logger/StartUp/Update.
+    -->
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
+  </ItemGroup>
+
   <ItemGroup>
-    <!-- InstalledAppsService читает файл от BaseDirectory/Resources — путь на диске
-         не меняется, меняется только то, какой проект его копирует в выход. -->
+    <!-- InstalledAppsService ��?��??" BaseDirectory/Resources ��?��?��? �?��?" ��?��?��. ????????????: ��?������?��?
+         ��?��?��?��?��?? ???? %APPDATA% ��?��?��?? ��?��?��?��?, ???????????: ???????????????????. -->
     <None Update="Resources\system_apps_filter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
