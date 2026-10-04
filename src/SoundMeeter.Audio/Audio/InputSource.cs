@@ -62,6 +62,12 @@ public sealed class InputSource
     /// <summary>Предупреждение о просрочке уже выдано — не повторяем каждый пакет.</summary>
     private bool _warnedBacklog;
 
+    /// <summary>
+    /// Сколько кадров денойзера считается нормой: один кадр RNNoise на старте
+    /// (10 мс) плюс небольшой запас на «неровный» первый пакет.
+    /// </summary>
+    private const long GlitchReportThreshold = 480;
+
     public InputSource(InputChannelModel model)
     {
         _model = model;
@@ -163,7 +169,30 @@ public sealed class InputSource
         // реверберации дало бы щелчок в первом же пакете после перезапуска.
         _effects.Reset();
 
+        LogDenoiserGlitches();
+
         _logger.LogInformation("Strip «{Strip}» closed: device={Device}", _model.Name, _model.DeviceId);
+    }
+
+    /// <summary>
+    /// Пишет в журнал, если денойзеру пришлось подмешивать тишину или отбрасывать
+    /// вход. Оба числа в норме нулевые (единицы — только первый кадр после
+    /// включения), и ненулевое значение означает, что пакет длиннее очереди
+    /// денойзера, то есть звук рвётся — ровно тот случай, когда «кажется, что
+    /// шумоподавление трещит».
+    /// </summary>
+    private void LogDenoiserGlitches()
+    {
+        var denoiser = _denoiser;
+        if (denoiser == null) return;
+        if (denoiser.UnderrunFrames <= GlitchReportThreshold &&
+            denoiser.OverrunFrames <= GlitchReportThreshold)
+            return;
+
+        _logger.LogWarning(
+            "Strip «{Strip}»: денойзер подмешал {Underrun} и отбросил {Overrun} кадров — " +
+            "конвейер не успевает за пакетом, в звуке будут щелчки",
+            _model.Name, denoiser.UnderrunFrames, denoiser.OverrunFrames);
     }
 
     public void Dispose()
@@ -236,8 +265,10 @@ public sealed class InputSource
             ApplyGain(outBuf, outFrames);
 
             // 4) Денойзер RNNoise (48кГц/стерео) — только если включён и доступен.
-            //    Процессор держит фиксированную задержку в 10 мс и всегда
-            //    возвращает ровно outFrames, поэтому буфер не раздувается.
+            //    Процессор держит постоянную задержку (~20 мс — столько у
+            //    rnnoise.dll) и всегда возвращает ровно outFrames, поэтому буфер
+            //    не раздувается. Очередь внутри переваривает пакет целиком, так
+            //    что длина пакета на результат не влияет.
             if (_model.DenoiserEnabled && _denoiser != null)
                 _denoiser.Process(outBuf, outFrames);
 
