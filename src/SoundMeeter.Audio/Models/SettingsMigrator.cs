@@ -34,7 +34,7 @@ public enum MigrationOutcome
 public static class SettingsMigrator
 {
     /// <summary>Версия схемы, которую понимает и пишет эта сборка.</summary>
-    public const int CurrentSchemaVersion = 5;
+    public const int CurrentSchemaVersion = 6;
 
     /// <summary>
     /// Приводит загруженный снимок к <see cref="CurrentSchemaVersion"/>.
@@ -91,6 +91,9 @@ public static class SettingsMigrator
                 break;
             case 4:
                 Migrate4To5(settings);
+                break;
+            case 5:
+                Migrate5To6(settings);
                 break;
             default:
                 // Сюда попасть нельзя: Migrate крутится только пока версия < Current.
@@ -245,6 +248,58 @@ public static class SettingsMigrator
     }
 
     /// <summary>
+    /// 5 → 6. У входного стрипа появился графический эквалайзер (SM-B05):
+    /// включение, десять полос, общий makeup-gain и два среза.
+    ///
+    /// У старых файлов полей нет, и десериализация подставит значения свойств, а
+    /// вот руками правленный файл мог оставить массив полос короче
+    /// <see cref="InputChannelModel.EqBandCount"/>, длиннее или с NaN. Полосы
+    /// приводим к рабочей длине: DSP и окно настроек читают их по индексу, и
+    /// лишняя или недостающая запись — это либо мусор в обработке, либо полоса,
+    /// которой не на чем рисоваться.
+    ///
+    /// Значение по умолчанию у полос — 0 дБ, а у срезов — «выключено» (крайние
+    /// положения шкалы). Именно поэтому здесь <see cref="Sanitize(float, float, float, float)"/>
+    /// с явной заменой: ноль герц для частоты среза недопустим, в отличие от
+    /// нуля дБ у остальных параметров.
+    /// </summary>
+    private static void Migrate5To6(AppSettings settings)
+    {
+        foreach (var input in settings.Inputs)
+        {
+            input.EqBandGains = NormalizeEqBands(input.EqBandGains);
+
+            float limit = InputChannelModel.EqBandGainLimitDb;
+            input.EqPreampDb = Sanitize(input.EqPreampDb, 0f, -limit, limit);
+            input.EqLowCutHz = Sanitize(input.EqLowCutHz,
+                InputChannelModel.EffectDefaults.EqLowCutHz,
+                InputChannelModel.EqLowCutMinHz, InputChannelModel.EqLowCutMaxHz);
+            input.EqHighCutHz = Sanitize(input.EqHighCutHz,
+                InputChannelModel.EffectDefaults.EqHighCutHz,
+                InputChannelModel.EqHighCutMinHz, InputChannelModel.EqHighCutMaxHz);
+        }
+
+        settings.SchemaVersion = 6;
+    }
+
+    /// <summary>
+    /// Полосы эквалайзера, приведённые к рабочей длине: недостающие добавляются
+    /// нулевыми, лишние отбрасываются, значения вне диапазона и NaN заменяются
+    /// нулём дБ.
+    /// </summary>
+    private static float[] NormalizeEqBands(float[]? source)
+    {
+        var bands = new float[InputChannelModel.EqBandCount];
+        if (source is null) return bands;
+
+        float limit = InputChannelModel.EqBandGainLimitDb;
+        for (int i = 0; i < bands.Length; i++)
+            bands[i] = i < source.Length ? Sanitize(source[i], -limit, limit) : 0f;
+
+        return bands;
+    }
+
+    /// <summary>
     /// Приводит список назначений к ровно <see cref="InputChannelModel.FuncButtonSlotCount"/>
     /// записей: лишние отбрасываются, недостающие добираются пустыми, Id шин
     /// чистятся от пустых строк и дублей. Разметка стрипа обращается к первому
@@ -276,4 +331,11 @@ public static class SettingsMigrator
     /// </summary>
     private static float Sanitize(float value, float min, float max) =>
         float.IsFinite(value) ? Math.Clamp(value, min, max) : 0f;
+
+    /// <summary>
+    /// То же, но с явной заменой вместо нуля: у частот среза ноль герц — не
+    /// рабочее значение, а «выключено» — это крайнее положение шкалы.
+    /// </summary>
+    private static float Sanitize(float value, float fallback, float min, float max) =>
+        float.IsFinite(value) ? Math.Clamp(value, min, max) : fallback;
 }

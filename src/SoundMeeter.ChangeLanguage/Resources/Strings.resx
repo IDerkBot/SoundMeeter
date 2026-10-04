@@ -384,6 +384,51 @@
   <data name="Sm.Effect.Reverb" xml:space="preserve">
     <value>Reverb</value>
   </data>
+  <data name="Sm.Effect.Equalizer" xml:space="preserve">
+    <value>Equalizer</value>
+  </data>
+  <data name="Sm.Eq.Shaping" xml:space="preserve">
+    <value>Overall gain and cuts</value>
+  </data>
+  <data name="Sm.Eq.Preamp" xml:space="preserve">
+    <value>makeup</value>
+  </data>
+  <data name="Sm.Eq.LowCut" xml:space="preserve">
+    <value>low cut</value>
+  </data>
+  <data name="Sm.Eq.HighCut" xml:space="preserve">
+    <value>high cut</value>
+  </data>
+  <data name="Sm.Eq.Flat" xml:space="preserve">
+    <value>Reset all</value>
+  </data>
+  <data name="Sm.Eq.FlatTip" xml:space="preserve">
+    <value>All bands to 0 dB, makeup gain to 0, cuts off.</value>
+  </data>
+  <data name="Sm.Eq.Hint" xml:space="preserve">
+    <value>Drag a point to set its band. Wheel over a point — ±0.5 dB, double-click — 0 dB. Parameters are read live: the engine does not restart, so the change is heard at once. Cuts at the ends of their scale are off.</value>
+  </data>
+  <data name="Sm.Eq.Preset" xml:space="preserve">
+    <value>Curve preset</value>
+  </data>
+  <data name="Sm.Eq.PresetTip" xml:space="preserve">
+    <value>Picking a preset applies it at once to all ten bands and to the overall gain. The low and high cuts stay as they are.</value>
+  </data>
+  <data name="Sm.Eq.Preset.Vocal" xml:space="preserve">
+    <value>Vocal</value>
+  </data>
+  <data name="Sm.Eq.Preset.Warm" xml:space="preserve">
+    <value>Warm</value>
+  </data>
+  <data name="Sm.Eq.Preset.Bright" xml:space="preserve">
+    <value>Bright</value>
+  </data>
+  <data name="Sm.Eq.Preset.Deep" xml:space="preserve">
+    <value>Deep</value>
+  </data>
+  <data name="Sm.Eq.Preset.Scooped" xml:space="preserve">
+    <value>Scooped</value>
+  </data>
   <data name="Sm.Effect.Threshold" xml:space="preserve">
     <value>threshold</value>
   </data>
@@ -605,6 +650,9 @@
   </data>
   <data name="Sm.Midi.Param.Reverb" xml:space="preserve">
     <value>Reverb</value>
+  </data>
+  <data name="Sm.Midi.Param.Eq" xml:space="preserve">
+    <value>EQ</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Noise</value>
@@ -940,7 +988,7 @@
     <value>Directory: </value>
   </data>
   <data name="Sm.Update.Report.Kept" xml:space="preserve">
-    <value>Autostart keys and the %APPDATA%\SoundMeeter settings folder are not touched.</value>
+    <value>The autostart entry and the %APPDATA%\SoundMeeter settings folder are not touched.</value>
   </data>
   <data name="Sm.Update.Plan.PayloadMissing" xml:space="preserve">
     <value>The unpacked update archive was not found.</value>
@@ -1054,7 +1102,7 @@
    <value>Start with Windows</value>
   </data>
   <data name="Sm.Tray.StartupTip" xml:space="preserve">
-   <value>Launch SoundMeeter when you log in. Adds a record to the current user's Run key; turning it off removes that record.</value>
+   <value>Launch SoundMeeter when you log in. Registers a scheduled task that runs with administrator rights (SoundMeeter needs them for AppRouting), so no UAC prompt appears at logon; turning it off removes that task.</value>
   </data>
   <data name="Sm.Tray.On" xml:space="preserve">
    <value>on</value>

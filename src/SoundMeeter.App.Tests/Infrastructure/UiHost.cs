@@ -1,6 +1,7 @@
 using SoundMeeter.Services;
 using System.Runtime.ExceptionServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace SoundMeeter.Tests.Infrastructure;
@@ -44,12 +45,14 @@ public static class UiHost
     {
         try
         {
-            _ = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+            var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+
+            InstallTheme(app);
 
             // LocResources, а не Loc: словарь строк — это WPF. Сам Loc лежит в
-            // SoundMeeter.Audio и поднимается без графики, но подключать его к
+            // SoundMeeter.Audio и поднимается без графики, но подключить его к
             // Application.Resources может только сторона с UI.
-            LocResources.Install(Application.Current);
+            LocResources.Install(app);
             _ready = true;
         }
         catch (Exception ex)
@@ -62,6 +65,28 @@ public static class UiHost
         }
 
         Dispatcher.Run();
+    }
+
+    /// <summary>
+    /// Тема приложения в <see cref="Application.Resources"/> — ровно как в
+    /// <c>App.xaml</c>.
+    ///
+    /// Тест создаёт <see cref="Application"/> программно и не проходит через
+    /// App.xaml, поэтому без этого словаря UI-тесты шли бы не в том окружении,
+    /// в каком работает приложение: любой <c>{StaticResource …}</c> из темы в
+    /// шаблоне падал бы при загрузке разметки, и тест рушился бы на XAML вместо
+    /// проверяемого поведения.
+    /// </summary>
+    private static void InstallTheme(Application app)
+    {
+        app.Resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("/StreamerTools.Style;component/Themes/DarkTheme.xaml", UriKind.Relative)
+        });
+
+        // Неявный стиль Button из App.xaml: без него кнопки в тестах выглядели бы
+        // иначе, чем у пользователя.
+        app.Resources[typeof(Button)] = new Style(typeof(Button), (Style)app.Resources["BtnFilled"]);
     }
 
     /// <summary>Выполнить действие в единственном STA-потоке приложения.</summary>

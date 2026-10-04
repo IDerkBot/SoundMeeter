@@ -1,5 +1,6 @@
 using SoundMeeter.Controls;
 using SoundMeeter.ViewModels;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -190,6 +191,43 @@ namespace SoundMeeter.Views.Controls
             : ReferenceEquals(button, DelayBtn) ? DelayPopup
             : ReferenceEquals(button, ReverbBtn) ? ReverbPopup
             : null;
+
+        #endregion
+
+        #region Кнопка EQ
+
+        // Эквалайзер отличается от соседей только тем, что ПКМ открывает не попап, а
+        // окно: кривую с десятью полосами в 272 px попапа не положить.
+
+        /// <summary>
+        /// ПКМ по EQ — открыть окно эквалайзера стрипа (ЛКМ — включение).
+        ///
+        /// Окно одно на стрип: кривая у каждого стрипа своя, и два окна одного и
+        /// того же стрипа только путали бы между собой. Окна других стрипов не
+        /// трогаем — сравниваем не тип окна, а Id стрипа внутри него.
+        /// </summary>
+        private void OnEqRightClick(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            if (DataContext is not InputChannelViewModel vm) return;
+
+            var owner = Window.GetWindow(this);
+            if (owner is null) return;
+
+            if (owner.OwnedWindows.OfType<EqualizerWindow>()
+                       .FirstOrDefault(window => window.StripId == vm.Id) is { } existing)
+            {
+                if (existing.IsVisible)
+                {
+                    existing.Activate();
+                    return;
+                }
+
+                existing.Close();
+            }
+
+            new EqualizerWindow(vm.Equalizer) { Owner = owner }.Show();
+        }
 
         #endregion
 

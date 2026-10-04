@@ -864,7 +864,7 @@ private static bool GetButtonState(InputChannelViewModel vm, string parameter) =
 ## Связанные заметки
 
 - [StreamerTools/Tasks.md](../StreamerTools/Tasks.md) — бэклог фич (часть пунктов уже неактуальна)
-- [StreamerTools/Tests.md](../StreamerTools/Tests.md) — описание текущего харнесса (часть утверждений неверна)
+- [StreamerTools/Tests.md](Tests.md) — описание текущего харнесса (часть утверждений неверна)
 - [StreamerTools/modules-summ.md](../StreamerTools/modules-summ.md) — транскрипт сессии ИИ, предлагается удалить
 
 > [!note] О vault

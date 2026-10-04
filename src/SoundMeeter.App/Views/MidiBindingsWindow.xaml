@@ -159,6 +159,7 @@
                                                             FontSize="10"
                                                             Foreground="#CCC"
                                                             IsChecked="{Binding IsInverted}"
+                                                            Style="{StaticResource CheckBoxCompact}"
                                                             ToolTip="{DynamicResource Sm.Midi.ReverseTip}" />
                                                     </StackPanel>
                                                 </StackPanel>

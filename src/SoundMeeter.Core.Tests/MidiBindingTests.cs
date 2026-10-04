@@ -50,7 +50,8 @@ public class MidiBindingTests
             MidiParameters.CompressorEnabledKey,
             MidiParameters.FxGainEnabledKey,
             MidiParameters.DelayEnabledKey,
-            MidiParameters.ReverbEnabledKey
+            MidiParameters.ReverbEnabledKey,
+            MidiParameters.EqEnabledKey
         ];
 
         foreach (string key in keys)
@@ -108,6 +109,23 @@ public class MidiBindingTests
 
         Assert.False(vm.Func1.IsEngaged);
         Assert.Equal("b1=1 b2=0 v1=0", Strips.Routing(vm));
+    }
+
+    [Fact]
+    public void MidiToggleDrivesTheEqualizerThroughTheStrip()
+    {
+        var vm = Strips.Microphone(new FakeAudioEngine());
+
+        ToggleButton(vm, MidiParameters.EqEnabledKey);
+
+        // Включение идёт через стрип, а не напрямую в модель: только стрип
+        // знает, что настройка стала правкой пресета.
+        Assert.True(vm.EqEnabled);
+        Assert.True(vm.Model.EqEnabled);
+        Assert.True(GetButtonState(vm, MidiParameters.EqEnabledKey));
+
+        SetButtonState(vm, MidiParameters.EqEnabledKey, false);
+        Assert.False(vm.Model.EqEnabled);
     }
 
     private const BindingFlags PrivateStatic =

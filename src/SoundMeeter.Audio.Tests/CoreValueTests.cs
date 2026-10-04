@@ -25,7 +25,9 @@ public class AppBehaviourSettingsTests
 
         SettingsMigrator.Migrate(settings, out _);
 
-        Assert.Equal(5, settings.SchemaVersion);
+        // Не «5», а текущая версия: файл версии 4 обязан доехать до последней
+        // схемы, иначе на нём по дороге потерялись бы поля следующих шагов.
+        Assert.Equal(SettingsMigrator.CurrentSchemaVersion, settings.SchemaVersion);
         Assert.True(settings.TrayEnabled);
         Assert.False(settings.RunAtStartup);
     }
@@ -44,7 +46,12 @@ public class AppBehaviourSettingsTests
     [Fact]
     public void BehaviourFlagsSurviveJsonRoundTrip()
     {
-        var settings = new AppSettings { SchemaVersion = 5, TrayEnabled = false, RunAtStartup = true };
+        var settings = new AppSettings
+        {
+            SchemaVersion = SettingsMigrator.CurrentSchemaVersion,
+            TrayEnabled = false,
+            RunAtStartup = true
+        };
 
         string json = System.Text.Json.JsonSerializer.Serialize(settings);
         var reloaded = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json)!;
@@ -54,9 +61,15 @@ public class AppBehaviourSettingsTests
         Assert.True(reloaded.RunAtStartup);
     }
 
+    /// <summary>
+    /// Номер схемы закреплён намеренно: смена формата файла обязана быть
+    /// осознанным шагом (добавить <c>n → n+1</c> в <see cref="SettingsMigrator"/>),
+    /// а не побочным эффектом правки модели. Тест ломается ровно тогда, когда
+    /// версия поехала без нового шага миграции.
+    /// </summary>
     [Fact]
-    public void CurrentSchemaVersionIsFive()
+    public void CurrentSchemaVersionIsSix()
     {
-        Assert.Equal(5, SettingsMigrator.CurrentSchemaVersion);
+        Assert.Equal(6, SettingsMigrator.CurrentSchemaVersion);
     }
 }

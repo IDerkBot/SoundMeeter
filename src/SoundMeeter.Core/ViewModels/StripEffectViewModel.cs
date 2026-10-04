@@ -59,6 +59,14 @@ public sealed partial class EffectKnobViewModel : LocalizedViewModel
     /// <summary>Значение по умолчанию: к нему сбрасывает двойной щелчок по крутилке.</summary>
     public float DefaultValue { get; init; }
 
+    /// <summary>
+    /// Крутилка logarithmic: доля параметра на равном угле дуги вместо единицы
+    /// значения. Нужна частотным параметрам — у среза 3…20 кГц размах в 17 тысяч
+    /// единиц, и на линейной шкале до верха не доехать, а кнопкой сброса не
+    /// «покрутить».
+    /// </summary>
+    public bool IsLogarithmic { get; init; }
+
     /// <summary>Двойной щелчок по крутилке — вернуть значение по умолчанию.</summary>
     [RelayCommand]
     private void Reset() => Value = DefaultValue;
@@ -147,4 +155,41 @@ public partial class StripEffectViewModel : LocalizedViewModel
         OnPropertyChanged(nameof(ToolTip));
         foreach (var knob in Knobs) knob.Refresh();
     }
+}
+
+/// <summary>
+/// Заводит крутилку параметра эффекта со всеми её привязками к пресету.
+///
+/// Фабрика отдельная от <see cref="StripEffectViewModel.Knobs"/>, потому что
+/// крутилки заводят не только эффекты с попапом: окно эквалайзера собирает свои
+/// ползунки иначе, но диапазоны, шаг сброса и отметка «пресет изменён» должны
+/// вести себя у всех одинаково.
+/// </summary>
+internal static class EffectKnobs
+{
+    public static EffectKnobViewModel Create(
+        string nameKey,
+        string unit,
+        string format,
+        double min,
+        double max,
+        float defaultValue,
+        Func<float> get,
+        Action<float> set,
+        Action markDirty,
+        bool logarithmic = false) =>
+        new(get, value =>
+        {
+            set(value);
+            markDirty();
+        })
+        {
+            NameKey = nameKey,
+            Unit = unit,
+            Format = format,
+            Minimum = min,
+            Maximum = max,
+            DefaultValue = defaultValue,
+            IsLogarithmic = logarithmic
+        };
 }

@@ -25,6 +25,16 @@ public partial class InputChannelViewModel : LocalizedViewModel
     /// </summary>
     private bool _routingByFunc;
 
+    /// <summary>
+    /// Стрип пересоздан или удалён: на него больше не ссылается ни источник, ни
+    /// обработка. Поднятие нужно окну эквалайзера — закрыть его, показывать
+    /// настройки несуществующего канала незачем.
+    ///
+    /// Событие поднимается ДО освобождения эквалайзера: тот снимает с себя
+    /// подписку на это событие, и наоборот — дошёл бы не тот, кому оно нужно.
+    /// </summary>
+    public event EventHandler? Invalidated;
+
     public InputChannelModel Model { get; }
     public string Id => Model.Id;
     public bool IsMicrophone => Model.IsMicrophone;
@@ -183,6 +193,13 @@ public partial class InputChannelViewModel : LocalizedViewModel
     [ObservableProperty]
     private bool _reverbEnabled;
 
+    /// <summary>Графический эквалайзер включён (состояние — кнопка EQ в колонке).</summary>
+    [ObservableProperty]
+    private bool _eqEnabled;
+
+    /// <summary>Эквалайзер стрипа: кнопка в колонке и отдельное окно настроек.</summary>
+    public EqualizerViewModel Equalizer { get; private set; } = null!;
+
     /// <summary>Компрессор: порог, сжатие, атака, отпускание, makeup.</summary>
     public StripEffectViewModel Compressor { get; private set; } = null!;
 
@@ -216,6 +233,12 @@ public partial class InputChannelViewModel : LocalizedViewModel
     partial void OnReverbEnabledChanged(bool value)
     {
         Model.ReverbEnabled = value;
+        _markDirty();
+    }
+
+    partial void OnEqEnabledChanged(bool value)
+    {
+        Model.EqEnabled = value;
         _markDirty();
     }
 
@@ -265,6 +288,10 @@ public partial class InputChannelViewModel : LocalizedViewModel
         Reverb.Knobs.Add(Knob("Sm.Effect.Size", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbSize, () => Model.ReverbSize, v => Model.ReverbSize = v));
         Reverb.Knobs.Add(Knob("Sm.Effect.Damping", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbDamping, () => Model.ReverbDamping, v => Model.ReverbDamping = v));
         Reverb.Knobs.Add(Knob("Sm.Effect.Mix", "%", "0", 0, 100, InputChannelModel.EffectDefaults.ReverbMix, () => Model.ReverbMix, v => Model.ReverbMix = v));
+
+        // Эквалайзер здесь, а не в отдельном методе: он тоже часть набора
+        // эффектов стрипа и освобождается вместе с остальными.
+        Equalizer = new EqualizerViewModel(this, _markDirty);
     }
 
     /// <summary>
@@ -280,19 +307,7 @@ public partial class InputChannelViewModel : LocalizedViewModel
         float defaultValue,
         Func<float> get,
         Action<float> set) =>
-        new(get, value =>
-        {
-            set(value);
-            _markDirty();
-        })
-        {
-            NameKey = nameKey,
-            Unit = unit,
-            Format = format,
-            Minimum = min,
-            Maximum = max,
-            DefaultValue = defaultValue
-        };
+        EffectKnobs.Create(nameKey, unit, format, min, max, defaultValue, get, set, _markDirty);
 
     #endregion
 
@@ -385,6 +400,16 @@ public partial class InputChannelViewModel : LocalizedViewModel
         _denoiserFormantMidDb = model.DenoiserFormantMidDb;
         _denoiserFormantHighDb = model.DenoiserFormantHighDb;
         _denoiserFormantGroupDb = model.DenoiserFormantGroupDb;
+
+        // Включение эффектов — из пресета, а не из поля ViewModel по умолчанию.
+        // Иначе после загрузки файла настроек кнопки всех включённых эффектов
+        // показывали бы «выключено», хотя обработка уже работает: DSP читает
+        // модель, а не ViewModel.
+        _compressorEnabled = model.CompressorEnabled;
+        _fxGainEnabled = model.FxGainEnabled;
+        _delayEnabled = model.DelayEnabled;
+        _reverbEnabled = model.ReverbEnabled;
+        _eqEnabled = model.EqEnabled;
 
         foreach (var bus in buses)
         {
@@ -746,12 +771,15 @@ public partial class InputChannelViewModel : LocalizedViewModel
     /// </summary>
     protected override void DisposeCore()
     {
+        Invalidated?.Invoke(this, EventArgs.Empty);
+
         Func1.Dispose();
         Func2.Dispose();
         Compressor.Dispose();
         FxGain.Dispose();
         Delay.Dispose();
         Reverb.Dispose();
+        Equalizer.Dispose();
     }
 
     /// <summary>

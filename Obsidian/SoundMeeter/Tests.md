@@ -1,13 +1,13 @@
 ## Что появилось
 
-Тестов теперь шесть проектов, **120 тестов, ~6 с, без аудиоустройств и без администратора**
+Тестов теперь шесть проектов, **153 теста, ~6 с, без аудиоустройств и без администратора**
 (до разделения на Core/App был один проект `SoundMeeter.Tests` на 48 тестов):
 
 | Проект | Тестов | Файлы |
 |---|---|---|
-| `SoundMeeter.App.Tests` | 54 | `FuncButtonTests`, `StripEffectTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
-| `SoundMeeter.Core.Tests` | 11 | `AudioEnginePresetTests`, `MidiBindingTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
-| `SoundMeeter.Audio.Tests` | 31 | `StripDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
+| `SoundMeeter.App.Tests` | 71 | `FuncButtonTests`, `StripEffectTests`, `EqualizerWindowTests`, `GainKnobTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
+| `SoundMeeter.Core.Tests` | 12 | `AudioEnginePresetTests`, `MidiBindingTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
+| `SoundMeeter.Audio.Tests` | 46 | `StripDspTests`, `EqualizerDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
 | `SoundMeeter.Update.Tests` | 18 | `AppVersionTests`, выбор ассета релиза |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | все ключи локализации находятся, все языковые файлы полны |
 
@@ -16,8 +16,11 @@
 | `FuncButtonTests` | назначение, эксклюзивность, аддитивный режим, возврат базы, метка, кнопка без назначения |
 | `AudioEnginePresetTests` | чистка мёртвых Id, глубокое копирование снимка, «перезапуск» |
 | `StripDspTests` | компрессор/trim/задержка/реверберация на сигнале, NaN-защита |
-| `StripEffectTests` | крутилки, попап, раскладка колонки, клики |
-| `MidiBindingTests` | дескрипторы Func, Set/Get/Toggle через приватный диспетчер |
+| `EqualizerDspTests` | подъём/провал полосы на её частоте, срезы, прозрачность выключенного EQ, шаг полос; главное — что нарисованная кривая совпадает с измеренной АЧХ; пресеты: длина, диапазоны, перевод, слышимость |
+| `EqualizerWindowTests` | кнопка EQ (ЛКМ) и окно (ПКМ, одно на стрип, закрывается вместе со стрипом), полосы и крутилки в окне, «сбросить всё», список пресетов и его применение, кривая вообще рисуется |
+| `GainKnobTests` | линейная шкала по-прежнему в децибелах; логарифмическая проезжает 3…20 кГц за десяток щелчков и тратит диапазон равномерно; контроль с `Minimum = 0` |
+| `StripEffectTests` | крутилки, попап, раскладка колонки, клики, включение эффектов из пресета |
+| `MidiBindingTests` | дескрипторы Func и эффектов, Set/Get/Toggle через приватный диспетчер |
 | `ParamResetTests` | сброс всех пяти типов регуляторов, «повторный сброс не пачкает пресет» |
 | `ModuleBoundaryTests` | 9 проверок: модули не знают друг о друге, не знают про ядро и приложение, ядро не знает про приложение и UI-модули, приложение знает про ядро, точка входа только у приложения |
 | `AppIconTests` | значок по пути и по PID на настоящем файле Windows: непустой, замороженный, кэшируется, на мусоре и на мёртвом PID возвращает null, ConvertBack падает |
@@ -28,6 +31,12 @@
 `App.Tests` линкует их исходники (`<Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\...">`
 ). Дублировать фикстуры нельзя: `FakeAudioEngine` — реализация `IAudioEngine`, и вторая копия
 разошлась бы с первой по сигнатуре.
+
+`UiHost` ставит тестам ту же тему, что и `App.xaml`: `Application` создаётся программно и через
+`App.xaml` не проходит, а без `DarkTheme.xaml` в `Application.Resources` любой
+`{StaticResource …}` из темы в шаблоне роняет загрузку разметки — и тест падает на XAML вместо
+проверяемого поведения. Стоило добавить в разметку ссылку на стиль темы, и девять UI-тестов
+упали разом.
 
 ## Граница «ядро не тянет UI» — теперь проверяется
 

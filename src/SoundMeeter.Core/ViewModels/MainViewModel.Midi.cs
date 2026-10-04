@@ -200,7 +200,8 @@ public partial class MainViewModel
         "IsMuted" or "IsSolo" or "IsMono" or "DenoiserEnabled" => true,
         MidiParameters.Func1Key or MidiParameters.Func2Key => true,
         MidiParameters.CompressorEnabledKey or MidiParameters.FxGainEnabledKey
-            or MidiParameters.DelayEnabledKey or MidiParameters.ReverbEnabledKey => true,
+            or MidiParameters.DelayEnabledKey or MidiParameters.ReverbEnabledKey
+            or MidiParameters.EqEnabledKey => true,
         _ => false
     };
 
@@ -261,6 +262,7 @@ public partial class MainViewModel
         MidiParameters.FxGainEnabledKey => vm.FxGainEnabled,
         MidiParameters.DelayEnabledKey => vm.DelayEnabled,
         MidiParameters.ReverbEnabledKey => vm.ReverbEnabled,
+        MidiParameters.EqEnabledKey => vm.EqEnabled,
         _ => false
     };
 
@@ -293,6 +295,7 @@ public partial class MainViewModel
             case MidiParameters.FxGainEnabledKey: vm.FxGainEnabled = value; break;
             case MidiParameters.DelayEnabledKey: vm.DelayEnabled = value; break;
             case MidiParameters.ReverbEnabledKey: vm.ReverbEnabled = value; break;
+            case MidiParameters.EqEnabledKey: vm.EqEnabled = value; break;
         }
     }
 
@@ -340,6 +343,7 @@ public partial class MainViewModel
             case MidiParameters.FxGainEnabledKey: vm.FxGainEnabled = !vm.FxGainEnabled; break;
             case MidiParameters.DelayEnabledKey: vm.DelayEnabled = !vm.DelayEnabled; break;
             case MidiParameters.ReverbEnabledKey: vm.ReverbEnabled = !vm.ReverbEnabled; break;
+            case MidiParameters.EqEnabledKey: vm.EqEnabled = !vm.EqEnabled; break;
         }
     }
 

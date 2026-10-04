@@ -106,8 +106,8 @@ public sealed class DenoiserDsp : IDisposable
     private readonly float[] _scL = new float[FrameSize];
     private readonly float[] _scR = new float[FrameSize];
 
-    private Biquad _eqLowL, _eqMidL, _eqHighL;
-    private Biquad _eqLowR, _eqMidR, _eqHighR;
+    private BiquadFilter _eqLowL, _eqMidL, _eqHighL;
+    private BiquadFilter _eqLowR, _eqMidR, _eqHighR;
     private float _eqLow, _eqMid, _eqHigh, _groupDb;
     private float _makeup = 1f;
     private bool _eqPrimed;
@@ -360,15 +360,16 @@ public sealed class DenoiserDsp : IDisposable
     }
 
     private void UpdateEq(float lowDb, float midDb, float highDb, float groupDb)
-    {        if (_eqPrimed && _eqLow == lowDb && _eqMid == midDb && _eqHigh == highDb && _groupDb == groupDb)
+    {
+        if (_eqPrimed && _eqLow == lowDb && _eqMid == midDb && _eqHigh == highDb && _groupDb == groupDb)
             return;
 
-        _eqLowL.SetPeaking(LowFreq, lowDb, Q);
-        _eqMidL.SetPeaking(MidFreq, midDb, Q);
-        _eqHighL.SetPeaking(HighFreq, highDb, Q);
-        _eqLowR.SetPeaking(LowFreq, lowDb, Q);
-        _eqMidR.SetPeaking(MidFreq, midDb, Q);
-        _eqHighR.SetPeaking(HighFreq, highDb, Q);
+        SetPeak(ref _eqLowL, LowFreq, lowDb);
+        SetPeak(ref _eqMidL, MidFreq, midDb);
+        SetPeak(ref _eqHighL, HighFreq, highDb);
+        SetPeak(ref _eqLowR, LowFreq, lowDb);
+        SetPeak(ref _eqMidR, MidFreq, midDb);
+        SetPeak(ref _eqHighR, HighFreq, highDb);
 
         _eqLow = lowDb;
         _eqMid = midDb;
@@ -376,6 +377,18 @@ public sealed class DenoiserDsp : IDisposable
         _groupDb = groupDb;
         _makeup = MathF.Pow(10f, groupDb / 20f);
         _eqPrimed = true;
+    }
+
+    /// <summary>
+    /// Пик формантного EQ со сбросом состояния. Именно со сбросом: полосы
+    /// пересчитываются на ходу, у денойзера за ними нечего тянуть, а оборванная
+    /// нить фильтра слышна как щелчок. Эквалайзер стрипа так не делает — там
+    /// сброса быть не должно (см. <see cref="BiquadFilter"/>).
+    /// </summary>
+    private void SetPeak(ref BiquadFilter filter, float freq, float gainDb)
+    {
+        filter.SetPeaking(freq, gainDb, Q, InputSource.SampleRate);
+        filter.ResetState();
     }
 
     private static float Sanitize(float x) => float.IsFinite(x) && MathF.Abs(x) >= DenormalFloor ? x : 0f;
@@ -452,46 +465,5 @@ public sealed class DenoiserDsp : IDisposable
     {
         RnNoiseInterop.Destroy(_rnState);
         _rnState = IntPtr.Zero;
-    }
-
-    /// <summary>Биквад-пик (RBJ cookbook), Direct Form I.</summary>
-    private struct Biquad
-    {
-        public float B0, B1, B2, A1, A2;
-        public float X1, X2, Y1, Y2;
-
-        public void SetPeaking(float freq, float gainDb, float q)
-        {
-            float a = MathF.Pow(10f, gainDb / 40f);
-            float w0 = 2f * MathF.PI * freq / InputSource.SampleRate;
-            float alpha = MathF.Sin(w0) / (2f * q);
-            float cos = MathF.Cos(w0);
-
-            float b0 = 1f + alpha * a;
-            float b1 = -2f * cos;
-            float b2 = 1f - alpha * a;
-            float a0 = 1f + alpha / a;
-            float a1 = -2f * cos;
-            float a2 = 1f - alpha / a;
-
-            B0 = b0 / a0;
-            B1 = b1 / a0;
-            B2 = b2 / a0;
-            A1 = a1 / a0;
-            A2 = a2 / a0;
-
-            // Сброс состояния: без него смена коэффициентов даёт щелчок.
-            X1 = X2 = Y1 = Y2 = 0f;
-        }
-
-        public float Process(float x)
-        {
-            float y = B0 * x + B1 * X1 + B2 * X2 - A1 * Y1 - A2 * Y2;
-            X2 = X1;
-            X1 = x;
-            Y2 = Y1;
-            Y1 = y;
-            return y;
-        }
     }
 }

@@ -384,6 +384,51 @@
   <data name="Sm.Effect.Reverb" xml:space="preserve">
     <value>Реверберация</value>
   </data>
+  <data name="Sm.Effect.Equalizer" xml:space="preserve">
+    <value>Эквалайзер</value>
+  </data>
+  <data name="Sm.Eq.Shaping" xml:space="preserve">
+    <value>Общий уровень и срезы</value>
+  </data>
+  <data name="Sm.Eq.Preamp" xml:space="preserve">
+    <value>компенсация</value>
+  </data>
+  <data name="Sm.Eq.LowCut" xml:space="preserve">
+    <value>срез снизу</value>
+  </data>
+  <data name="Sm.Eq.HighCut" xml:space="preserve">
+    <value>срез сверху</value>
+  </data>
+  <data name="Sm.Eq.Flat" xml:space="preserve">
+    <value>Сбросить всё</value>
+  </data>
+  <data name="Sm.Eq.FlatTip" xml:space="preserve">
+    <value>Все полосы в 0 дБ, компенсация в 0, срезы выключены.</value>
+  </data>
+  <data name="Sm.Eq.Hint" xml:space="preserve">
+    <value>Тяните точку, чтобы поднять или опустить полосу. Колесо над точкой — ±0.5 дБ, двойной клик — 0 дБ. Параметры читаются на лету: движок не перезапускается, поэтому правка слышна сразу. Срез на краю шкалы выключен.</value>
+  </data>
+  <data name="Sm.Eq.Preset" xml:space="preserve">
+    <value>Пресет кривой</value>
+  </data>
+  <data name="Sm.Eq.PresetTip" xml:space="preserve">
+    <value>Выбор пресета сразу применяет его ко всем десяти полосам и к общему уровню. Срезы снизу и сверху остаются как есть.</value>
+  </data>
+  <data name="Sm.Eq.Preset.Vocal" xml:space="preserve">
+    <value>Голос</value>
+  </data>
+  <data name="Sm.Eq.Preset.Warm" xml:space="preserve">
+    <value>Тёплый</value>
+  </data>
+  <data name="Sm.Eq.Preset.Bright" xml:space="preserve">
+    <value>Яркий</value>
+  </data>
+  <data name="Sm.Eq.Preset.Deep" xml:space="preserve">
+    <value>Глубокий</value>
+  </data>
+  <data name="Sm.Eq.Preset.Scooped" xml:space="preserve">
+    <value>Провал</value>
+  </data>
   <data name="Sm.Effect.Threshold" xml:space="preserve">
     <value>порог</value>
   </data>
@@ -605,6 +650,9 @@
   </data>
   <data name="Sm.Midi.Param.Reverb" xml:space="preserve">
     <value>Реверберация</value>
+  </data>
+  <data name="Sm.Midi.Param.Eq" xml:space="preserve">
+    <value>Эквалайзер</value>
   </data>
   <data name="Sm.Midi.Param.DenoiserNoiseRemover" xml:space="preserve">
     <value>DEN Шум</value>
@@ -940,7 +988,7 @@
     <value>Каталог: </value>
   </data>
   <data name="Sm.Update.Report.Kept" xml:space="preserve">
-    <value>Ключи автозапуска и папка настроек %APPDATA%\SoundMeeter не затрагиваются.</value>
+    <value>Запись автозапуска и папка настроек %APPDATA%\SoundMeeter не затрагиваются.</value>
   </data>
   <data name="Sm.Update.Plan.PayloadMissing" xml:space="preserve">
     <value>Распакованный архив обновления не найден.</value>
@@ -1054,7 +1102,7 @@
    <value>Запускать вместе с Windows</value>
   </data>
   <data name="Sm.Tray.StartupTip" xml:space="preserve">
-   <value>Запускать SoundMeeter при входе в Windows. Добавляет запись в ключ Run текущего пользователя; выключение убирает её.</value>
+   <value>Запускать SoundMeeter при входе в Windows. Создаёт задачу планировщика, которая запускается с правами администратора (микшеру они нужны для AppRouting), поэтому при входе не появляется запрос UAC; выключение удаляет задачу.</value>
   </data>
   <data name="Sm.Tray.On" xml:space="preserve">
    <value>включить</value>

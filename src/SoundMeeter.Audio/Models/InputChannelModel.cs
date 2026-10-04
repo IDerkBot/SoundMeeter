@@ -92,6 +92,15 @@ public class InputChannelModel
         public const float ReverbSize = 60f;
         public const float ReverbDamping = 40f;
         public const float ReverbMix = 0f;
+
+        public const float EqPreampDb = 0f;
+
+        /// <summary>Частота среза снизу по умолчанию: 20 Гц, то есть «не резать».
+        /// См. <see cref="InputChannelModel.EqLowCutMinHz"/>.</summary>
+        public const float EqLowCutHz = InputChannelModel.EqLowCutMinHz;
+
+        /// <summary>Частота среза сверху по умолчанию: 20 кГц, то есть «не резать».</summary>
+        public const float EqHighCutHz = InputChannelModel.EqHighCutMaxHz;
     }
 
     /// <summary>Компрессор включён.</summary>
@@ -147,6 +156,86 @@ public class InputChannelModel
 
     /// <summary>Доля мокрого сигнала реверберации, % (0..100).</summary>
     public float ReverbMix { get; set; }
+
+    #endregion
+
+    #region Эквалайзер стрипа (SM-B05)
+
+    /// <summary>
+    /// Число полос графического эквалайзера. Полосы идут с шагом примерно в
+    /// октаву (стандартные центры 31/62/125 Гц округлены до целых), поэтому
+    /// число и центральные частоты — одно целое: полосы не равны, а соседние
+    /// отличаются примерно вдвое, иначе соседние пики налезали бы друг на друга.
+    /// </summary>
+    public const int EqBandCount = 10;
+
+    /// <summary>Предел усиления/ослабления полосы, дБ (±12).</summary>
+    public const float EqBandGainLimitDb = 12f;
+
+    /// <summary>Предел общего makeup-gain эквалайзера, дБ (±12).</summary>
+    public const float EqPreampLimitDb = 12f;
+
+    /// <summary>Нижняя граница ползунка среза снизу, Гц. Значение = «срез выключен».</summary>
+    public const float EqLowCutMinHz = 20f;
+
+    /// <summary>Верхняя граница ползунка среза снизу, Гц.</summary>
+    public const float EqLowCutMaxHz = 300f;
+
+    /// <summary>Нижняя граница ползунка среза сверху, Гц.</summary>
+    public const float EqHighCutMinHz = 3000f;
+
+    /// <summary>
+    /// Верхняя граница ползунка среза сверху, Гц. Значение = «срез выключен».
+    /// Ставить выше нельзя: при 48 кГц частота Найквиста 24 кГц, и ФНЧ на 20 кГц
+    /// уже снимает верхний октав — «выключено» обязано быть насквозь прозрачным.
+    /// </summary>
+    public const float EqHighCutMaxHz = 20000f;
+
+    private static readonly float[] EqFrequencies =
+        [31f, 62f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f];
+
+    /// <summary>
+    /// Центральные частоты полос, Гц. <see cref="ReadOnlySpan{T}"/> вместо
+    /// массива, чтобы вызывающий не мог бы его переписать, а копия не
+    /// выделялась на каждом кадре DSP.
+    /// </summary>
+    public static ReadOnlySpan<float> EqBandFrequencies => EqFrequencies;
+
+    /// <summary>Эквалайзер включён.</summary>
+    public bool EqEnabled { get; set; }
+
+    /// <summary>
+    /// Усиление полос, дБ, ровно <see cref="EqBandCount"/> штук. Массив, а не
+    /// словарь: полосы адресуются по индексу и из DSP, и из разметки, а имена
+    /// у них есть только в окне настроек.
+    /// </summary>
+    public float[] EqBandGains { get; set; } = new float[EqBandCount];
+
+    /// <summary>Общий makeup-gain эквалайзера, дБ (−12..+12): компенсирует суммарный подъём полос.</summary>
+    public float EqPreampDb { get; set; } = EffectDefaults.EqPreampDb;
+
+    /// <summary>Срез снизу, Гц (20 = выключен).</summary>
+    public float EqLowCutHz { get; set; } = EffectDefaults.EqLowCutHz;
+
+    /// <summary>Срез сверху, Гц (20000 = выключен).</summary>
+    public float EqHighCutHz { get; set; } = EffectDefaults.EqHighCutHz;
+
+    /// <summary>
+    /// Усиление полосы, дБ. Индекс вне диапазона и мусор в массиве (файл,
+    /// правленный руками) читаются как 0 дБ: лучше ровная полоса, чем разрыв в
+    /// обработке. Рабочий диапазон приводит <see cref="SettingsMigrator"/>.
+    /// </summary>
+    public float GetEqBand(int index) =>
+        EqBandGains is { } bands && index >= 0 && index < bands.Length && float.IsFinite(bands[index])
+            ? bands[index]
+            : 0f;
+
+    /// <summary>Записать усиление полосы. Индекс вне диапазона игнорируется.</summary>
+    public void SetEqBand(int index, float gainDb)
+    {
+        if (EqBandGains is null || index < 0 || index >= EqBandGains.Length) return;
+        EqBandGains[index] = gainDb;
+    }
 
     #endregion
 

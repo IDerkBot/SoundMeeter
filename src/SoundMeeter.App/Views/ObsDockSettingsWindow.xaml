@@ -172,7 +172,10 @@
                     ItemsSource="{Binding InputChannels}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected}" ToolTip="{Binding Tooltip}">
+                            <CheckBox
+                                IsChecked="{Binding IsSelected}"
+                                Style="{StaticResource CheckBoxCompact}"
+                                ToolTip="{Binding Tooltip}">
                                 <TextBlock
                                     FontSize="10"
                                     Text="{Binding DisplayName}"
@@ -195,7 +198,10 @@
                     ItemsSource="{Binding OutputChannels}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected}" ToolTip="{Binding Tooltip}">
+                            <CheckBox
+                                IsChecked="{Binding IsSelected}"
+                                Style="{StaticResource CheckBoxCompact}"
+                                ToolTip="{Binding Tooltip}">
                                 <TextBlock
                                     FontSize="10"
                                     Text="{Binding DisplayName}"

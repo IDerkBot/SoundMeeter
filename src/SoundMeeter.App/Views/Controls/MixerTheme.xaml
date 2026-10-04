@@ -318,7 +318,8 @@
             <CheckBox
                 Grid.Column="0"
                 VerticalAlignment="Center"
-                IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                Style="{StaticResource CheckBoxCompact}" />
             <TextBlock
                 Grid.Column="1"
                 Margin="4,0,4,0"
@@ -361,6 +362,7 @@
                 Width="56"
                 Height="56"
                 HorizontalAlignment="Center"
+                IsLogarithmic="{Binding IsLogarithmic}"
                 Maximum="{Binding Maximum}"
                 Minimum="{Binding Minimum}"
                 ToolTip="{Binding ToolTip}"
@@ -536,7 +538,8 @@
                 <CheckBox
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    IsChecked="{Binding IsEnabled, Mode=TwoWay}">
+                    IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                    Style="{StaticResource CheckBoxCompact}">
                     <TextBlock
                         FontSize="10"
                         Foreground="White"

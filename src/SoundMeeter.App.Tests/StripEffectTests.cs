@@ -128,6 +128,35 @@ public class StripEffectTests
     }
 
     [Fact]
+    public void EffectTogglesShowWhatThePresetSays()
+    {
+        // DSP читает модель, а не ViewModel. Если бы кнопка брала состояние из
+        // поля ViewModel по умолчанию, после загрузки settings.json все включённые
+        // эффекты выглядели бы выключенными, хотя обработка уже работает.
+        var model = new InputChannelModel
+        {
+            CompressorEnabled = true,
+            FxGainEnabled = true,
+            DelayEnabled = true,
+            ReverbEnabled = true,
+            EqEnabled = true
+        };
+        var vm = new InputChannelViewModel(
+            model,
+            new FakeAudioEngine(),
+            Strips.Buses(),
+            new List<SoundMeeter.Services.DeviceInfo>(),
+            () => { });
+
+        Assert.True(vm.CompressorEnabled);
+        Assert.True(vm.FxGainEnabled);
+        Assert.True(vm.DelayEnabled);
+        Assert.True(vm.ReverbEnabled);
+        Assert.True(vm.EqEnabled);
+        Assert.True(vm.Equalizer.IsEnabled);
+    }
+
+    [Fact]
     public void ClickingAnEffectButtonTogglesTheEffect()
     {
         UiHost.Run(() =>

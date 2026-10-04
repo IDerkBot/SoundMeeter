@@ -266,6 +266,26 @@
                             ToolTip="{Binding ToolTip}" />
                     </Grid>
                     </UniformGrid>
+
+                <!--
+                    Эквалайзер: ЛКМ, как у остальных эффектов, — вкл/выкл, а ПКМ
+                    открывает отдельное окно. Отдельное, а не попап: десять полос с
+                    кривой не влезают в 272 px попапа, а окно можно держать открытым
+                    и свернуть микшер — правка слышна сразу.
+
+                    Обёртка нужна ради DataContext: привязки идут к
+                    EqualizerViewModel, а не к стрипу.
+                -->
+                    <Grid Margin="0,2,0,0" DataContext="{Binding Equalizer}">
+                        <ToggleButton
+                            x:Name="EqBtn"
+                            Margin="2"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                            MouseRightButtonUp="OnEqRightClick"
+                            Style="{StaticResource EffectBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
                 </StackPanel>
 
                 <Popup

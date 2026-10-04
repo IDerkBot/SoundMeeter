@@ -68,6 +68,9 @@ public static class MidiParameters
     /// <summary>Ключ привязки включения реверберации.</summary>
     public const string ReverbEnabledKey = "ReverbEnabled";
 
+    /// <summary>Ключ привязки включения эквалайзера.</summary>
+    public const string EqEnabledKey = "EqEnabled";
+
     public static readonly IReadOnlyList<MidiParameterDescriptor> All = new List<MidiParameterDescriptor>
     {
         new() { Key = "VolumeDb", LabelKey = "Sm.Midi.Param.VolumeDb", ForInput = true, ForBus = true, Shape = MidiParamShape.Fader, Min = -60, Max = 12 },
@@ -90,6 +93,7 @@ public static class MidiParameters
         new() { Key = FxGainEnabledKey, LabelKey = "Sm.Midi.Param.FxGain", ForInput = true, Shape = MidiParamShape.Button },
         new() { Key = DelayEnabledKey, LabelKey = "Sm.Midi.Param.Delay", ForInput = true, Shape = MidiParamShape.Button },
         new() { Key = ReverbEnabledKey, LabelKey = "Sm.Midi.Param.Reverb", ForInput = true, Shape = MidiParamShape.Button },
+        new() { Key = EqEnabledKey, LabelKey = "Sm.Midi.Param.Eq", ForInput = true, Shape = MidiParamShape.Button },
 
         new() { Key = "DenoiserNoiseRemover", LabelKey = "Sm.Midi.Param.DenoiserNoiseRemover", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },
         new() { Key = "DenoiserDryWet", LabelKey = "Sm.Midi.Param.DenoiserDryWet", ForInput = true, Shape = MidiParamShape.Knob, Min = 0, Max = 100 },

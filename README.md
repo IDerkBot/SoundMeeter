@@ -10,7 +10,7 @@ driven from a MIDI control surface and from a dock panel inside OBS Studio.
 
 ```
 mic ──┐                                    ┌─► strip 1 ─┐
-      ├─► Denoiser ─► Compressor ─► Gain ──┤            ├─► Bus 1 ─► headphones
+      ├─► Denoiser ─► EQ ─► Compressor ─► Gain ──┤            ├─► Bus 1 ─► headphones
 loop ─┤             ─► Delay ─► Reverb ────┤            │
       │                                   └─► strip 2 ─┘
 cable ┘                                            └─► Bus 2 ─► stream
@@ -34,6 +34,8 @@ cable ┘                                            └─► Bus 2 ─► stre
 **DSP (per input strip)**
 
 - Gain
+- Graphic equalizer — 10 bands (31 Hz…16 kHz) with a draggable response curve in its
+  own window, 5 curve presets, low cut, high cut and overall makeup gain
 - Compressor — threshold, ratio, attack, release, makeup gain
 - Delay — time, feedback, damping, mix
 - Reverb — size, damping, mix

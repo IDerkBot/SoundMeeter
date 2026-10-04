@@ -90,6 +90,36 @@ public static class VisualTree
     }
 
     /// <summary>
+    /// Правая кнопка мыши: подъём события, как это делает WM_RBUTTONUP. Отдельная
+    /// кнопка в интерфейсе проверяется именно так — ПКМ открывает окно настроек
+    /// эквалайзера, а ЛКМ переключает эффект, и спутать их нельзя.
+    /// </summary>
+    public static void RightClick(UIElement element)
+    {
+        var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Right)
+        {
+            RoutedEvent = UIElement.MouseRightButtonUpEvent,
+            Source = element
+        };
+        element.RaiseEvent(args);
+    }
+
+    /// <summary>
+    /// Колесо мыши: <paramref name="notches"/> щелчков вниз (отрицательное — вверх).
+    /// Позиция курсора в <see cref="MouseWheelEventArgs"/> не задаётся, поэтому
+    /// проверяется то, что от неё не зависит: шаг регулятора.
+    /// </summary>
+    public static void Wheel(UIElement element, int notches = 1)
+    {
+        var args = new MouseWheelEventArgs(Mouse.PrimaryDevice, Environment.TickCount, notches)
+        {
+            RoutedEvent = UIElement.MouseWheelEvent,
+            Source = element
+        };
+        element.RaiseEvent(args);
+    }
+
+    /// <summary>
     /// Отдельный шаблон из словаря темы в обычный визуальный элемент.
     /// У <c>ContentControl</c> своя тема, и вложенный шаблон из
     /// <c>ContentTemplate</c> не попадает в визуальное дерево так, как его
