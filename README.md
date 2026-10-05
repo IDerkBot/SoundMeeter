@@ -51,7 +51,8 @@ cable ┘                                            └─► Bus 2 ─► stre
   cable by name and refuses to bind a cable output as a strip input
 - **OBS Studio dock panel** — a built-in loopback HTTP + WebSocket server pushes strip
   state to a Browser Dock at 30 Hz and accepts volume/mute/solo/mono commands back
-- Auto-update from GitHub Releases (portable ZIP, self-replacing via `robocopy /MIR`)
+- Auto-update from GitHub Releases (portable ZIP, self-replacing via `robocopy /MIR`), with the
+  release notes shown as rendered markdown — headings, lists, links, code
 
 **Application**
 
@@ -123,11 +124,11 @@ renaming it is a separate task that has to start from `UpdateApplier`.
 dotnet test src\SoundMeeter.slnx
 ```
 
-217 xUnit tests across six projects, no audio hardware required:
+246 xUnit tests across six projects, no audio hardware required:
 
 | Project | Tests | Covers |
 |---|---|---|
-| `SoundMeeter.App.Tests` | 73 | WPF views and controls (STA host), param reset, effect popups, empty-mixer hints, app icons, module and layer boundaries |
+| `SoundMeeter.App.Tests` | 102 | WPF views and controls (STA host), param reset, effect popups, empty-mixer hints, markdown release notes, app icons, module and layer boundaries |
 | `SoundMeeter.Core.Tests` | 25 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, "core stays WPF-free" |
 | `SoundMeeter.Audio.Tests` | 95 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
 | `SoundMeeter.Update.Tests` | 18 | Semantic version comparison and release-asset selection |
