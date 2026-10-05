@@ -25,6 +25,8 @@ cable ┘                                            └─► Bus 2 ─► stre
 **Mixing**
 
 - Input strips and output buses as separate, reorderable columns
+- The mixer starts **empty**: strips are added by you (`＋`) and are never created
+  automatically from the list of sound devices
 - Per-strip vertical fader, segmented VU meter, dB readout
 - LED buttons: **Mute**, **Solo**, **Mono** (solo is global-aware across inputs and buses)
 - Per-strip routing to hardware outputs (`OUT`) and virtual-cable inputs (`VIRT`), both multi-select
@@ -121,13 +123,13 @@ renaming it is a separate task that has to start from `UpdateApplier`.
 dotnet test src\SoundMeeter.slnx
 ```
 
-120 xUnit tests across six projects, no audio hardware required:
+217 xUnit tests across six projects, no audio hardware required:
 
 | Project | Tests | Covers |
 |---|---|---|
-| `SoundMeeter.App.Tests` | 54 | WPF views and controls (STA host), param reset, effect popups, app icons, module and layer boundaries |
-| `SoundMeeter.Core.Tests` | 11 | ViewModels, MIDI bindings, preset restore through the engine, "core stays WPF-free" |
-| `SoundMeeter.Audio.Tests` | 31 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
+| `SoundMeeter.App.Tests` | 73 | WPF views and controls (STA host), param reset, effect popups, empty-mixer hints, app icons, module and layer boundaries |
+| `SoundMeeter.Core.Tests` | 25 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, "core stays WPF-free" |
+| `SoundMeeter.Audio.Tests` | 95 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
 | `SoundMeeter.Update.Tests` | 18 | Semantic version comparison and release-asset selection |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | Every localization key resolves; every language file is complete |
 

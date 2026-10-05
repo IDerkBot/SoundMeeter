@@ -78,6 +78,46 @@ public class AudioEnginePresetTests
         Assert.DoesNotContain("b2", engine.Inputs[0].FuncButtons[0].BusIds);
     }
 
+    /// <summary>
+    /// Первый запуск: файла настроек нет, и микшер должен остаться пустым.
+    /// Раньше движок на старте создавал два пустых входа и две пустые шины, а
+    /// осмотр каталога — ещё по стрипу на каждое устройство, то есть набор
+    /// каналов определяла машина. Теперь стрипы появляются только по команде
+    /// пользователя, и снимок пустого микшера обязан оставаться пустым —
+    /// иначе «пустой» старт тихо расползается по кругу.
+    /// </summary>
+    [Fact]
+    public void AnEmptyPresetLeavesTheMixerEmpty()
+    {
+        using var engine = new WasapiAudioEngine();
+        var empty = new AppSettings { SchemaVersion = SettingsMigrator.CurrentSchemaVersion };
+        SettingsMigrator.Migrate(empty, out _);
+
+        engine.ApplyPreset(empty);
+
+        Assert.Empty(engine.Inputs);
+        Assert.Empty(engine.Buses);
+
+        // Ни добавления, ни повторного «перезапуска» не должно ронять стрипы:
+        // снимок пустого микшера и есть законное состояние.
+        engine.ApplyPreset(engine.CreateSnapshot());
+        Assert.Empty(engine.Inputs);
+        Assert.Empty(engine.Buses);
+    }
+
+    /// <summary>Каналы добавляет пользователь, а не движок: одна команда — один стрип.</summary>
+    [Fact]
+    public void AddInputAndAddBusCreateExactlyOneStrip()
+    {
+        using var engine = new WasapiAudioEngine();
+
+        engine.AddInput();
+        engine.AddBus();
+
+        Assert.Single(engine.Inputs);
+        Assert.Single(engine.Buses);
+    }
+
     [Fact]
     public void ReapplyingASnapshotRestoresTheEngagedButton()
     {

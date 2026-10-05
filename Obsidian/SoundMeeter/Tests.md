@@ -1,12 +1,12 @@
 ## Что появилось
 
-Тестов теперь шесть проектов, **187 тестов, ~13 с, без аудиоустройств и без администратора**
+Тестов теперь шесть проектов, **217 тестов, ~13 с, без аудиоустройств и без администратора**
 (до разделения на Core/App был один проект `SoundMeeter.Tests` на 48 тестов):
 
 | Проект | Тестов | Файлы |
 |---|---|---|
-| `SoundMeeter.App.Tests` | 71 | `FuncButtonTests`, `StripEffectTests`, `EqualizerWindowTests`, `GainKnobTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
-| `SoundMeeter.Core.Tests` | 22 | `AudioEnginePresetTests`, `MidiBindingTests`, `SettingsTransferTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
+| `SoundMeeter.App.Tests` | 73 | `FuncButtonTests`, `StripEffectTests`, `EqualizerWindowTests`, `MixerViewTests`, `GainKnobTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
+| `SoundMeeter.Core.Tests` | 25 | `AudioEnginePresetTests`, `MidiBindingTests`, `SettingsTransferTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
 | `SoundMeeter.Audio.Tests` | 70 | `StripDspTests`, `EqualizerDspTests`, `DenoiserDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
 | `SoundMeeter.Update.Tests` | 18 | `AppVersionTests`, выбор ассета релиза |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | все ключи локализации находятся, все языковые файлы полны |
@@ -14,14 +14,15 @@
 | Файл | Что защищает |
 |---|---|
 | `FuncButtonTests` | назначение, эксклюзивность, аддитивный режим, возврат базы, метка, кнопка без назначения |
-| `AudioEnginePresetTests` | чистка мёртвых Id, глубокое копирование снимка, «перезапуск» |
+| `AudioEnginePresetTests` | чистка мёртвых Id, глубокое копирование снимка, «перезапуск»; пустой пресет оставляет микшер пустым, `AddInput`/`AddBus` дают ровно один стрип |
+| `MixerViewTests` | пустая лента показывает подсказку в обеих группах и убирает её с первым стрипом |
 | `StripDspTests` | компрессор/trim/задержка/реверберация на сигнале, NaN-защита |
 | `EqualizerDspTests` | подъём/провал полосы на её частоте, срезы, прозрачность выключенного EQ, шаг полос; главное — что нарисованная кривая совпадает с измеренной АЧХ; пресеты: длина, диапазоны, перевод, слышимость |
 | `EqualizerWindowTests` | кнопка EQ (ЛКМ) и окно (ПКМ, одно на стрип, закрывается вместе со стрипом), полосы и крутилки в окне, «сбросить всё», список пресетов и его применение, кривая вообще рисуется |
 | `GainKnobTests` | линейная шкала по-прежнему в децибелах; логарифмическая проезжает 3…20 кГц за десяток щелчков и тратит диапазон равномерно; контроль с `Minimum = 0` |
 | `StripEffectTests` | крутилки, попап, раскладка колонки, клики, включение эффектов из пресета |
 | `MidiBindingTests` | дескрипторы Func и эффектов, Set/Get/Toggle через приватный диспетчер |
-| `SettingsTransferTests` | импорт/экспорт всех настроек: экспорт не теряет поля, которых нет у снимка движка (маршруты приложений, скрытые устройства, док, трей, автозапуск); круг экспорт→чтение; отказ на более новой схеме, на мусоре и на чужом JSON без стрипов; миграция старого файла; копия прежних настроек |
+| `SettingsTransferTests` | импорт/экспорт всех настроек: экспорт не теряет поля, которых нет у снимка движка (маршруты приложений, скрытые устройства, док, трей, автозапуск); круг экспорт→чтение; отказ на более новой схеме, на мусоре и на чужом JSON без наших полей, при этом экспорт без единого стрипа импортируется; миграция старого файла; копия прежних настроек |
 | `ParamResetTests` | сброс всех пяти типов регуляторов, «повторный сброс не пачкает пресет» |
 | `ModuleBoundaryTests` | 9 проверок: модули не знают друг о друге, не знают про ядро и приложение, ядро не знает про приложение и UI-модули, приложение знает про ядро, точка входа только у приложения |
 | `AppIconTests` | значок по пути и по PID на настоящем файле Windows: непустой, замороженный, кэшируется, на мусоре и на мёртвом PID возвращает null, ConvertBack падает |

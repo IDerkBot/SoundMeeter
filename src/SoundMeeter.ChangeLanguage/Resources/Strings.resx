@@ -246,8 +246,8 @@
   <data name="Sm.Transfer.NewerSchema" xml:space="preserve">
     <value>The file uses settings schema version {0}, but this build only understands {1} — nothing was changed</value>
   </data>
-  <data name="Sm.Transfer.NoStrips" xml:space="preserve">
-    <value>The file contains no mixer strips — this is not a SoundMeeter settings file, nothing was changed</value>
+  <data name="Sm.Transfer.NotOurFile" xml:space="preserve">
+    <value>The file has no SoundMeeter settings fields — this is not a settings file, nothing was changed</value>
   </data>
   <data name="Sm.Mixer.Inputs" xml:space="preserve">
     <value>INPUTS</value>
@@ -260,6 +260,12 @@
   </data>
   <data name="Sm.Mixer.AddOutputTip" xml:space="preserve">
     <value>Add output strip</value>
+  </data>
+  <data name="Sm.Mixer.NoInputs" xml:space="preserve">
+    <value>No input channels yet. Add a strip with ＋ and pick a device for it.</value>
+  </data>
+  <data name="Sm.Mixer.NoOutputs" xml:space="preserve">
+    <value>No output channels yet. Add a strip with ＋ and pick a device for it.</value>
   </data>
   <data name="Sm.Strip.RemoveTip" xml:space="preserve">
     <value>Remove strip</value>
@@ -979,7 +985,7 @@
     <value>settings.json is unreadable ({0}); the file was kept as {1}, starting with default settings</value>
   </data>
   <data name="Sm.Settings.NoPreset" xml:space="preserve">
-    <value>No saved settings — a minimal set of strips was created</value>
+    <value>No saved settings — the mixer starts empty, add the channels you need</value>
   </data>
   <data name="Sm.Obs.ObsRunning" xml:space="preserve">
     <value>OBS is running and will overwrite user.ini on exit. Close OBS and try again.</value>

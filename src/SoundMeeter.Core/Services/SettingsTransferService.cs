@@ -42,6 +42,28 @@ namespace SoundMeeter.Services
     {
         private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
+        /// <summary>
+        /// Поля, по которым узнаётся наш файл настроек. Имена — как в JSON,
+        /// то есть ровно имена свойств <see cref="AppSettings"/>: сериализация
+        /// идёт без политики именования.
+        /// </summary>
+        private static readonly string[] OwnFields =
+        {
+            nameof(AppSettings.SchemaVersion),
+            nameof(AppSettings.LogLevel),
+            nameof(AppSettings.Language),
+            nameof(AppSettings.PersistentRoutes),
+            nameof(AppSettings.EngineWasRunning),
+            nameof(AppSettings.Inputs),
+            nameof(AppSettings.Outputs),
+            nameof(AppSettings.RemovedDeviceIds),
+            nameof(AppSettings.HiddenDeviceIds),
+            nameof(AppSettings.Midi),
+            nameof(AppSettings.ObsDock),
+            nameof(AppSettings.TrayEnabled),
+            nameof(AppSettings.RunAtStartup)
+        };
+
         private readonly SettingsService _settings;
         private readonly ILogger _logger = AppLog.For<SettingsTransferService>();
 
@@ -105,9 +127,11 @@ namespace SoundMeeter.Services
                     Loc.Get("Sm.Transfer.NotFound", Path.GetFileName(path)));
 
             AppSettings? loaded;
+            string json;
             try
             {
-                loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path));
+                json = File.ReadAllText(path);
+                loaded = JsonSerializer.Deserialize<AppSettings>(json);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
                                           or JsonException or ArgumentException or NotSupportedException)
@@ -122,26 +146,38 @@ namespace SoundMeeter.Services
                 return SettingsImportResult.Failed(
                     Loc.Get("Sm.Transfer.Unreadable", "empty document"));
 
+            // Чужой JSON разбирается в AppSettings без ошибок и молча даёт пустой
+            // документ: импорт такого файла заменил бы настройки микшера на
+            // пустоту. Отличаем его по составу полей, а не по числу стрипов —
+            // с тех пор как каналы создаёт только пользователь, настоящий файл
+            // настроек без единого стрипа (экспорт свежей установки) законен.
+            if (!LooksLikeSettingsFile(json))
+                return SettingsImportResult.Failed(Loc.Get("Sm.Transfer.NotOurFile"));
+
             var outcome = SettingsMigrator.Migrate(loaded, out var note);
 
             if (outcome == MigrationOutcome.UnsupportedNewerVersion)
                 return SettingsImportResult.Failed(Loc.Get("Sm.Transfer.NewerSchema",
                     loaded.SchemaVersion, SettingsMigrator.CurrentSchemaVersion));
 
-            // Чужой JSON разбирается в AppSettings без ошибок и молча даёт пустой
-            // документ: импорт такого снёс бы микшер до нуля стрипов. Настоящий
-            // файл настроек полосы всегда содержит — их создаёт EnsureDefaultStrips
-            // даже на пустом старте, — поэтому пустой результат читаем как чужой файл.
-            if (loaded.Inputs is null || loaded.Outputs is null
-                || loaded.Inputs.Count + loaded.Outputs.Count == 0)
-            {
-                return SettingsImportResult.Failed(Loc.Get("Sm.Transfer.NoStrips"));
-            }
-
             if (note.Length > 0)
                 _logger.LogInformation("Импорт настроек из {Path}: {Note}", path, note);
 
             return SettingsImportResult.Read(loaded, note);
+        }
+
+        /// <summary>
+        /// В корне объекта есть хотя бы одно поле <see cref="AppSettings"/>.
+        /// Проверка до миграции и по сырому тексту: разбор уже прошёл, но любое
+        /// чужое поле (список, объект) без ошибки превратилось бы в пустой
+        /// объект — ровно то, что нельзя импортировать.
+        /// </summary>
+        private static bool LooksLikeSettingsFile(string json)
+        {
+            using var document = JsonDocument.Parse(json);
+            if (document.RootElement.ValueKind != JsonValueKind.Object) return false;
+
+            return OwnFields.Any(field => document.RootElement.TryGetProperty(field, out _));
         }
     }
 }

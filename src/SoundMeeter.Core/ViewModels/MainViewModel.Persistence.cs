@@ -31,7 +31,9 @@ public partial class MainViewModel
         }
         else
         {
-            _engine.EnsureDefaultStrips();
+            // Каналов нет: микшер начинается пустым, и это осознанное решение,
+            // а не недостаток настроек. Набор каналов задаёт пользователь —
+            // см. WasapiAudioEngine: осмотр каталога не добавляет стрипов.
             if (_settings.HasUnsupportedNewerSchema)
                 _logger.LogWarning("Настройки не применены: {Report}", _settings.LoadReport);
             else

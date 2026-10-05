@@ -197,11 +197,12 @@ public sealed class SettingsTransferTests : IDisposable
 
     /// <summary>
     /// Чужой JSON разбирается в AppSettings без единой ошибки и молча даёт пустой
-    /// документ. Без этой проверки импорт такого файла снёс бы микшер до нуля
-    /// стрипов — а разбирать отказ пользователю пришлось бы уже по факту.
+    /// документ. Без этой проверки импорт такого файла заменил бы настройки
+    /// микшера на пустоту — а разбирать отказ пользователю пришлось бы уже по
+    /// факту. Отличаем чужой файл по составу полей, а не по числу стрипов.
     /// </summary>
     [Fact]
-    public void ReadRefusesForeignJsonWithoutStrips()
+    public void ReadRefusesForeignJsonWithoutKnownFields()
     {
         var (_, transfer) = NewStore();
         File.WriteAllText(TempFile("foreign.json"), """{"hello":"world","count":42}""");
@@ -210,6 +211,26 @@ public sealed class SettingsTransferTests : IDisposable
 
         Assert.False(read.Success);
         Assert.Null(read.Settings);
+    }
+
+    /// <summary>
+    /// Настоящий файл настроек без единого стрипа — это экспорт свежей
+    /// установки, где пользователь ещё ничего не добавил. Отвергать такой файл
+    /// нельзя: с тех пор как каналы создаёт только пользователь, пустой микшер
+    /// законное состояние, и его перенос между машинами — тоже.
+    /// </summary>
+    [Fact]
+    public void ReadAcceptsAnExportWithoutASingleStrip()
+    {
+        var (_, transfer) = NewStore();
+        var empty = new AppSettings { SchemaVersion = SettingsMigrator.CurrentSchemaVersion };
+        File.WriteAllText(TempFile("empty.json"), JsonSerializer.Serialize(empty));
+
+        var read = transfer.Read(TempFile("empty.json"));
+
+        Assert.True(read.Success, read.Message);
+        Assert.Empty(read.Settings!.Inputs);
+        Assert.Empty(read.Settings.Outputs);
     }
 
     [Fact]

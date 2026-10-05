@@ -53,7 +53,6 @@ public sealed class FakeAudioEngine : IAudioEngine
     public void SetInputSource(string inputId, string? deviceId) { }
     public void SetInputAppTarget(string inputId, string? deviceId) { }
     public void SetBusSource(string busId, string? deviceId) { }
-    public void EnsureDefaultStrips() { }
     public AppSettings CreateSnapshot() => new();
     public void ApplyPreset(AppSettings preset) { }
     public void EnsureRoutingTable() { }

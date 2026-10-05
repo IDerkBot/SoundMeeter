@@ -73,9 +73,6 @@ public interface IAudioEngine : IDisposable
     /// <summary>Назначает выходной шине устройство воспроизведения (null — отключить).</summary>
     void SetBusSource(string busId, string? deviceId);
 
-    /// <summary>Создаёт стрипы по умолчанию, если списки пусты (первый запуск).</summary>
-    void EnsureDefaultStrips();
-
     /// <summary>Снимок текущих настроек для сохранения.</summary>
     AppSettings CreateSnapshot();
 

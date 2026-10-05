@@ -13,12 +13,23 @@ namespace SoundMeeter.Services;
 /// Аудиодвижок в стиле VoiceMeeter: пользователь создаёт стрипы (входы/выходы),
 /// назначает им устройства из каталога. Роутинг — матрица вход×шина (bus.Id),
 /// применяется на лету.
+///
+/// Стрипы появляются только по команде пользователя (<see cref="AddInput"/>,
+/// <see cref="AddBus"/>) — осмотр каталога устройств не добавляет в микшер
+/// ничего. Автосоздание стрипов под каждое устройство делало первый запуск
+/// неуправляемым: набор каналов задавала машина, а не человек.
 /// </summary>
 public sealed class WasapiAudioEngine : IAudioEngine
 {
     private readonly object _gate = new();
     private readonly SoloState _soloState = new();
     private readonly List<DeviceInfo> _catalog = new();
+
+    /// <summary>
+    /// Устройства, стрип которых пользователь удалил. Стрипов движок больше
+    /// не создаёт сам, поэтому список нужен только для восстановления: вернуть
+    /// из пресета канал, который пользователь снёс, нельзя.
+    /// </summary>
     private readonly HashSet<string> _removedDeviceIds = new();
     private readonly ILogger _logger = AppLog.For<WasapiAudioEngine>();
 
@@ -94,12 +105,10 @@ public sealed class WasapiAudioEngine : IAudioEngine
                 bus.IsAvailable = !string.IsNullOrEmpty(bus.DeviceId) && catalogIds.Contains(bus.DeviceId);
             }
 
-            // Автоматически берём в работу устройства, у которых ещё нет стрипа
-            // (микрофоны → входы, устройства воспроизведения → выходные шины).
-            AdoptDevicesUnlocked();
-
             // Стрип «SPK CABLE-x Output» при уже снятом входе того же кабеля —
             // дубликат: приложения роутятся прямо в выход кабеля. Убираем.
+            // Такой стрип набирался автосозданием в прошлых сборках, поэтому
+            // проверка нужна и для пресетов, написанных ими.
             DropRedundantCableLoopbacksUnlocked();
 
             // Ручной выбор цели приложений мог устареть: устройство отключили или
@@ -115,42 +124,6 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
         ChannelsChanged?.Invoke();
         if (wasRunning) Start();
-    }
-
-    private void AdoptDevicesUnlocked()
-    {
-        foreach (var device in _catalog)
-        {
-            if (_removedDeviceIds.Contains(device.DeviceId)) continue;
-
-            if (device.IsMicrophone)
-            {
-                if (InputsInternal.All(i => i.DeviceId != device.DeviceId))
-                {
-                    InputsInternal.Add(new InputChannelModel
-                    {
-                        Name = $"MIC {device.Name}",
-                        IsMicrophone = true,
-                        DeviceId = device.DeviceId,
-                        IsAvailable = true
-                    });
-                }
-            }
-            else
-            {
-                if (BusesInternal.All(b => b.DeviceId != device.DeviceId))
-                {
-                    BusesInternal.Add(new OutputBusModel
-                    {
-                        Name = device.Name,
-                        DeviceId = device.DeviceId,
-                        IsAvailable = true
-                    });
-                }
-            }
-        }
-
-        EnsureRoutingTableUnlocked();
     }
 
     /// <summary>
@@ -568,24 +541,6 @@ public sealed class WasapiAudioEngine : IAudioEngine
         ChannelsChanged?.Invoke();
     }
 
-    public void EnsureDefaultStrips()
-    {
-        lock (_gate)
-        {
-            if (InputsInternal.Count == 0)
-            {
-                InputsInternal.Add(new InputChannelModel { Name = "Unassigned input", IsAvailable = false });
-                InputsInternal.Add(new InputChannelModel { Name = "Unassigned input", IsAvailable = false });
-            }
-            if (BusesInternal.Count == 0)
-            {
-                BusesInternal.Add(new OutputBusModel { Name = "Unassigned", IsAvailable = false });
-                BusesInternal.Add(new OutputBusModel { Name = "Unassigned", IsAvailable = false });
-            }
-            EnsureRoutingTableUnlocked();
-        }
-    }
-
     public AppSettings CreateSnapshot()
     {
         lock (_gate)
@@ -603,8 +558,8 @@ public sealed class WasapiAudioEngine : IAudioEngine
     {
         lock (_gate)
         {
-            // Восстанавливаем список «скрытых» устройств до повторного осмотра
-            // каталога, чтобы AdoptDevicesUnlocked не создал им стрипы заново.
+            // Восстанавливаем список «скрытых» устройств: он решает, какие стрипы
+            // пресета мы вообще имеем право вернуть в микшер.
             _removedDeviceIds.Clear();
             if (preset.RemovedDeviceIds != null)
                 foreach (var id in preset.RemovedDeviceIds) _removedDeviceIds.Add(id);

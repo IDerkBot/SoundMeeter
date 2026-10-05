@@ -611,7 +611,7 @@ public interface ILoc {
 - **5 скопированных ControlTemplate** (`LedToggle`, `RouteBtn`, `FuncBtn`, `EffectBtn`, `MenuRow`) без `BasedOn`; **6 скопированных 21-строчных блоков слайдеров** в `DenoiserSettingsView.xaml:32-157`; **7 копий оформления попапа**
 - **Реестры конвертеров продублированы в трёх местах** под разными именами (`BoolToVis` / `BoolToVisibilityConverter` / `InverseBoolConverter`); `UpdateWindow.xaml` и `MidiBindingsWindow.xaml` **не мерджат `MixerTheme`**
 - **Bare `<Style TargetType="TextBlock">` в `MixerTheme.xaml:20-22` затеняет тему приложения** для всего поддерева микшера, включая `LogWindow` и `DevicePickerWindow`
-- **Мёртвый код**: `PeakToHeightConverter` и `PeakToWidthConverter` — одинаковая математика, **ноль использований**; `ZeroToVisibilityConverter` и `InverseZeroToVisibilityConverter` — ноль использований; `AssemblyInfo.cs:3-10` объявляет `Themes/Generic.xaml`, которого **нет в проекте**
+- **Мёртвый код**: `PeakToHeightConverter` и `PeakToWidthConverter` — одинаковая математика, **ноль использований**; `InverseZeroToVisibilityConverter` — ноль использований (`ZeroToVisibilityConverter` с 0.1.2 занял подсказку пустых групп в `MixerView`); `AssemblyInfo.cs:3-10` объявляет `Themes/Generic.xaml`, которого **нет в проекте**
 - **`InstalledAppsView.xaml.cs` и `RunningAppsView.xaml.cs` — один файл трижды** (побайтово), `OutputStripView.xaml.cs:64-92` — копия `InputStripView.xaml.cs:106-128`
 
 ### Настройки и данные
@@ -703,7 +703,7 @@ public interface ILoc {
 |---|---|---|
 | `IAudioEngineTransport` | `IsRunning`, `Start`, `Stop`, `StateChanged` | Только жизненный цикл |
 | `IDeviceCatalog` | `Catalog`, `RefreshDevices`, `ChannelsChanged` | Тестируемость `RefreshDevices` (сейчас 0) |
-| `IStripEditor` | `Inputs`, `Buses`, `Add*`/`Remove*`/`Move*`, `Set*Source`, `EnsureDefaultStrips` | Владеет `_gate` |
+| `IStripEditor` | `Inputs`, `Buses`, `Add*`/`Remove*`/`Move*`, `Set*Source` | Владеет `_gate` |
 | `IMixMatrix` | `SetRoute`, `SetRouteGain`, `SetInputSolo`, `SetOutputSolo` | Единственные, кому **обязан** работать под `_gate` во время микса |
 | `IMixerPresetService` | `CreateSnapshot`, `ApplyPreset` | Чистые данные; здесь же решить replace-vs-overlay |
 | **Убрать из движка** | `Midi { get; set; }` | MIDI-настройки не имеют отношения к WASAPI |
@@ -931,7 +931,7 @@ private static bool GetButtonState(InputChannelViewModel vm, string parameter) =
 - [ ] **Убрать дубли**: 5 шаблонов, 6 блоков слайдеров, 7 оформлений попапа, 3 реестра конвертеров
 - [ ] **Доступность**: `AutomationProperties.Name`, индикаторы фокуса, `GainKnob` как `RangeBase` + `AutomationPeer`, порядок табуляции, клавиатурный reorder
 - [ ] **`HorizontalFillPanel` — `Background`/`HitTestCore`**, чтобы дроп в зазоре работал
-- [ ] **Мёртвый код**: `PeakTo*Converter` (2), `ZeroToVisibilityConverter` (2), `Themes/Generic.xaml` (отсутствует), `ApplyPresetUnlocked`, `AudioPolicy/*` (~90 строк)
+- [ ] **Мёртвый код**: `PeakTo*Converter` (2), `InverseZeroToVisibilityConverter`, `Themes/Generic.xaml` (отсутствует), `ApplyPresetUnlocked`, `AudioPolicy/*` (~90 строк)
 
 ### Этап 6 — по времени: согласованность
 
