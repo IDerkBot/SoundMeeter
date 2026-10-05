@@ -1,5 +1,7 @@
 # SoundMeeter
 
+<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/27209787-8566-4ef6-9a3d-aa30a94b42a7" />
+
 An open-source Windows audio mixer for streamers and podcasters — a VoiceMeeter-style
 "hardware mixer" in software.
 
