@@ -124,14 +124,14 @@ renaming it is a separate task that has to start from `UpdateApplier`.
 dotnet test src\SoundMeeter.slnx
 ```
 
-246 xUnit tests across six projects, no audio hardware required:
+259 xUnit tests across six projects, no audio hardware required:
 
 | Project | Tests | Covers |
 |---|---|---|
 | `SoundMeeter.App.Tests` | 102 | WPF views and controls (STA host), param reset, effect popups, empty-mixer hints, markdown release notes, app icons, module and layer boundaries |
-| `SoundMeeter.Core.Tests` | 25 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, "core stays WPF-free" |
+| `SoundMeeter.Core.Tests` | 29 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, changelog text, "core stays WPF-free" |
 | `SoundMeeter.Audio.Tests` | 95 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
-| `SoundMeeter.Update.Tests` | 18 | Semantic version comparison and release-asset selection |
+| `SoundMeeter.Update.Tests` | 27 | Semantic version comparison, release-asset selection, multi-version changelog |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | Every localization key resolves; every language file is complete |
 
 xUnit v2 cannot host an STA thread, so UI tests go through
@@ -345,7 +345,8 @@ and so cannot keep the dry and denoised signals time-aligned.
 - **`Loc` and `AppLog` are static**, with ~99 call sites across ViewModels, which limits
   ViewModel testability.
 - **Auto-update is hard-wired** to `IDerkBot/SoundMeeter` as compile-time constants, and
-  depends on a GitHub Release having been published.
+  depends on a GitHub Release having been published. The changelog costs one extra API call
+  (`/releases`) on top of `/releases/latest`; if it fails, only the target release is shown.
 - **Icon loading is untestable at the ViewModel level** — and no longer needs to be:
   icons live in the UI converters (`AppIconTests` covers them), while the core only knows
   paths and PIDs.

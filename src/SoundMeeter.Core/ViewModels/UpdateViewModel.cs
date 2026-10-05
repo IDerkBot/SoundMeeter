@@ -45,6 +45,28 @@ public partial class UpdateViewModel : LocalizedViewModel
         ? Loc.Get("Sm.Update.Status.NoNotes")
         : Update.ReleaseNotes;
 
+    /// <summary>
+    /// Описание, которое видит пользователь: все релизы, между которыми он
+    /// перескакивает, от новых к старым. Список приходит из проверки обновлений,
+    /// а пустым он бывает у собранного вручную <see cref="UpdateInfo"/> (тесты,
+    /// будущий источник релизов) — тогда показываем описание целевого релиза,
+    /// как и раньше.
+    /// </summary>
+    public string ChangelogNotes => Update.Changelog.Count == 0
+        ? ReleaseNotes
+        : UpdateChangelog.Compose(Update.Changelog, Loc.Get("Sm.Update.Status.NoNotes"));
+
+    /// <summary>Сколько версий пользователь пропускает (0 — обновление на одну).</summary>
+    public int SkippedReleases => Update.SkippedReleases;
+
+    /// <summary>
+    /// Подпись под количеством пропущенных версий. Объясняет, почему в описании
+    /// столько блоков: обновление сразу через несколько версий иначе выглядит как
+    /// сбой окна.
+    /// </summary>
+    public string SkippedReleasesText =>
+        SkippedReleases > 0 ? Loc.Get("Sm.UpdateWindow.SkippedReleases", SkippedReleases) : "";
+
     public string AssetName => Update.Asset is { } asset ? $"{asset.Name} ({asset.HumanSize})" : "";
 
     /// <summary>Нет zip-ассета — автоустановка невозможна, только ссылка на релиз.</summary>

@@ -11,10 +11,12 @@ using System.Text.Json;
 namespace SoundMeeter.Services
 {
     /// <summary>
-    /// Проверка обновлений по GitHub Releases: GET api.github.com/repos/{owner}/{repo}/releases/latest.
-    /// endpoint /releases/latest сам не отдаёт черновики и пре-релизы, поэтому достаточно
-    /// одного запроса. Дальше — выбор portable-zip ассета, скачивание с прогрессом,
-    /// распаковка и подмена файлов (см. <see cref="UpdateApplier"/>).
+    /// Проверка обновлений по GitHub Releases. Два запроса: /releases/latest — целевой
+    /// релиз, /releases — остальные, которые пользователь пропускает (обновление через
+    /// несколько версий должно показать их описания тоже). Второй запрос
+    /// вспомогательный: если он не удался, показываем только последний релиз.
+    /// Дальше — выбор portable-zip ассета, скачивание с прогрессом, распаковка и
+    /// подмена файлов (см. <see cref="UpdateApplier"/>).
     ///
     /// Имя класса уточняет ИСТОЧНИК, а не механизм: релизов может быть несколько
     /// (свой сервер, зеркало, корпоративный GitLab), и все они реализуют один и тот
@@ -30,6 +32,13 @@ namespace SoundMeeter.Services
         private const string ApiBase = "https://api.github.com/repos/";
 
         /// <summary>
+        /// Сколько релизов запрашиваем для changelog. Страница GitHub — до ста
+        /// записей, но десятка с запасом хватает: между релизами проходят недели,
+        /// а показывать сотню описаний в диалоге никто не станет читать.
+        /// </summary>
+        private const int ChangelogPageSize = 30;
+
+        /// <summary>
         /// Скачивание большого архива упирается в HttpClient.Timeout: таймер живёт до
         /// конца чтения тела ответа, даже при ResponseHeadersRead.
         /// </summary>
@@ -38,15 +47,23 @@ namespace SoundMeeter.Services
         private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         private readonly HttpClient _http;
+        private readonly AppVersion _current;
         private readonly ILogger _logger = AppLog.For<GithubUpdateService>();
         private bool _disposed;
 
-        public GithubUpdateService() : this(new HttpClient()) { }
+        public GithubUpdateService() : this(new HttpClient(), null) { }
 
         /// <summary>Конструктор с внешним HttpClient — чтобы подменить в тестах.</summary>
-        public GithubUpdateService(HttpClient http)
+        public GithubUpdateService(HttpClient http) : this(http, null) { }
+
+        /// <summary>
+        /// Версия «установленной сборки» задаётся явно только в тестах: у тестового
+        /// раннера своя версия, и проверка «новее ли нас релиз» зависела бы от неё.
+        /// </summary>
+        internal GithubUpdateService(HttpClient http, AppVersion? currentVersion)
         {
             _http = http ?? throw new ArgumentNullException(nameof(http));
+            _current = currentVersion ?? AppVersion.Current;
             if (_http.Timeout == TimeSpan.FromSeconds(100))
             {
                 _http.Timeout = HttpTimeout;
@@ -63,7 +80,7 @@ namespace SoundMeeter.Services
                 new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         }
 
-        public AppVersion CurrentVersion { get; } = AppVersion.Current;
+        public AppVersion CurrentVersion => _current;
 
         public string UpdateRoot => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -112,16 +129,6 @@ namespace SoundMeeter.Services
                 }
 
                 var asset = SelectAsset(dto.Assets);
-                var update = new UpdateInfo
-                {
-                    Version = version,
-                    TagName = dto.TagName,
-                    Title = string.IsNullOrWhiteSpace(dto.Name) ? dto.TagName : dto.Name,
-                    ReleaseNotes = dto.Body ?? "",
-                    HtmlUrl = dto.HtmlUrl ?? $"https://github.com/{Owner}/{Repo}/releases/tag/{dto.TagName}",
-                    PublishedAt = dto.PublishedAt,
-                    Asset = asset
-                };
 
                 if (version <= CurrentVersion)
                 {
@@ -131,8 +138,25 @@ namespace SoundMeeter.Services
                         Loc.Get("Sm.Update.Check.UpToDate", CurrentVersion));
                 }
 
-                _logger.LogInformation("Доступно обновление {Version} (установлено {Current}), ассет: {Asset}",
-                    version, CurrentVersion, asset?.Name ?? "нет");
+                // Релиз новый — собираем всю цепочку пропущенных версий, а не только
+                // записи последней.
+                var changelog = await FetchChangelogAsync(dto, version, cancellationToken).ConfigureAwait(false);
+
+                var update = new UpdateInfo
+                {
+                    Version = version,
+                    TagName = dto.TagName,
+                    Title = string.IsNullOrWhiteSpace(dto.Name) ? dto.TagName : dto.Name,
+                    ReleaseNotes = dto.Body ?? "",
+                    HtmlUrl = dto.HtmlUrl ?? $"https://github.com/{Owner}/{Repo}/releases/tag/{dto.TagName}",
+                    PublishedAt = dto.PublishedAt,
+                    Asset = asset,
+                    Changelog = changelog
+                };
+
+                _logger.LogInformation(
+                    "Доступно обновление {Version} (установлено {Current}), релизов в changelog: {Count}, ассет: {Asset}",
+                    version, CurrentVersion, changelog.Count, asset?.Name ?? "нет");
                 return new UpdateCheckResult(true, true, update,
                     asset == null
                         ? Loc.Get("Sm.Update.Check.AvailableNoPortable", version)
@@ -149,6 +173,93 @@ namespace SoundMeeter.Services
                 return UpdateCheckResult.Failed(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Релизы, которые пользователь пропускает: от цели обновления до первой
+        /// версии новее установленной, от новых к старым.
+        ///
+        /// Запрос один и тихий: если список не пришёл или разобрать его не удалось,
+        /// показываем описание целевого релиза. Лучше одно описание, чем отказ
+        /// «обновление не найдено» из-за второго, вспомогательного запроса.
+        /// </summary>
+        private async Task<IReadOnlyList<UpdateRelease>> FetchChangelogAsync(GitHubReleaseDto latest,
+            AppVersion target, CancellationToken cancellationToken)
+        {
+            var single = ToRelease(latest, target);
+
+            try
+            {
+                using var response = await _http
+                    .GetAsync($"{ApiBase}{Owner}/{Repo}/releases?per_page={ChangelogPageSize}", cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Список релизов недоступен: {Status} — покажем только последний",
+                        (int)response.StatusCode);
+                    return [single];
+                }
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                var releases = JsonSerializer.Deserialize<List<GitHubReleaseDto>>(json, JsonOptions);
+                var changelog = releases is null ? [] : BuildChangelog(releases, CurrentVersion, target);
+
+                // Целевой релиз в changelog обязателен: список мог не вернуть его
+                // (переименованный тег, например), а окно обновления показывает
+                // именно changelog — потерять его значило бы показать пустоту.
+                return changelog.Any(release => release.Version == target)
+                    ? changelog
+                    : new[] { single }.Concat(changelog).ToList();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Changelog пропущен: {Message}", ex.Message);
+                return [single];
+            }
+        }
+
+        /// <summary>
+        /// Отбор релизов для changelog: без черновиков и пре-релизов, без дублей по
+        /// версии и без всего, что не попадает в диапазон «новее установленной и не
+        /// новее цели». Порядок — по версии, от новых к старым: ответ GitHub
+        /// отсортирован по дате публикации, а читать список релизов нужно по версии.
+        /// </summary>
+        internal static IReadOnlyList<UpdateRelease> BuildChangelog(IEnumerable<GitHubReleaseDto> releases,
+            AppVersion current, AppVersion target)
+        {
+            var seen = new HashSet<AppVersion>();
+            var changelog = new List<UpdateRelease>();
+
+            foreach (var dto in releases ?? [])
+            {
+                if (dto is null || dto.Draft || dto.Prerelease) continue;
+                if (dto.TagName is not { } tag || !AppVersion.TryParse(tag, out var version)) continue;
+                if (version <= current || version > target) continue;
+
+                // Один тег иногда публикуют дважды (пересборка релиза): в changelog
+                // такая версия должна появиться один раз.
+                if (!seen.Add(version)) continue;
+
+                changelog.Add(ToRelease(dto, version));
+            }
+
+            changelog.Sort(static (a, b) => b.Version.CompareTo(a.Version));
+            return changelog;
+        }
+
+        private static UpdateRelease ToRelease(GitHubReleaseDto dto, AppVersion version) => new()
+        {
+            Version = version,
+            TagName = dto.TagName ?? "",
+            Title = string.IsNullOrWhiteSpace(dto.Name) ? dto.TagName ?? "" : dto.Name!,
+            ReleaseNotes = dto.Body ?? "",
+            HtmlUrl = dto.HtmlUrl ?? $"https://github.com/{Owner}/{Repo}/releases/tag/{dto.TagName}",
+            PublishedAt = dto.PublishedAt
+        };
 
         /// <summary>
         /// Выбирает архив для автоустановки: обычный .zip, причём предпочтительно

@@ -843,6 +843,9 @@
   <data name="Sm.UpdateWindow.Install" xml:space="preserve">
     <value>Установить</value>
   </data>
+  <data name="Sm.UpdateWindow.SkippedReleases" xml:space="preserve">
+    <value>пропущено промежуточных версий: {0}</value>
+  </data>
   <data name="Sm.Update.Status.NoNotes" xml:space="preserve">
     <value>Релиз без описания.</value>
   </data>

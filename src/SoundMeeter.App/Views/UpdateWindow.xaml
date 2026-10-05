@@ -16,6 +16,8 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <!--  Подсказка «пропущено версий» прячется при нуле  -->
+        <converters:InverseZeroToVisibilityConverter x:Key="InverseZeroToVisibility" />
     </Window.Resources>
 
     <Grid Margin="14">
@@ -72,10 +74,17 @@
                 FontSize="11"
                 Foreground="#808080"
                 Text="{Binding AssetName}" />
+            <TextBlock
+                Margin="10,0,0,0"
+                FontSize="11"
+                Foreground="#808080"
+                Text="{Binding SkippedReleasesText}"
+                Visibility="{Binding SkippedReleases, Converter={StaticResource InverseZeroToVisibility}}" />
         </StackPanel>
 
         <!--
-            Описание релиза приходит с GitHub в markdown, поэтому это не TextBlock:
+            Описание приходит с GitHub в markdown и может содержать записи всех
+            версий между установленной и целевой, поэтому это не TextBlock:
             заголовки, списки, ссылки и код разбираются (MarkdownView), иначе
             пользователь читал бы исходник разметки. Прокрутка — своя у RichTextBox.
         -->
@@ -87,7 +96,7 @@
             BorderBrush="#3A3A3A"
             BorderThickness="1"
             CornerRadius="4">
-            <controls:MarkdownView Markdown="{Binding ReleaseNotes}" />
+            <controls:MarkdownView Markdown="{Binding ChangelogNotes}" />
         </Border>
 
         <!--  Прогресс загрузки  -->

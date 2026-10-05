@@ -843,6 +843,9 @@
   <data name="Sm.UpdateWindow.Install" xml:space="preserve">
     <value>Install</value>
   </data>
+  <data name="Sm.UpdateWindow.SkippedReleases" xml:space="preserve">
+    <value>skipping {0} intermediate versions</value>
+  </data>
   <data name="Sm.Update.Status.NoNotes" xml:space="preserve">
     <value>This release has no description.</value>
   </data>

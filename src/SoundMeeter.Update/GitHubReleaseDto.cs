@@ -3,8 +3,9 @@ using System.Text.Json.Serialization;
 namespace SoundMeeter.Models;
 
 /// <summary>
-/// Ответ GET https://api.github.com/repos/{owner}/{repo}/releases/latest.
-/// Внутренний DTO: наружу торчат только <see cref="UpdateInfo"/> и <see cref="UpdateAsset"/>.
+/// Ответ GET https://api.github.com/repos/{owner}/{repo}/releases/latest и
+/// списка /releases. Внутренний DTO: наружу торчат только <see cref="UpdateInfo"/>,
+/// <see cref="UpdateRelease"/> и <see cref="UpdateAsset"/>.
 /// </summary>
 internal sealed class GitHubReleaseDto
 {
@@ -19,6 +20,13 @@ internal sealed class GitHubReleaseDto
 
     [JsonPropertyName("html_url")]
     public string? HtmlUrl { get; set; }
+
+    /// <summary>
+    /// Черновик виден только автору через API, но в списке релизов он попасть
+    /// может (например, при своём ключе), и показывать его в changelog нельзя.
+    /// </summary>
+    [JsonPropertyName("draft")]
+    public bool Draft { get; set; }
 
     [JsonPropertyName("prerelease")]
     public bool Prerelease { get; set; }

@@ -1,14 +1,14 @@
 ## Что появилось
 
-Тестов теперь шесть проектов, **246 тестов, ~14 с, без аудиоустройств и без администратора**
+Тестов теперь шесть проектов, **259 тестов, ~14 с, без аудиоустройств и без администратора**
 (до разделения на Core/App был один проект `SoundMeeter.Tests` на 48 тестов):
 
 | Проект | Тестов | Файлы |
 |---|---|---|
 | `SoundMeeter.App.Tests` | 102 | `FuncButtonTests`, `StripEffectTests`, `EqualizerWindowTests`, `MixerViewTests`, `MarkdownParserTests`, `MarkdownViewTests`, `GainKnobTests`, `ParamResetTests`, `AppIconTests`, `ModuleBoundaryTests` + STA-хост |
-| `SoundMeeter.Core.Tests` | 25 | `AudioEnginePresetTests`, `MidiBindingTests`, `SettingsTransferTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
+| `SoundMeeter.Core.Tests` | 29 | `AudioEnginePresetTests`, `MidiBindingTests`, `SettingsTransferTests`, `UpdateChangelogTests`, `CoreWpfFreeTests` + фикстуры ViewModel |
 | `SoundMeeter.Audio.Tests` | 95 | `StripDspTests`, `EqualizerDspTests`, `DenoiserDspTests`, `SettingsMigratorTests`, `CoreValueTests`, `SampleRingBufferTests`, `AudioModuleBoundaryTests`, `Signal` |
-| `SoundMeeter.Update.Tests` | 18 | `AppVersionTests`, выбор ассета релиза |
+| `SoundMeeter.Update.Tests` | 27 | `AppVersionTests`, выбор ассета релиза, `UpdateChangelogTests` |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | все ключи локализации находятся, все языковые файлы полны |
 
 | Файл | Что защищает |
@@ -18,6 +18,8 @@
 | `MixerViewTests` | пустая лента показывает подсказку в обеих группах и убирает её с первым стрипом |
 | `MarkdownParserTests` | разбор описания релиза: заголовки (шесть уровней, без пробела — не заголовок), вложенные и нумерованные списки, теги задач, ленивое продолжение, `код`-блоки, цитаты, линии, ссылки (обычные, по сноске, авто, голый адрес), экранирование и жёсткие переносы, выбрасывание html-бейджей при сохранении `<br>`, `a < b > c` остаётся текстом |
 | `MarkdownViewTests` | заголовок стал крупнее и полужирнее, блок кода моноширинный и дословный, ссылка кликабельна и уходит в браузер (адрес перехватывается, браузер не запускается), `javascript:`-ссылка остаётся текстом, пустое описание не оставляет окно без документа |
+| `UpdateChangelogTests` (Update) | обновление через несколько версий: в цепочку попадает ровно то, что между установленной версией и целью, без черновиков, пре-релизов, не-версий и дублей по версии; порядок по версии, а не по дате; недоступный или битый список релизов не ломает проверку; цель всегда в changelog; при актуальной версии список не запрашивается |
+| `UpdateChangelogTests` (Core) | текст сборки описания: заголовок «версия (дата)» у каждого релиза от новых к старым, разметка релиза не теряется, пустые заметки заменяются подписью «описания нет» |
 | `StripDspTests` | компрессор/trim/задержка/реверберация на сигнале, NaN-защита |
 | `EqualizerDspTests` | подъём/провал полосы на её частоте, срезы, прозрачность выключенного EQ, шаг полос; главное — что нарисованная кривая совпадает с измеренной АЧХ; пресеты: длина, диапазоны, перевод, слышимость |
 | `EqualizerWindowTests` | кнопка EQ (ЛКМ) и окно (ПКМ, одно на стрип, закрывается вместе со стрипом), полосы и крутилки в окне, «сбросить всё», список пресетов и его применение, кривая вообще рисуется |
