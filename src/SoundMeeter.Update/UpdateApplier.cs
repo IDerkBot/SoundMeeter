@@ -41,14 +41,12 @@ namespace SoundMeeter.Services
         private const long MinimumFileSize = 16 * 1024;
 
         /// <summary>
-        /// Каталоги и файлы, которые нельзя удалять даже внутри каталога установки.
-        /// Это данные приложения и каталоги обновлений: установка в профиль — редкий,
-        /// но возможный сценарий, и стирать собственные настройки там нельзя.
+        /// Нижняя граница для exe, в котором сборка спрятана целиком (single-file).
+        /// Отдельная управляющая сборка — сотни килобайт, бандл с рантаймом —
+        /// десятки мегабайт; 8 МБ разделяют их с большим запасом и не дают принять
+        /// за бандл огрызок или чужой архив.
         /// </summary>
-        private static readonly string[] ProtectedNames = { "logs", "updates", "presets" };
-
-        private static readonly string[] ProtectedFiles =
-            { "settings.json", "settings.corrupt.json", "settings.json.tmp", "system_apps_filter.json" };
+        private const long SingleFileMinimumSize = 8 * 1024 * 1024;
 
         private static readonly ILogger Logger = AppLog.For("UpdateApplier");
 
@@ -79,15 +77,42 @@ namespace SoundMeeter.Services
 
             VerifyPortableExecutable(mainExe, notes);
 
-            // 2) Управляющая сборка приложения: без неё запуститься нечем.
+            // 2) Управляющая сборка приложения. Обычная portable-сборка кладёт её
+            //    рядом с exe (SoundMeeter.dll), а сборка одним файлом прячет всё
+            //    внутри exe — и тогда её нет чем подтвердить, кроме размера и
+            //    состава payload. Без этой проверки каждое обновление на
+            //    single-file отвергалось бы как «это не сборка».
             var mainAssembly = Directory.EnumerateFiles(payloadDirectory, MainAssemblyName, SearchOption.AllDirectories)
                 .FirstOrDefault();
+
             if (mainAssembly == null)
-                throw new InvalidOperationException(
-                    Loc.Get("Sm.Update.Plan.NoAssembly", update.TagName, MainAssemblyName));
-            if (new FileInfo(mainAssembly).Length < MinimumFileSize)
+            {
+                long exeSize = new FileInfo(mainExe).Length;
+
+                // Порог отличает бандл от огрызка: exe одной сборки весит сотни
+                // килобайт, а self-contained single-file — десятки мегабайт.
+                // Всё остальное (частично распакованный архив, мусор) отвергается.
+                //
+                // Считаем ТОЛЬКО сборочные файлы: рядом с exe законно лежит
+                // system_apps_filter.json (его пользователь правит руками), и его
+                // наличие не делает архив неполным. А вот чужая dll рядом означает
+                // ровно обратное: сборка разъехалась, и запускать нечего.
+                var assemblies = Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories)
+                    .Where(file => IsAssemblyLeftover(Path.GetFileName(file) ?? ""))
+                    .ToList();
+
+                if (assemblies.Count > 0 || exeSize < SingleFileMinimumSize)
+                    throw new InvalidOperationException(
+                        Loc.Get("Sm.Update.Plan.NoAssembly", update.TagName, MainAssemblyName));
+
+                notes.Add(Loc.Get("Sm.Update.Plan.SingleFile", FormatBytes(exeSize)));
+                Logger.LogInformation("Сборка одним файлом: {Size}, управляющая сборка внутри exe", exeSize);
+            }
+            else if (new FileInfo(mainAssembly).Length < MinimumFileSize)
+            {
                 throw new InvalidOperationException(Loc.Get("Sm.Update.Plan.AssemblyTooSmall",
                     MainAssemblyName, update.TagName, new FileInfo(mainAssembly).Length));
+            }
 
             // 3) Подпись Authenticode. Сборки не подписаны, поэтому её отсутствие —
             //    предупреждение; невалидная подпись — уже повод остановиться.
@@ -160,9 +185,17 @@ namespace SoundMeeter.Services
         }
 
         /// <summary>
-        /// Файлы каталога установки, которых нет в новой сборке. Сравнение имён
-        /// регистронезависимое (как в Windows), пути нормализуются относительно
-        /// payload. Каталоги приложения (настройки, логи, обновления) исключаются явно.
+        /// Файлы каталога установки, которых нет в новой сборке.
+        ///
+        /// Удаляется ровно одно: остатки прежней многофайловой сборки — dll и pdb.
+        /// Всё остальное не трогаем никогда: ни json и ini, ни папки, ни файлы, которые
+        /// положил рядом пользователь. Именно так переход на публикацию одним файлом
+        /// вычищает старые сборки, не превращаясь в «удали всё, чего нет в архиве».
+        ///
+        /// Папки обходятся насквозь, но не удаляются: в них лежат satellite-сборки
+        /// локализаций, и оставленная старая `ru\....resources.dll` перебила бы
+        /// локализацию, вшитую в новый exe, — интерфейс показал бы строки прошлой
+        /// версии (и «⟨Sm.Ключ⟩» на новых ключах). Сама папка остаётся на месте.
         /// </summary>
         private static List<string> CollectFilesToDelete(string payloadDirectory, string installDirectory)
         {
@@ -171,15 +204,14 @@ namespace SoundMeeter.Services
 
             var payload = new HashSet<string>(
                 Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories)
-                    .Select(f => RelativePath(payloadDirectory, f)),
+                    .Select(file => Path.GetFileName(file) ?? ""),
                 StringComparer.OrdinalIgnoreCase);
-
-            string installPrefix = installDirectory.TrimEnd('\\') + "\\";
 
             foreach (var file in Directory.EnumerateFiles(installDirectory, "*", SearchOption.AllDirectories))
             {
-                if (payload.Contains(RelativePath(payloadDirectory, file))) continue;
-                if (IsProtected(file, installPrefix)) continue;
+                var name = Path.GetFileName(file);
+                if (!IsAssemblyLeftover(name)) continue;
+                if (payload.Contains(name)) continue;
                 result.Add(file);
             }
 
@@ -187,34 +219,14 @@ namespace SoundMeeter.Services
             return result;
         }
 
-        private static bool IsProtected(string file, string installPrefix)
-        {
-            // Данные приложения лежат вне каталога установки и в силу этого
-            // недостижимы для перечисления; защищаем тот случай, когда каталог
-            // установки совпал с каталогом данных (portable-установка в профиле).
-            if (ProtectedFiles.Contains(Path.GetFileName(file), StringComparer.OrdinalIgnoreCase)) return true;
-
-            var relative = file.StartsWith(installPrefix, StringComparison.OrdinalIgnoreCase)
-                ? file[installPrefix.Length..]
-                : file;
-
-            var segments = relative.Split('\\', '/');
-            for (int i = 0; i < segments.Length - 1; i++)
-            {
-                if (ProtectedNames.Contains(segments[i], StringComparer.OrdinalIgnoreCase)) return true;
-            }
-
-            return false;
-        }
-
-        private static string RelativePath(string root, string file)
-        {
-            var prefix = root.TrimEnd('\\') + "\\";
-            var full = Path.GetFullPath(file);
-            return full.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                ? full[prefix.Length..]
-                : Path.GetFileName(full);
-        }
+        /// <summary>
+        /// Остаток старой сборки: только dll и pdb. Расширение, а не белый список
+        /// имён: правило должно пережить и новую сборку, и файлы сторонних
+        /// библиотек, и не дать удалить ничего, что не является сборкой.
+        /// </summary>
+        private static bool IsAssemblyLeftover(string name) =>
+            name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+            || name.EndsWith(".pdb", StringComparison.OrdinalIgnoreCase);
 
         private static long SafeLength(string file)
         {

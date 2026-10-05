@@ -1056,6 +1056,9 @@
   <data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
     <value>{0} в архиве релиза {1} подозрительно мал ({2} байт) — обновление отклонено.</value>
   </data>
+  <data name="Sm.Update.Plan.SingleFile" xml:space="preserve">
+    <value>сборка одним файлом: всё внутри исполняемого файла ({1})</value>
+  </data>
   <data name="Sm.Update.Plan.FilesTotal" xml:space="preserve">
     <value>Файлов в сборке: {0}, суммарно {1}</value>
   </data>

@@ -89,12 +89,23 @@
     <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- InstalledAppsService ��?��??" BaseDirectory/Resources ��?��?��? �?��?" ��?��?��. ????????????: ��?������?��?
-         ��?��?��?��?��?? ???? %APPDATA% ��?��?��?? ��?��?��?��?, ???????????: ???????????????????. -->
+<ItemGroup>
+    <!--
+      InstalledAppsService читает ключевые слова из файла рядом с exe и правит
+      его содержимое: список системных приложений у пользователя свой, и менять
+      его удобнее текстовым редактором, чем пересобирать сборку. Поэтому в csproj
+      он копируется в выход (обычная сборка), а при публикации одним файлом
+      сервис создаёт его сам из встроенной копии — того же файла, поэтому список
+      по умолчанию всегда один и тот же.
+
+      Логическое имя встроенной копии читает сам сервис
+      (InstalledAppsService.FilterResource).
+    -->
     <None Update="Resources\system_apps_filter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Resources\system_apps_filter.json"
+                      LogicalName="soundmeeter.system-apps-filter.json" />
   </ItemGroup>
 
   <!-- Панель док-панели OBS: вшиваем в сборку ядра, а не приложения. ObsDockAssets

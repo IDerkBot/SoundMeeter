@@ -31,6 +31,24 @@
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <!--
+    Portable-сборка публикуется одним файлом SoundMeeter.exe: настройки живут в
+    профиле Properties/publishProfiles/portable.pubxml, потому что эти свойства
+    действуют только на dotnet publish и не должны менять dotnet build (иначе
+    каждая сборка тащила бы рантайм в выход).
+
+    Почему так, а не просто «dotnet publish»: рядом с exe не должно быть ни
+    файлов, ни требований к установленному .NET — получатель релиза просто
+    запускает файл. Если публикация прошла без профиля, об этом скажет
+    предупреждение ниже: молчаливый многофайловый выход выглядел бы как поломка
+    сборки, а обнаружился бы уже в релизе у пользователя.
+  -->
+  <Target Name="WarnWithoutSingleFileProfile" BeforeTargets="Publish"
+          Condition="'$(PublishSingleFile)' != 'true'">
+    <Warning Code="SM0001"
+             Text="Публикация без профиля portable: рядом с exe появятся DLL и json. Для релиза используйте: dotnet publish src\SoundMeeter.App\SoundMeeter.App.csproj -p:PublishProfile=portable -c Release" />
+  </Target>
+
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />
   </ItemGroup>

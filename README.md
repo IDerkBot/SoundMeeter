@@ -116,6 +116,80 @@ The project is called `SoundMeeter.App`, but the assembly and the executable are
 `SoundMeeter.exe` inside the portable ZIP and restarts the process by that name), so
 renaming it is a separate task that has to start from `UpdateApplier`.
 
+### Publish (single file)
+
+The release artifact is **`SoundMeeter.exe` plus one editable file next to it**
+(`Resources/system_apps_filter.json`) - no DLLs, no `.json` next to the exe beyond that, and
+no .NET runtime requirement:
+
+```powershell
+dotnet publish src\SoundMeeter.App\SoundMeeter.App.csproj -p:PublishProfile=portable -c Release -o publish
+```
+
+The profile lives in `src/SoundMeeter.App/Properties/publishProfiles/portable.pubxml`. It is a
+profile rather than csproj properties on purpose: those only mean anything during publish, and
+in the csproj they would also apply to `dotnet build`, making every build self-contained.
+
+| Property | Why |
+|---|---|
+| `SelfContained` | a release recipient may not have the .NET Desktop Runtime installed |
+| `IncludeNativeLibrariesForSelfExtract` | the only native library (`rnnoise.dll`) travels inside the exe and is extracted on first start; without this the SDK drops native files next to the exe |
+| `EnableCompressionInSingleFile` | ~69 MB instead of ~190 MB; extraction is paid once, then cached by content hash |
+| `DebugType=none`, `AllowedReferenceRelatedFileExtensions=none` | otherwise `.pdb` files land next to the exe, and it is no longer one file |
+| `SatelliteResourceLanguages=en;ru` | only the interface languages travel inside the exe |
+
+`PublishTrimmed` is **not** enabled and must never be: trimming breaks WPF reflection.
+
+Two things this format changed in the code:
+
+- `Resources/system_apps_filter.json` ships next to the exe again, because it is meant to be
+  edited: the system-app keyword list is per machine. The same file is also embedded in
+  `SoundMeeter.Core`, purely as the source for creating it if it is missing (first run, a
+  deleted file, a read-only install directory) - the file always wins over the embedded copy,
+  and the update never deletes it.
+- `UpdateApplier` accepted only archives containing `SoundMeeter.dll`, so **every** single-file
+  update would have been rejected as "incomplete". A payload of exactly one executable of at
+  least 8 MB is now accepted as a single-file build; anything smaller is still rejected, so a
+  truncated archive cannot slip through.
+
+The deletion rule became narrower on purpose: an update removes **only `.dll` and `.pdb` files**
+anywhere under the install directory - the leftovers of the old multi-file build, including its
+stale `ru\*.resources.dll`, which would otherwise shadow the localization baked into the new exe.
+Folders are never removed (they just end up empty), and nothing else next to the exe is touched:
+not `.json`, not logs, not anything the user put there.
+
+`dotnet publish` without `-p:PublishProfile=portable` still works but warns (`SM0001`): it
+produces the old multi-file layout, which is fine for debugging and wrong for a release.
+
+### Release script
+
+`publish.ps1` in the repository root runs the whole release flow - tests, publish, checks, zip:
+
+```powershell
+.\publish.ps1                      # artifacts\SoundMeeter.zip, tests included
+.\publish.ps1 -SkipTests           # skip the test run
+.\publish.ps1 -OutputPath D:\rel   # put the artifacts somewhere else
+```
+
+Layout: the loose files go to `artifacts\publish\`, the archive to `artifacts\SoundMeeter.zip`.
+The archive must not live *inside* the publish directory - it would end up inside itself.
+
+Each check exists because the failure it catches is silent otherwise:
+
+- **tests run first** - the updater already installs versions on its own, so a release built
+  without them is a knowingly broken release;
+- **the artifacts directory is wiped before publishing** - `dotnet publish` does not remove
+  files it no longer produces, and those leftovers are exactly what would go into the zip;
+- **no `.dll`/`.pdb` next to the exe, and the exe is at least 8 MB** - otherwise this is not the
+  single-file build that `UpdateApplier` accepts;
+- **`SoundMeeter.exe` at the archive root** (`./SoundMeeter.exe` is not found by the updater) and
+  the archive must not contain itself.
+
+On success it prints the archive path, its size, the file list and a SHA-256. Compression uses
+the system `tar` (bsdtar ships with Windows 10+) because the exe is already compressed inside the
+bundle; `Compress-Archive` is the fallback. The script is saved as UTF-8 **with** BOM - Windows
+PowerShell 5.1 reads BOM-less `.ps1` as ANSI and breaks the parser on non-ASCII.
+
 ---
 
 ## Tests
@@ -124,14 +198,14 @@ renaming it is a separate task that has to start from `UpdateApplier`.
 dotnet test src\SoundMeeter.slnx
 ```
 
-259 xUnit tests across six projects, no audio hardware required:
+271 xUnit tests across six projects, no audio hardware required:
 
 | Project | Tests | Covers |
 |---|---|---|
 | `SoundMeeter.App.Tests` | 102 | WPF views and controls (STA host), param reset, effect popups, empty-mixer hints, markdown release notes, app icons, module and layer boundaries |
-| `SoundMeeter.Core.Tests` | 29 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, changelog text, "core stays WPF-free" |
+| `SoundMeeter.Core.Tests` | 32 | ViewModels, MIDI bindings, preset restore through the engine, settings import/export, changelog text, app-filter file and its embedded fallback, "core stays WPF-free" |
 | `SoundMeeter.Audio.Tests` | 95 | DSP blocks, ring buffer, settings migrator, WPF-free boundary checks |
-| `SoundMeeter.Update.Tests` | 27 | Semantic version comparison, release-asset selection, multi-version changelog |
+| `SoundMeeter.Update.Tests` | 36 | Semantic version comparison, release-asset selection, multi-version changelog, update plan for single-file payloads |
 | `SoundMeeter.ChangeLanguage.Tests` | 6 | Every localization key resolves; every language file is complete |
 
 xUnit v2 cannot host an STA thread, so UI tests go through
@@ -286,7 +360,7 @@ All configuration is on disk; no environment variables are read anywhere in the 
 | Logs | `%LOCALAPPDATA%\SoundMeeter\logs\` (rotating) |
 | Run at startup | Scheduled task `\SoundMeeter` (logon trigger, `RunLevel=Highest`; a leftover `HKCU\...\Run` record is migrated to it) |
 | OBS dock registration | `%APPDATA%\obs-studio\user.ini` → `[BasicWindow] ExtraBrowserDocks` |
-| App filter keywords | `Resources/system_apps_filter.json` (copied to output) |
+| App filter keywords | `Resources/system_apps_filter.json` next to the exe - editable by the user, and re-created from the copy embedded in `SoundMeeter.Core` if missing; updates never delete it |
 | Single instance | `Local\SoundMeeter.SingleInstance.<user>` mutex + show-window event |
 
 Notable `settings.json` behaviour:

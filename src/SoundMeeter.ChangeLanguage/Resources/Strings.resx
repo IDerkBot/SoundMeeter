@@ -1053,8 +1053,11 @@
   <data name="Sm.Update.Plan.NoAssembly" xml:space="preserve">
     <value>The release archive {0} has no {1} — the update is incomplete.</value>
   </data>
-  <data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
-    <value>{0} in the release archive {1} is suspiciously small ({2} bytes) — the update was rejected.</value>
+<data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
+    <value>{0} in the release archive {1} is suspiciously small ({2} bytes) - the update was rejected.</value>
+  </data>
+  <data name="Sm.Update.Plan.SingleFile" xml:space="preserve">
+    <value>single-file build: everything is inside the executable ({1})</value>
   </data>
   <data name="Sm.Update.Plan.FilesTotal" xml:space="preserve">
     <value>Files in the build: {0}, {1} in total</value>
