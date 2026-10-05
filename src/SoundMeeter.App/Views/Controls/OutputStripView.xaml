@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
     d:DesignHeight="360"
     d:DesignWidth="138"
     mc:Ignorable="d">
@@ -17,7 +18,7 @@
     </UserControl.Resources>
 
     <Border
-        Width="138"
+        Width="150"
         Margin="0,0,10,6"
         Padding="6"
         Background="#3E3E42"
@@ -35,19 +36,22 @@
             <DockPanel Margin="0,0,0,4" LastChildFill="True">
                 <Button
                     Width="18"
-                    Height="18"
-                    Margin="4,0,0,0"
+                    Height="26"
+                    Margin="0"
                     Padding="0"
+                    wpf:Button.Icon="Close"
+                    wpf:Button.IconHeight="8"
+                    wpf:Button.IconWidth="8"
                     Background="Transparent"
                     BorderThickness="0"
                     Click="OnRemoveClick"
-                    Content="×"
                     DockPanel.Dock="Right"
                     FontSize="12"
                     FontWeight="Bold"
                     Foreground="#AAA"
                     ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
                 <Button
+                    Height="26"
                     Padding="0"
                     HorizontalAlignment="Center"
                     Background="Transparent"
@@ -60,7 +64,32 @@
                     ToolTip="{DynamicResource Sm.Strip.ChooseOutputTip}" />
             </DockPanel>
 
-            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource MeterAndFader}" />
+            <UniformGrid Columns="2">
+                <ContentControl
+                    Height="420"
+                    Content="{Binding}"
+                    ContentTemplate="{StaticResource MeterAndFader}" />
+                <UniformGrid VerticalAlignment="Top" Rows="3">
+                    <ToggleButton
+                        Margin="2"
+                        Content="{DynamicResource Sm.Strip.MonoShort}"
+                        IsChecked="{Binding IsMono}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
+                    <ToggleButton
+                        Margin="2"
+                        Content="{DynamicResource Sm.Strip.SoloShort}"
+                        IsChecked="{Binding IsSolo}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
+                    <ToggleButton
+                        Margin="2"
+                        Content="{DynamicResource Sm.Strip.Mute}"
+                        IsChecked="{Binding IsMuted}"
+                        Style="{StaticResource LedToggle}"
+                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
+                </UniformGrid>
+            </UniformGrid>
 
             <TextBlock
                 Margin="0,2,0,4"
@@ -69,26 +98,7 @@
                 Foreground="#AAA"
                 Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
 
-            <UniformGrid Columns="3">
-                <ToggleButton
-                    Margin="0,0,2,0"
-                    Content="{DynamicResource Sm.Strip.MonoShort}"
-                    IsChecked="{Binding IsMono}"
-                    Style="{StaticResource LedToggle}"
-                    ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
-                <ToggleButton
-                    Margin="1,0"
-                    Content="{DynamicResource Sm.Strip.SoloShort}"
-                    IsChecked="{Binding IsSolo}"
-                    Style="{StaticResource LedToggle}"
-                    ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
-                <ToggleButton
-                    Margin="2,0,0,0"
-                    Content="{DynamicResource Sm.Strip.Mute}"
-                    IsChecked="{Binding IsMuted}"
-                    Style="{StaticResource LedToggle}"
-                    ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
-            </UniformGrid>
+
         </StackPanel>
     </Border>
 </UserControl>

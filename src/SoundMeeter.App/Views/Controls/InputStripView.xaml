@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panels="clr-namespace:SoundMeeter.Controls"
     xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
     d:DesignWidth="160"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -23,7 +24,7 @@
         забирает оставшуюся высоту стрипа.
     -->
     <Border
-        Width="138"
+        Width="150"
         Margin="0,0,10,6"
         Padding="6"
         AllowDrop="True"
@@ -72,19 +73,20 @@
                 LastChildFill="True">
                 <Button
                     Width="18"
-                    Height="18"
-                    Margin="4,0,0,0"
+                    Height="26"
+                    Margin="0"
                     Padding="0"
+                    wpf:Button.Icon="Close"
+                    wpf:Button.IconHeight="8"
+                    wpf:Button.IconWidth="8"
                     Background="Transparent"
                     BorderThickness="0"
                     Click="OnRemoveClick"
-                    Content="×"
                     DockPanel.Dock="Right"
-                    FontSize="12"
-                    FontWeight="Bold"
                     Foreground="#AAA"
                     ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
                 <Button
+                    Height="26"
                     Padding="0"
                     HorizontalAlignment="Center"
                     Background="Transparent"
@@ -99,184 +101,177 @@
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="68" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
 
-                <ContentControl
+                <StackPanel
                     Grid.Row="0"
                     Grid.Column="0"
-                    Height="200"
-                    VerticalAlignment="Top"
-                    Content="{Binding}"
-                    ContentTemplate="{StaticResource MeterAndFader}" />
+                    VerticalAlignment="Top">
+                    <ContentControl
+                        Height="260"
+                        Content="{Binding}"
+                        ContentTemplate="{StaticResource MeterAndFader}" />
+                    <TextBlock
+                        Margin="0,8,0,4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        FontSize="10"
+                        Foreground="#AAA"
+                        Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
+                </StackPanel>
 
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="0,2,0,4"
-                    HorizontalAlignment="Center"
-                    FontSize="10"
-                    Foreground="#AAA"
-                    Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
-
-<!--
+                <!--
                     Колонка кнопок стрипа: маршрутизация и состояние (слева в
                     этом списке), ниже — две кнопки FUNC и сетка эффектов 2×2.
                     Всё в одной колонке, поэтому ряды не наезжают друг на друга,
                     а полоса растёт вниз по мере надобности.
                 -->
-                <StackPanel
-                    Grid.RowSpan="2"
-                    Grid.Column="1"
-                    VerticalAlignment="Top">
+                <StackPanel Grid.Column="1">
                     <UniformGrid Columns="1">
-                    <Button
-                        x:Name="OutBtn"
-                        Margin="2"
-                        Click="OnOutClick"
-                        Content="{Binding OutButtonText}"
-                        IsEnabled="{Binding HasHardware}"
-                        Style="{StaticResource RouteBtn}"
-                        ToolTip="{DynamicResource Sm.Strip.HardwareOutputsTip}" />
-                    <Button
-                        x:Name="VirtBtn"
-                        Margin="2"
-                        Click="OnVirtClick"
-                        Content="{Binding VirtButtonText}"
-                        IsEnabled="{Binding HasVirtual}"
-                        Style="{StaticResource RouteBtn}"
-                        ToolTip="{DynamicResource Sm.Strip.VirtualOutputsTip}" />
-                    <ToggleButton
-                        Margin="2"
-                        Content="{DynamicResource Sm.Strip.Mono}"
-                        IsChecked="{Binding IsMono}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
-                    <ToggleButton
-                        Margin="2"
-                        Content="{DynamicResource Sm.Strip.Solo}"
-                        IsChecked="{Binding IsSolo}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
-                    <ToggleButton
-                        Margin="2"
-                        Content="{DynamicResource Sm.Strip.Mute}"
-                        IsChecked="{Binding IsMuted}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
-                    <ToggleButton
-                        x:Name="DenBtn"
-                        Margin="2"
-                        Content="{DynamicResource Sm.Strip.Denoiser}"
-                        IsChecked="{Binding DenoiserEnabled}"
-                        MouseRightButtonUp="OnDenRightClick"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
+                        <Button
+                            x:Name="OutBtn"
+                            Margin="2"
+                            Click="OnOutClick"
+                            Content="{Binding OutButtonText}"
+                            IsEnabled="{Binding HasHardware}"
+                            Style="{StaticResource RouteBtn}"
+                            ToolTip="{DynamicResource Sm.Strip.HardwareOutputsTip}" />
+                        <Button
+                            x:Name="VirtBtn"
+                            Margin="2"
+                            Click="OnVirtClick"
+                            Content="{Binding VirtButtonText}"
+                            IsEnabled="{Binding HasVirtual}"
+                            Style="{StaticResource RouteBtn}"
+                            ToolTip="{DynamicResource Sm.Strip.VirtualOutputsTip}" />
+                        <ToggleButton
+                            Margin="2"
+                            Content="{DynamicResource Sm.Strip.Mono}"
+                            IsChecked="{Binding IsMono}"
+                            Style="{StaticResource LedToggle}"
+                            ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
+                        <ToggleButton
+                            Margin="2"
+                            Content="{DynamicResource Sm.Strip.Solo}"
+                            IsChecked="{Binding IsSolo}"
+                            Style="{StaticResource LedToggle}"
+                            ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
+                        <ToggleButton
+                            Margin="2"
+                            Content="{DynamicResource Sm.Strip.Mute}"
+                            IsChecked="{Binding IsMuted}"
+                            Style="{StaticResource LedToggle}"
+                            ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
+                        <ToggleButton
+                            x:Name="DenBtn"
+                            Margin="2"
+                            Content="{DynamicResource Sm.Strip.Denoiser}"
+                            IsChecked="{Binding DenoiserEnabled}"
+                            MouseRightButtonUp="OnDenRightClick"
+                            Style="{StaticResource LedToggle}"
+                            ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
+
+                        <!--
+                            Кнопки FUNC — переключатели: нажатие применяет
+                            назначенные выходы к роутингу стрипа, повторное снимает
+                            и возвращает прежний. ПКМ — назначение (попап).
+                            
+                            Кнопку без назначения отключать нельзя: у отключённого
+                            элемента не приходит ПКМ, и назначить выходы было бы
+                            уже нечем (попап открывает только она). Вместо этого
+                            приглушаем её, а нажатие такой кнопки открывает попап
+                            назначения (OnFuncClick).
+                            
+                            Обёртка нужна ради DataContext: привязки идут к
+                            FuncButtonViewModel, а не к стрипу.
+                        -->
+                        <Grid DataContext="{Binding Func1}">
+                            <ToggleButton
+                                x:Name="Func1Btn"
+                                Margin="2"
+                                Click="OnFuncClick"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                                MouseRightButtonUp="OnFuncRightClick"
+                                Opacity="{Binding ButtonOpacity}"
+                                Style="{StaticResource FuncBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                        <Grid DataContext="{Binding Func2}">
+                            <ToggleButton
+                                x:Name="Func2Btn"
+                                Margin="2"
+                                Click="OnFuncClick"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                                MouseRightButtonUp="OnFuncRightClick"
+                                Opacity="{Binding ButtonOpacity}"
+                                Style="{StaticResource FuncBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                    </UniformGrid>
 
                     <!--
-                        Кнопки FUNC — переключатели: нажатие применяет
-                        назначенные выходы к роутингу стрипа, повторное снимает
-                        и возвращает прежний. ПКМ — назначение (попап).
-
-                        Кнопку без назначения отключать нельзя: у отключённого
-                        элемента не приходит ПКМ, и назначить выходы было бы
-                        уже нечем (попап открывает только она). Вместо этого
-                        приглушаем её, а нажатие такой кнопки открывает попап
-                        назначения (OnFuncClick).
-
-                        Обёртка нужна ради DataContext: привязки идут к
-                        FuncButtonViewModel, а не к стрипу.
+                        Эффекты стрипа (SM-B05): компрессор, trim, задержка,
+                        реверберация. Сетка 2×2, чтобы колонка кнопок не выросла на
+                        четыре ряда: кнопки узкие, подписи в две буквы. ЛКМ — вкл/выкл,
+                        ПКМ — попап с крутилками.
                     -->
-                    <Grid DataContext="{Binding Func1}">
-                        <ToggleButton
-                            x:Name="Func1Btn"
-                            Margin="2"
-                            Click="OnFuncClick"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
-                            MouseRightButtonUp="OnFuncRightClick"
-                            Opacity="{Binding ButtonOpacity}"
-                            Style="{StaticResource FuncBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                    <Grid DataContext="{Binding Func2}">
-                        <ToggleButton
-                            x:Name="Func2Btn"
-                            Margin="2"
-                            Click="OnFuncClick"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
-                            MouseRightButtonUp="OnFuncRightClick"
-                            Opacity="{Binding ButtonOpacity}"
-                            Style="{StaticResource FuncBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
+                    <UniformGrid Columns="2">
+                        <Grid DataContext="{Binding Compressor}">
+                            <ToggleButton
+                                x:Name="CompressorBtn"
+                                Margin="2"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                MouseRightButtonUp="OnEffectRightClick"
+                                Style="{StaticResource EffectBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                        <Grid DataContext="{Binding FxGain}">
+                            <ToggleButton
+                                x:Name="FxGainBtn"
+                                Margin="2"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                MouseRightButtonUp="OnEffectRightClick"
+                                Style="{StaticResource EffectBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                        <Grid DataContext="{Binding Delay}">
+                            <ToggleButton
+                                x:Name="DelayBtn"
+                                Margin="2"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                MouseRightButtonUp="OnEffectRightClick"
+                                Style="{StaticResource EffectBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                        <Grid DataContext="{Binding Reverb}">
+                            <ToggleButton
+                                x:Name="ReverbBtn"
+                                Margin="2"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                MouseRightButtonUp="OnEffectRightClick"
+                                Style="{StaticResource EffectBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
                     </UniformGrid>
 
-                <!--
-                    Эффекты стрипа (SM-B05): компрессор, trim, задержка,
-                    реверберация. Сетка 2×2, чтобы колонка кнопок не выросла на
-                    четыре ряда: кнопки узкие, подписи в две буквы. ЛКМ — вкл/выкл,
-                    ПКМ — попап с крутилками.
-                -->
-                <UniformGrid Margin="0,4,0,0" Columns="2">
-                    <Grid DataContext="{Binding Compressor}">
-                        <ToggleButton
-                            x:Name="CompressorBtn"
-                            Margin="2"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                            MouseRightButtonUp="OnEffectRightClick"
-                            Style="{StaticResource EffectBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                    <Grid DataContext="{Binding FxGain}">
-                        <ToggleButton
-                            x:Name="FxGainBtn"
-                            Margin="2"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                            MouseRightButtonUp="OnEffectRightClick"
-                            Style="{StaticResource EffectBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                    <Grid DataContext="{Binding Delay}">
-                        <ToggleButton
-                            x:Name="DelayBtn"
-                            Margin="2"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                            MouseRightButtonUp="OnEffectRightClick"
-                            Style="{StaticResource EffectBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                    <Grid DataContext="{Binding Reverb}">
-                        <ToggleButton
-                            x:Name="ReverbBtn"
-                            Margin="2"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                            MouseRightButtonUp="OnEffectRightClick"
-                            Style="{StaticResource EffectBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                    </UniformGrid>
-
-                <!--
-                    Эквалайзер: ЛКМ, как у остальных эффектов, — вкл/выкл, а ПКМ
-                    открывает отдельное окно. Отдельное, а не попап: десять полос с
-                    кривой не влезают в 272 px попапа, а окно можно держать открытым
-                    и свернуть микшер — правка слышна сразу.
-
-                    Обёртка нужна ради DataContext: привязки идут к
-                    EqualizerViewModel, а не к стрипу.
-                -->
-                    <Grid Margin="0,2,0,0" DataContext="{Binding Equalizer}">
+                    <!--
+                        Эквалайзер: ЛКМ, как у остальных эффектов, — вкл/выкл, а ПКМ
+                        открывает отдельное окно. Отдельное, а не попап: десять полос с
+                        кривой не влезают в 272 px попапа, а окно можно держать открытым
+                        и свернуть микшер — правка слышна сразу.
+                        
+                        Обёртка нужна ради DataContext: привязки идут к
+                        EqualizerViewModel, а не к стрипу.
+                    -->
+                    <Grid DataContext="{Binding Equalizer}">
                         <ToggleButton
                             x:Name="EqBtn"
                             Margin="2"
@@ -441,21 +436,23 @@
                 Margin="0,8,0,0"
                 VerticalAlignment="Center"
                 Visibility="{Binding ShowGainKnob, Converter={StaticResource BoolToVisibility}}">
-                <panels:GainKnob
-                    Width="86"
-                    Height="86"
-                    HorizontalAlignment="Center"
-                    Maximum="60"
-                    ToolTip="{DynamicResource Sm.Strip.GainTip}"
-                    Value="{Binding GainDb, Mode=TwoWay}"
-                    strip:ParamReset.Command="{Binding ResetGainCommand}" />
-                <TextBlock
-                    Margin="0,4,0,0"
-                    HorizontalAlignment="Center"
-                    FontSize="11"
-                    FontWeight="Bold"
-                    Foreground="#EEE"
-                    Text="{Binding GainDb, StringFormat={}{0:F1} dB}" />
+                <Grid>
+                    <panels:GainKnob
+                        Width="86"
+                        Height="86"
+                        HorizontalAlignment="Center"
+                        strip:ParamReset.Command="{Binding ResetGainCommand}"
+                        Maximum="60"
+                        ToolTip="{DynamicResource Sm.Strip.GainTip}"
+                        Value="{Binding GainDb, Mode=TwoWay}" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="11"
+                        FontWeight="Bold"
+                        Foreground="#EEE"
+                        Text="{Binding GainDb, StringFormat={}{0:F1} dB}" />
+                </Grid>
                 <TextBlock
                     Margin="0,2,0,0"
                     HorizontalAlignment="Center"

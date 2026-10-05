@@ -3,9 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
-    xmlns:panels="clr-namespace:SoundMeeter.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panels="clr-namespace:SoundMeeter.Controls"
+    xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
     d:DesignHeight="400"
     d:DesignWidth="1200"
     mc:Ignorable="d">
@@ -13,6 +14,21 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+                <ResourceDictionary>
+                    <Style
+                        x:Key="BtnAdd"
+                        BasedOn="{StaticResource {x:Type Button}}"
+                        TargetType="Button">
+                        <Setter Property="Width" Value="20" />
+                        <Setter Property="Height" Value="20" />
+                        <Setter Property="Margin" Value="8,0,0,0" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="wpf:Button.Icon" Value="Plus" />
+                        <Setter Property="wpf:Button.IconHeight" Value="10" />
+                        <Setter Property="wpf:Button.IconWidth" Value="10" />
+                    </Style>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -37,36 +53,49 @@
                 </Grid.RowDefinitions>
                 <StackPanel
                     Grid.Row="0"
+                    Margin="0,0,0,4"
                     Orientation="Horizontal">
                     <TextBlock
+                        Margin="4,0,0,0"
+                        Padding="0"
                         VerticalAlignment="Center"
                         Style="{StaticResource GroupHeader}"
                         Text="{DynamicResource Sm.Mixer.Inputs}" />
                     <Button
-                        Width="20"
-                        Height="20"
-                        Margin="8,0,0,0"
-                        Padding="0"
                         Command="{Binding AddInputCommand}"
-                        Content="＋"
-                        FontSize="14"
+                        Style="{StaticResource BtnAdd}"
                         ToolTip="{DynamicResource Sm.Mixer.AddInputTip}" />
                 </StackPanel>
-                <ItemsControl
-                    x:Name="InputsList"
-                    Grid.Row="1"
-                    ItemsSource="{Binding Inputs}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <panels:HorizontalFillPanel AllowReorder="True" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <controls:InputStripView RemoveCommand="{Binding DataContext.RemoveInputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!--
+                    Пока стрипов нет, на их месте стоит подсказка: микшер
+                    начинается пустым, и одна кнопка «＋» без объяснения
+                    выглядит как сломанная лента. Ширина задана явно (колонка
+                    по содержимому), иначе однострочный текст растянул бы окно.
+                -->
+                <Grid Grid.Row="1">
+                    <ItemsControl x:Name="InputsList" ItemsSource="{Binding Inputs}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <panels:HorizontalFillPanel AllowReorder="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls:InputStripView RemoveCommand="{Binding DataContext.RemoveInputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock
+                        x:Name="InputsHint"
+                        Width="210"
+                        VerticalAlignment="Center"
+                        FontSize="11"
+                        Foreground="#9A9A9A"
+                        IsHitTestVisible="False"
+                        Text="{DynamicResource Sm.Mixer.NoInputs}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding Inputs.Count, Converter={StaticResource ZeroToVisibility}}" />
+                </Grid>
             </Grid>
 
             <Border
@@ -82,33 +111,43 @@
                 </Grid.RowDefinitions>
                 <StackPanel
                     Grid.Row="0"
+                    Margin="0,0,0,4"
                     Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource GroupHeader}" Text="{DynamicResource Sm.Mixer.Outputs}" />
-                    <Button
-                        Width="20"
-                        Height="20"
-                        Margin="8,0,0,0"
+                    <TextBlock
+                        Margin="4,0,0,0"
                         Padding="0"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource GroupHeader}"
+                        Text="{DynamicResource Sm.Mixer.Outputs}" />
+                    <Button
                         Command="{Binding AddBusCommand}"
-                        Content="＋"
-                        FontSize="14"
+                        Style="{StaticResource BtnAdd}"
                         ToolTip="{DynamicResource Sm.Mixer.AddOutputTip}" />
                 </StackPanel>
-                <ItemsControl
-                    x:Name="BusesList"
-                    Grid.Row="1"
-                    ItemsSource="{Binding Buses}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <panels:HorizontalFillPanel AllowReorder="True" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <controls:OutputStripView RemoveCommand="{Binding DataContext.RemoveBusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <Grid Grid.Row="1">
+                    <ItemsControl x:Name="BusesList" ItemsSource="{Binding Buses}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <panels:HorizontalFillPanel AllowReorder="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls:OutputStripView RemoveCommand="{Binding DataContext.RemoveBusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock
+                        x:Name="OutputsHint"
+                        Width="210"
+                        VerticalAlignment="Center"
+                        FontSize="11"
+                        Foreground="#9A9A9A"
+                        IsHitTestVisible="False"
+                        Text="{DynamicResource Sm.Mixer.NoOutputs}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding Buses.Count, Converter={StaticResource ZeroToVisibility}}" />
+                </Grid>
             </Grid>
         </Grid>
     </ScrollViewer>

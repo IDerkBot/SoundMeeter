@@ -7,8 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="SoundMeeter"
     Width="1280"
-    Height="700"
+    Height="1000"
     Background="#1E1E1E"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <local:MainView />
 </Window>
