@@ -56,6 +56,9 @@
     -->
     <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\Strips.cs" Link="Infrastructure\Strips.cs" />
     <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\FakeAudioEngine.cs" Link="Infrastructure\FakeAudioEngine.cs" />
+    <!-- Заглушка ITextToSpeechHost: окно настроек TTS проверяется настоящей разметкой,
+         и без неё проверку пришлось бы поднимать всё приложение целиком. -->
+    <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\FakeTextToSpeechHost.cs" Link="Infrastructure\FakeTextToSpeechHost.cs" />
   </ItemGroup>
 
 </Project>

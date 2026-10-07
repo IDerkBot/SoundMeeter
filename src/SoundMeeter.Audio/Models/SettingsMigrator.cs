@@ -34,7 +34,7 @@ public enum MigrationOutcome
 public static class SettingsMigrator
 {
     /// <summary>Версия схемы, которую понимает и пишет эта сборка.</summary>
-    public const int CurrentSchemaVersion = 6;
+    public const int CurrentSchemaVersion = 8;
 
     /// <summary>
     /// Приводит загруженный снимок к <see cref="CurrentSchemaVersion"/>.
@@ -94,6 +94,12 @@ public static class SettingsMigrator
                 break;
             case 5:
                 Migrate5To6(settings);
+                break;
+            case 6:
+                Migrate6To7(settings);
+                break;
+            case 7:
+                Migrate7To8(settings);
                 break;
             default:
                 // Сюда попасть нельзя: Migrate крутится только пока версия < Current.
@@ -280,6 +286,108 @@ public static class SettingsMigrator
         }
 
         settings.SchemaVersion = 6;
+    }
+
+    /// <summary>
+    /// 6 → 7. Появился модуль синтеза речи (SM-E01) и «генерируемые» входные
+    /// стрипы — входы без устройства, в которые пишет код приложения.
+    ///
+    /// Главное здесь — не дать файлу включить модуль против воли пользователя. В
+    /// версии 6 этого модуля не существовало, значит и его настроек в файле быть не
+    /// могло: любой блок <c>TextToSpeech</c> здесь — либо мусор, либо правка руками.
+    /// И то и другое заменяется на безопасные значения по умолчанию, а сам модуль
+    /// остаётся выключенным, потому что он говорит в эфир, а включать то, что
+    /// никто не настраивал, нельзя.
+    ///
+    /// Списки голосов и игнора при этом не выбрасываются, а приводятся в порядок:
+    /// null вместо списка и пустой логин в записи сломали бы разбор команд, а
+    /// привести к виду ничего не стоит.
+    ///
+    /// Значения вне диапазонов (темп, громкость, пределы) миграция не проверяет:
+    /// в файле версии 7 их и так приводит к рабочим пределам окно настроек, а
+    /// последняя рубежная проверка стоит в самом синтезаторе (TtsSpeechOptions).
+    /// </summary>
+    private static void Migrate6To7(AppSettings settings)
+    {
+        var stored = settings.TextToSpeech;
+
+        settings.TextToSpeech = new TextToSpeechSettings
+        {
+            UserVoices = NormalizeUserVoices(stored?.UserVoices),
+            IgnoredUsers = NormalizeIgnoredUsers(stored?.IgnoredUsers),
+        };
+
+        // У стрипов появился признак «наполняется кодом». У файлов предыдущих
+        // версий таких стрипов быть не могло, поэтому приводим к false явно:
+        // внятнее, чем полагаться на дефолт свойства при записи нового файла.
+        foreach (var input in settings.Inputs)
+            input.IsGenerated = false;
+
+        settings.SchemaVersion = 7;
+    }
+
+    /// <summary>
+    /// 7 → 8. Появилась интеграция с Twitch (SM-F01): вход через OAuth, чтение
+    /// чата канала и показ статуса трансляции.
+    ///
+    /// Как и в предыдущем шаге, главное — не дать файлу включить себя против воли
+    /// пользователя. В версии 7 интеграции не существовало, значит и её настроек в
+    /// файле быть не могло: любой блок <c>Twitch</c> здесь — либо мусор, либо
+    /// правка руками. Подключение к чату и опрос статуса — это обращение к чужому
+    /// сервису, поэтому они остаются выключенными.
+    ///
+    /// Логин канала приводится к виду, который понимает API (без «@», обрезан по
+    /// длине): пустой или с «@» в значении означал бы подключение к каналу,
+    /// которого нет.
+    /// </summary>
+    private static void Migrate7To8(AppSettings settings)
+    {
+        var stored = settings.Twitch;
+
+        settings.Twitch = new TwitchSettings
+        {
+            // Enabled и LogAllMessages — намеренно не переносятся: см. выше.
+            //
+            // Логин канала — единственное, что переносится: это пожелание
+            // пользователя, и после повторного входа он захочет тот же канал, а не
+            // вводить его заново.
+            ChannelLogin = stored?.ChannelLogin?.Trim() ?? "",
+
+            // Признак входа и кэш идентификатора канала не переносятся. Первый —
+            // потому что описывает токен, а токен в settings.json не лежит никогда,
+            // и перенесённый он означал бы подключение, которого нет. Второй — по той
+            // же причине плюс потому, что адресует подписку на конкретный канал:
+            // после импорта канал может быть другим. Оба заполнятся сами.
+            AuthorizedLogin = "",
+            ChannelUserId = "",
+        };
+
+        settings.SchemaVersion = 8;
+    }
+
+    /// <summary>Записи голосов без пустых логинов; из двух записей одного логина остаётся последняя.</summary>
+    private static List<TtsUserVoice> NormalizeUserVoices(List<TtsUserVoice>? source)
+    {
+        if (source is null) return new List<TtsUserVoice>();
+
+        return source
+            .Where(pair => pair is { User: not null } && !string.IsNullOrWhiteSpace(pair.User))
+            .Select(pair => new TtsUserVoice(pair.User.Trim(), pair.Voice?.Trim() ?? ""))
+            .GroupBy(pair => pair.User, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .ToList();
+    }
+
+    /// <summary>Логины без «@», без пустых и без дублей в разном регистре.</summary>
+    private static List<string> NormalizeIgnoredUsers(List<string>? source)
+    {
+        if (source is null) return new List<string>();
+
+        return source
+            .Where(login => !string.IsNullOrWhiteSpace(login))
+            .Select(login => login.Trim().TrimStart('@'))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     /// <summary>

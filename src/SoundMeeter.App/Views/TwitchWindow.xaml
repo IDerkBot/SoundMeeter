@@ -1,0 +1,236 @@
+<Window
+    x:Class="SoundMeeter.Views.TwitchWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{DynamicResource Sm.Twitch.Title}"
+    Width="560"
+    Height="560"
+    MinWidth="500"
+    MinHeight="460"
+    Background="#1E1E1E"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+    <!--
+        Подключение к Twitch (SM-F01).
+
+        Отдельное окно, а не секция в настройках синтеза речи: вход в Twitch нужен и
+        сам по себе, без озвучки, а индикатор трансляции — не свойство синтезатора.
+
+        Порядок сверху вниз повторяет путь пользователя: сначала приложение
+        зарегистрировано (или уже зарегистрировано), потом вход, потом канал, и
+        только затем — показатели в эфире. Каждый шаг зависит от предыдущего, и
+        показывать их вперемешку значило бы заставлять гадать, что нажимать дальше.
+    -->
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="GroupLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="#9A9A9A" />
+                <Setter Property="Margin" Value="2,0,0,4" />
+            </Style>
+
+            <Style x:Key="Hint" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="Foreground" Value="#8C8C8C" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="FieldLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Foreground" Value="#CCC" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Вход в аккаунт Twitch  -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock
+                DockPanel.Dock="Top"
+                Style="{StaticResource GroupLabel}"
+                Text="{DynamicResource Sm.Twitch.Account}" />
+
+            <!--
+                Пока приложение не зарегистрировано в Twitch, вход невозможен. Это
+                говорится прямо и с кнопкой на консоль, а не прячется: иначе кнопка
+                «войти» молча ничего не делала бы, а пользователь искал бы причину не
+                там.
+            -->
+            <Border
+                DockPanel.Dock="Top"
+                Margin="0,0,0,8"
+                Padding="8"
+                Background="#33241F"
+                Visibility="{Binding IsConfigured, Converter={StaticResource InverseBoolToVisibility}}">
+                <StackPanel>
+                    <TextBlock
+                        Style="{StaticResource Hint}"
+                        Text="{DynamicResource Sm.Twitch.NotConfigured}" />
+                    <Button
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Left"
+                        Command="{Binding OpenConsoleCommand}"
+                        Content="{DynamicResource Sm.Twitch.OpenConsole}" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <TextBlock
+                    Width="120"
+                    Style="{StaticResource FieldLabel}"
+                    Text="{DynamicResource Sm.Twitch.AccountLabel}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="11"
+                    Foreground="#CCC"
+                    Text="{Binding AuthorizedLogin}" />
+                <Button
+                    Margin="10,0,0,0"
+                    Command="{Binding LogoutCommand}"
+                    Content="{DynamicResource Sm.Twitch.Logout}"
+                    IsEnabled="{Binding CanLogout}"
+                    Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+
+            <!--
+                Код для ввода. Показывается, когда вход идёт, и остаётся на экране:
+                ушёл в браузер, чтобы ввести код, и вернулся — код на месте.
+            -->
+            <Border
+                DockPanel.Dock="Top"
+                Margin="0,8,0,0"
+                Padding="8"
+                Background="#1F2933"
+                Visibility="{Binding HasLoginCode, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <TextBlock
+                        Style="{StaticResource Hint}"
+                        Text="{DynamicResource Sm.Twitch.LoginHint}" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        Foreground="#7CC48B"
+                        Text="{Binding LoginCode}" />
+                    <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                        <Button
+                            Command="{Binding OpenActivationPageCommand}"
+                            Content="{DynamicResource Sm.Twitch.OpenActivation}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Button
+                DockPanel.Dock="Bottom"
+                Margin="0,8,0,0"
+                HorizontalAlignment="Left"
+                Command="{Binding LoginCommand}"
+                Content="{DynamicResource Sm.Twitch.Login}"
+                IsEnabled="{Binding CanStartLogin}"
+                Visibility="{Binding IsAuthorized, Converter={StaticResource InverseBoolToVisibility}}" />
+        </DockPanel>
+
+        <!--  Канал и чат  -->
+        <DockPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock
+                DockPanel.Dock="Top"
+                Style="{StaticResource GroupLabel}"
+                Text="{DynamicResource Sm.Twitch.Chat}" />
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <TextBlock
+                    Width="120"
+                    Style="{StaticResource FieldLabel}"
+                    Text="{DynamicResource Sm.Twitch.Channel}" />
+                <TextBox
+                    Width="200"
+                    Text="{Binding ChannelLogin, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <CheckBox
+                DockPanel.Dock="Top"
+                Margin="0,6,0,0"
+                Content="{DynamicResource Sm.Twitch.Enable}"
+                IsChecked="{Binding Enabled}" />
+
+            <CheckBox
+                DockPanel.Dock="Top"
+                Margin="0,4,0,0"
+                Content="{DynamicResource Sm.Twitch.ShowStreamStatus}"
+                IsChecked="{Binding ShowStreamStatus}" />
+
+            <TextBlock
+                DockPanel.Dock="Bottom"
+                Margin="0,4,0,0"
+                Style="{StaticResource Hint}"
+                Text="{Binding ChannelHint}" />
+        </DockPanel>
+
+        <!--
+            Состояние в эфире. Здесь важно, что «неизвестно» и «не в эфире» — разные
+            состояния: обрыв сети не должен выглядеть как завершившаяся трансляция.
+        -->
+        <Border Grid.Row="2" Padding="10" Background="#242424">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource GroupLabel}"
+                    Text="{DynamicResource Sm.Twitch.StreamTitle}" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    Foreground="#CCC"
+                    Text="{Binding StreamStatusText}" />
+            </StackPanel>
+        </Border>
+
+        <!--  Результат последнего действия и кнопки  -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock
+                FontSize="10"
+                Foreground="#7CC48B"
+                Text="{Binding Feedback}"
+                TextWrapping="Wrap"
+                Visibility="{Binding IsStatusOk, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock
+                Margin="0,4,0,0"
+                FontSize="10"
+                Foreground="#E08A8A"
+                Text="{Binding Feedback}"
+                TextWrapping="Wrap"
+                Visibility="{Binding IsStatusOk, Converter={StaticResource InverseBoolToVisibility}}" />
+
+            <TextBlock
+                Margin="0,6,0,0"
+                FontSize="11"
+                Foreground="#9A9A9A"
+                Text="{Binding Status}"
+                TextWrapping="Wrap" />
+
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <Button
+                    Command="{Binding ApplyCommand}"
+                    Content="{DynamicResource Sm.Twitch.Apply}" />
+                <Button
+                    Margin="8,0,0,0"
+                    IsCancel="True"
+                    Click="OnCloseClick"
+                    Content="{DynamicResource Sm.Twitch.Close}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

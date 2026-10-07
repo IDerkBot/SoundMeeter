@@ -64,6 +64,70 @@ namespace SoundMeeter.Views.Controls
             { Owner = owner }.Show();
         }
 
+        /// <summary>
+        /// Настройки модуля синтеза речи (SM-E01): куда отдавать голос, каким
+        /// голосом говорить, команды чата и голоса пользователей.
+        /// </summary>
+        private void OnTextToSpeechClick(object sender, RoutedEventArgs e)
+        {
+            SettingsPopup.IsOpen = false;
+
+            if (DataContext is not MainViewModel main) return;
+
+            var owner = Window.GetWindow(this);
+            if (owner is null) return;
+
+            // Окно одно, как и у дока: второй экземпляр с теми же настройками
+            // только путает, а DataContext у него общий с главным окном.
+            if (owner.OwnedWindows.OfType<TextToSpeechWindow>().FirstOrDefault() is { } existing)
+            {
+                if (existing.IsVisible)
+                {
+                    existing.Activate();
+                    return;
+                }
+                existing.Close();
+            }
+
+new TextToSpeechWindow(new TextToSpeechSettingsViewModel(main))
+        {
+            Owner = owner,
+        }.Show();
+    }
+
+    /// <summary>
+    /// Окно подключения к Twitch (SM-F01). Отдельное окно, а не секция в настройках
+    /// синтеза речи: вход в Twitch нужен и сам по себе.
+    ///
+    /// Повторное открытие того же окна не создаёт второго: у интеграции один вход, один
+    /// набор подписок и один опрос трансляции, а второе окно запустило бы вторые — и
+    /// подписка на чат упёрлась бы в лимит Twitch.
+    /// </summary>
+    private void OnTwitchClick(object sender, RoutedEventArgs e)
+    {
+        SettingsPopup.IsOpen = false;
+
+        if (DataContext is not MainViewModel main) return;
+
+        var owner = Window.GetWindow(this);
+        if (owner is null) return;
+
+        if (owner.OwnedWindows.OfType<TwitchWindow>().FirstOrDefault() is { } existing)
+        {
+            if (existing.IsVisible)
+            {
+                existing.Activate();
+                return;
+            }
+            existing.Close();
+        }
+
+        new TwitchWindow(new TwitchSettingsViewModel(main, main.Twitch))
+        {
+            Owner = owner,
+        }.Show();
+    }
+
         /// <summary>Окно просмотра журнала и копирования диагностики.</summary>
         private void OnLogsClick(object sender, RoutedEventArgs e)
         {

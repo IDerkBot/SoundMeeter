@@ -64,7 +64,12 @@
 - [ ] Сделать возможность скрыть установленные приложения.
 - [ ] Улучшить док для OBS
 - [ ] Добавить док для StreamLabs
-- [ ] Авторизация через twitch (чтение чата и озвучка сообщений по паттерну)
+- [x] Авторизация через twitch (SM-F01): вход по схеме device code, чтение чата через
+      EventSub, статус трансляции, разбор `!tts`/`!ttsvoice` готовым модулем SM-E01.
+	- [x] Начало сообщений съедается
+	- [ ] Вписать client ID приложения в `TwitchAuthService.ClientId` ( twitch.tv/console →
+	      Register an Application → Copy Client ID). Пока строка пустая, окно честно
+	      пишет «в этой сборке нет client ID», а в сеть не ходит.
 - [ ] Проверка обновления через Hash
 - [ ] Разделить `IAudioEngine` (25 членов) на IRoutingTable / IDeviceCatalog / IRStripTopology / IPresetStore
 - [ ] Нажатие клавишь MIDI миксера не сразу обрабатывается, а после нескольких нажатий.

@@ -1,6 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Services;
 using SoundMeeter.Services.Logging;
+using System.Net.Http;
+using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.Services.Twitch;
 using SoundMeeter.ViewModels;
 using SoundMeeter.Views;
 using System.Windows;
@@ -48,32 +51,7 @@ namespace SoundMeeter
             // SoundMeeter.Audio и про UI ничего не знает.
             LocResources.Install(this);
 
-            var services = new ServiceCollection();
-            services.AddSingleton<IAudioEngine, WasapiAudioEngine>();
-            services.AddSingleton<SettingsService>();
-            // MainViewModel/AudioService (портированы из AudioRouter) резолвят ISettingsService,
-            // а настройки читаются через конкретный SettingsService — даём общий экземпляр.
-            services.AddSingleton<ISettingsService>(sp => sp.GetRequiredService<SettingsService>());
-
-            services.AddSingleton<IAudioService, AudioService>();
-            services.AddSingleton<IInstalledAppsService, InstalledAppsService>();
-            // Мост к UI-потоку и таймер метров: ядро знает только интерфейсы (SM-A10).
-            services.AddSingleton<IDispatcherService, DispatcherService>();
-            services.AddSingleton<IUiTimer>(_ => new DispatcherTimerAdapter(TimeSpan.FromMilliseconds(33)));
-            // Буфер обмена (копирование диагностики и адреса дока) — тоже UI.
-            services.AddSingleton<IClipboardService, ClipboardService>();
-            services.AddSingleton<IUpdateService, GithubUpdateService>();
-            // Автозапуск вместе с Windows (SM-D01).
-            services.AddSingleton<IStartupService, StartupService>();
-            // Док-панель OBS: локальный сервер, отдающий страницу панели.
-            services.AddSingleton<IObsDockServer, ObsDockServer>();
-
-            // Singleton: OnStartup восстанавливает пресет через этот же экземпляр,
-            // что и окно (transient давал окну второй экземпляр с пустыми стрипами).
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<IMidiService, MidiService>();
-            services.AddTransient<MainWindow>();
-            ServiceProvider = services.BuildServiceProvider();
+            ServiceProvider = AppServices.Create().BuildServiceProvider();
 
             var settingsService = ServiceProvider.GetRequiredService<SettingsService>();
             var engine = ServiceProvider.GetRequiredService<IAudioEngine>();
@@ -146,5 +124,6 @@ namespace SoundMeeter
             }
             base.OnExit(e);
         }
+
     }
 }

@@ -13,16 +13,25 @@ namespace SoundMeeter.Audio;
 /// float-сэмплы 48кГц/стерео в общий кольцевой буфер, откуда
 /// его читают все шины (через RingCursor).
 /// </summary>
-public sealed class InputSource
+public sealed class InputSource : ISampleSource
 {
     public const int SampleRate = 48000;
     public const int Channels = 2;
-    private const int BufferSeconds = AudioEngineDefaults.RingBufferMilliseconds / 1000;
     public static readonly WaveFormat OutputFormat = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, Channels);
 
     private readonly InputChannelModel _model;
-    private readonly SampleRingBuffer _ring = new(SampleRate * Channels * BufferSeconds);
     private readonly DenoiserDsp? _denoiser;
+
+    /// <summary>Кольцо источника. Пишет поток захвата устройства — в своём темпе.</summary>
+    private readonly SampleRingBuffer _ring = new(SampleRate * Channels * (AudioEngineDefaults.RingBufferMilliseconds / 1000));
+
+    /// <summary>
+    /// Очередь подмешиваемого звука (модуль синтеза речи). Её забирает
+    /// <see cref="BusTap"/> на выходе стрипа, потому что полосы кольца уже не
+    /// осталось: её занимает захват устройства. Рассуждение — в
+    /// <see cref="PushAudio"/>.
+    /// </summary>
+    private readonly SampleQueue _external;
 
     /// <summary>
     /// Эффекты стрипа (SM-B05): компрессор, trim, задержка, реверберация.
@@ -73,6 +82,7 @@ public sealed class InputSource
     {
         _model = model;
         _effects = new StripDsp(model);
+        _external = new SampleQueue(model.Name);
         try
         {
             _denoiser = new DenoiserDsp(model);
@@ -87,6 +97,41 @@ public sealed class InputSource
     public bool IsRunning => _recorder != null;
 
     public RingCursor OpenCursor() => _ring.OpenCursor();
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Точка подмешивания выбрана в кольце, а не перед обработкой стрипа
+    /// (усиление, денойзер, эффекты). Причины две:
+    /// <list type="bullet">
+    /// <item>внешний сигнал не должен попадать под денойзер: он рассчитан на
+    /// речь собеседника из микрофона и на синтезированный голос только испортил
+    /// бы тембр;</item>
+    /// <item>кольцо пишется под своим замком, а весь этот путь живёт в потоке
+    /// захвата — писать туда из чужого потока значило бы либо ещё один замок
+    /// на горячем пути, либо гонку с обработкой пакета.</item>
+    /// </list>
+    /// Фader, mute, solo и индивидуальная посылка на шины при этом работают:
+    /// они читаются в <see cref="BusTap"/> уже из кольца.
+    ///
+/// В КОЛЬЦО ЭТО НЕ ПОПАДАЕТ, А ИДЁТ ЧЕРЕЗ ОЧЕРЕДЬ. Это не оптимизация, а
+    /// условие работоспособности, и кольцо тут ни при чём: его полоса уже занята
+    /// захватом устройства (48 кГц в секунду в секунду), свободной не осталось.
+    /// Синтезатор отдаёт фразу целиком за доли секунды, и прямая запись переполнила
+    /// бы кольцо мгновенно — шина перескакивала бы к последней секунде фразы, и на
+    /// стриме звучало бы одно последнее слово. Очередь забирает тот же
+    /// <see cref="BusTap"/>, что и звук устройства, поэтому темп задаёт выходное
+    /// устройство, и речь совпадает с остальным звуком стрипа по построению.
+    /// </remarks>
+    public void PushAudio(ReadOnlySpan<float> samples) => _external.Enqueue(samples);
+
+    /// <summary>Очередь внешнего звука стрипа — её забирает тап.</summary>
+    public SampleQueue External => _external;
+
+    /// <summary>Сколько секунд подмешанного звука ещё не прозвучало.</summary>
+    public double BufferedSeconds => _external.BufferedSeconds;
+
+    /// <summary>Выбросить то, что ещё не ушло в шину (кнопка «стоп»).</summary>
+    public bool ClearPending() => _external.Clear();
 
     /// <summary>
     /// Стартует захват устройства.
@@ -223,6 +268,7 @@ public sealed class InputSource
     {
         Stop();
         _denoiser?.Dispose();
+        _external.Clear();
     }
 
     /// <summary>

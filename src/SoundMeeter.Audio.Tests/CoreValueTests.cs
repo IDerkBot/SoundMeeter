@@ -68,8 +68,10 @@ public class AppBehaviourSettingsTests
     /// версия поехала без нового шага миграции.
     /// </summary>
     [Fact]
-    public void CurrentSchemaVersionIsSix()
+    public void CurrentSchemaVersionIsEight()
     {
-        Assert.Equal(6, SettingsMigrator.CurrentSchemaVersion);
+        // 6 → 7: модуль синтеза речи (SM-E01) и генерируемые входные стрипы.
+        // 7 → 8: интеграция с Twitch (SM-F01) — вход, чат, статус трансляции.
+        Assert.Equal(8, SettingsMigrator.CurrentSchemaVersion);
     }
 }

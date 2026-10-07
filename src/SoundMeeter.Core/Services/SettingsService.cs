@@ -194,6 +194,8 @@ namespace SoundMeeter.Services
                     .Select(CloneRoute).ToList();
                 live.HiddenDeviceIds = imported.HiddenDeviceIds?.ToList() ?? new List<string>();
                 live.ObsDock = CloneObsDock(imported.ObsDock);
+                live.TextToSpeech = CloneTextToSpeech(imported.TextToSpeech);
+                live.Twitch = AdoptTwitchOnImport(imported.Twitch);
                 live.Language = imported.Language ?? "";
                 live.TrayEnabled = imported.TrayEnabled;
                 live.RunAtStartup = imported.RunAtStartup;
@@ -215,6 +217,12 @@ namespace SoundMeeter.Services
             // Снимок движка про док ничего не знает, ровно как про маршруты
             // приложений: переносим актуальные значения из Settings.
             settings.ObsDock = CloneObsDock(live.ObsDock);
+            // То же и для модуля синтеза речи (SM-E01): список голосов
+            // пользователей правится прямо в чате командой !ttsvoice, то есть
+            // мимо кнопки «Применить», и без копии сохранился бы снимок того
+            // состояния, которое было при последнем нажатии.
+            settings.TextToSpeech = CloneTextToSpeech(live.TextToSpeech);
+            settings.Twitch = (live.Twitch ?? new TwitchSettings()).Clone();
             settings.SchemaVersion = SettingsMigrator.CurrentSchemaVersion;
             settings.LogLevel = AppLog.Level.ToString();
             // Снимок движка про язык не знает, ровно как про маршруты приложений
@@ -252,6 +260,57 @@ namespace SoundMeeter.Services
                 ShowAllOutputs = source.ShowAllOutputs,
                 Channels = source.Channels.Select(c => c.Clone()).ToList()
             };
+        }
+
+        /// <summary>
+        /// Глубокая копия настроек синтеза речи. Списки голосов и игнора копируются
+        /// поштучно: они правятся и из окна настроек, и из чата, а список, взятый
+        /// ссылкой, сохранил бы в файл всё, что туда успели накидать с тех пор.
+        /// </summary>
+        private static TextToSpeechSettings CloneTextToSpeech(TextToSpeechSettings? source)
+        {
+            if (source == null) return new TextToSpeechSettings();
+            return new TextToSpeechSettings
+            {
+                Enabled = source.Enabled,
+                TargetInputId = source.TargetInputId,
+                TargetInputDeviceId = source.TargetInputDeviceId,
+                DefaultVoice = source.DefaultVoice,
+                Rate = source.Rate,
+                Volume = source.Volume,
+                SpeakCommand = source.SpeakCommand,
+                VoiceCommand = source.VoiceCommand,
+                AllowVoiceChange = source.AllowVoiceChange,
+                MaxQueueLength = source.MaxQueueLength,
+                MaxMessagesPerMinute = source.MaxMessagesPerMinute,
+                MaxMessageChars = source.MaxMessageChars,
+                UserVoices = source.UserVoices?.Select(pair => pair.Clone()).ToList() ?? new List<TtsUserVoice>(),
+                IgnoredUsers = source.IgnoredUsers?.ToList() ?? new List<string>(),
+            };
+        }
+
+        /// <summary>
+        /// Переносит настройки Twitch при импорте, и это НЕ простая копия.
+        ///
+        /// Признаки входа (<see cref="TwitchSettings.AuthorizedLogin"/> и кэш
+        /// <see cref="TwitchSettings.ChannelUserId"/>) описывают состояние ВИДИМОГО
+        /// компьютера: токен лежит в отдельном зашифрованном файле, и в
+        /// экспортируемый settings.json он не попадает. Перенести «кем вошли» без
+        /// токена — значит показать в окне подключение, которого нет: модуль
+        /// пойдёт в API с пустым токеном и откажет. Поэтому вход при импорте
+        /// сбрасывается, а пожелания пользователя (канал, включатель чата, опрос
+        /// статуса) переносятся — их пользователь настраивал сознательно.
+        ///
+        /// Кэш ChannelUserId при этом берётся не из файла, а обнуляется: он
+        /// адресует подписку на конкретный канал, и после импорта канал может быть
+        /// уже другим. Он заполнится сам при первом подключении.
+        /// </summary>
+        private static TwitchSettings AdoptTwitchOnImport(TwitchSettings? imported)
+        {
+            var result = imported?.Clone() ?? new TwitchSettings();
+            result.AuthorizedLogin = "";
+            result.ChannelUserId = "";
+            return result;
         }
 
         public async Task<AppSettings?> LoadAsync()

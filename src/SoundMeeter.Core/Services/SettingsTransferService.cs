@@ -60,6 +60,8 @@ namespace SoundMeeter.Services
             nameof(AppSettings.HiddenDeviceIds),
             nameof(AppSettings.Midi),
             nameof(AppSettings.ObsDock),
+            nameof(AppSettings.TextToSpeech),
+            nameof(AppSettings.Twitch),
             nameof(AppSettings.TrayEnabled),
             nameof(AppSettings.RunAtStartup)
         };

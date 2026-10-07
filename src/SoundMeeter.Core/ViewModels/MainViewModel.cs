@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Models;
 using SoundMeeter.Services;
+using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.Services.Twitch;
 using System.Collections.ObjectModel;
 
 namespace SoundMeeter.ViewModels;
@@ -80,7 +82,9 @@ public partial class MainViewModel : LocalizedViewModel
         IUpdateService updateService,
         IObsDockServer obsDock,
         IStartupService startup,
-        IUiTimer meterTimer)
+        IUiTimer meterTimer,
+        TextToSpeechService tts,
+        TwitchService twitch)
     {
         _audioService = audioService;
         _installedAppsService = installedAppsService;
@@ -96,10 +100,17 @@ public partial class MainViewModel : LocalizedViewModel
         _midi = midi;
         _dock = obsDock;
         _startup = startup;
+        // Модуль синтеза речи (SM-E01) берёт тот же SettingsService: его
+        // настройки лежат в том же settings.json, а команда !ttsvoice пишет их
+        // мимо кнопки «Применить», поэтому оба должны видеть один экземпляр.
+        _tts = tts;
+        _twitch = twitch;
         _engine.ChannelsChanged += OnChannelsChanged;
         _engine.StateChanged += OnStateChanged;
         _midi.MessageReceived += OnMidiMessageReceived;
         SubscribeDock();
+        SubscribeTts();
+        SubscribeTwitch();
 
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
         _audioService.AppsChanged += async (s, e) => await RefreshAppsAsync();
@@ -211,6 +222,9 @@ public partial class MainViewModel : LocalizedViewModel
         _meterTimer.Ticked -= OnMeterTick;
         _dock.Stop();
         _dock.CommandReceived -= OnDockCommand;
+        _tts.StatusChanged -= OnTtsStatusChanged;
+        _tts.Dispose();
+        ShutdownTwitch();
         _engine.Stop();
         _engine.ChannelsChanged -= OnChannelsChanged;
         _engine.StateChanged -= OnStateChanged;

@@ -1188,4 +1188,278 @@
   <data name="Sm.Tray.Exit" xml:space="preserve">
    <value>Выход</value>
   </data>
-</root>
+  <data name="Sm.Toolbar.TextToSpeech" xml:space="preserve">
+    <value>Озвучка текста</value>
+  </data>
+  <data name="Sm.Toolbar.TextToSpeechTip" xml:space="preserve">
+    <value>Озвучка текста: канал, голоса и команды чата</value>
+  </data>
+  <data name="Sm.Tts.Title" xml:space="preserve">
+    <value>Озвучка текста</value>
+  </data>
+  <data name="Sm.Tts.Enable" xml:space="preserve">
+    <value>Озвучивать сообщения чата</value>
+  </data>
+  <data name="Sm.Tts.EnableTip" xml:space="preserve">
+    <value>Модуль принимает сообщения чата, пока работает SoundMeeter</value>
+  </data>
+  <data name="Sm.Tts.Target" xml:space="preserve">
+    <value>Отдавать голос в:</value>
+  </data>
+  <data name="Sm.Tts.TargetHintStrip" xml:space="preserve">
+    <value>Голос идёт в канал «{0}». Разведите его по выходам как любой стрип.</value>
+  </data>
+  <data name="Sm.Tts.TargetHintGenerated" xml:space="preserve">
+    <value>Голос идёт в собственный канал «{0}». Устройства у него нет — включите маршрут в выход.</value>
+  </data>
+  <data name="Sm.Tts.GeneratedTarget" xml:space="preserve">
+    <value>Собственный канал TTS (создаётся сам)</value>
+  </data>
+  <data name="Sm.Tts.NoTarget" xml:space="preserve">
+    <value>Канал не выбран. Голосу некуда идти.</value>
+  </data>
+  <data name="Sm.Tts.DefaultVoice" xml:space="preserve">
+    <value>Голос по умолчанию:</value>
+  </data>
+  <data name="Sm.Tts.NoVoicesHint" xml:space="preserve">
+    <value>В Windows нет ни одного установленного голоса</value>
+  </data>
+  <data name="Sm.Tts.RussianVoiceFound" xml:space="preserve">
+    <value>Русских голосов {0} из {1} установленных</value>
+  </data>
+  <data name="Sm.Tts.NoRussianVoice" xml:space="preserve">
+    <value>Установлено голосов: {0}, русских среди них нет — речь будет звучать неправильно. Добавьте русский голос: Параметры Windows → Время и язык → Речь.</value>
+  </data>
+  <data name="Sm.Tts.Rate" xml:space="preserve">
+    <value>Темп речи:</value>
+  </data>
+  <data name="Sm.Tts.Volume" xml:space="preserve">
+    <value>Громкость:</value>
+  </data>
+  <data name="Sm.Tts.SpeakCommand" xml:space="preserve">
+    <value>Команда озвучки:</value>
+  </data>
+  <data name="Sm.Tts.VoiceCommand" xml:space="preserve">
+    <value>Команда выбора голоса:</value>
+  </data>
+  <data name="Sm.Tts.AllowVoiceChange" xml:space="preserve">
+    <value>Разрешить выбор голоса командой из чата</value>
+  </data>
+  <data name="Sm.Tts.MaxQueue" xml:space="preserve">
+    <value>Длина очереди:</value>
+  </data>
+  <data name="Sm.Tts.MaxPerMinute" xml:space="preserve">
+    <value>Реплик в минуту от одного пользователя:</value>
+  </data>
+  <data name="Sm.Tts.MaxChars" xml:space="preserve">
+    <value>Длина реплики:</value>
+  </data>
+  <data name="Sm.Tts.IgnoredUsers" xml:space="preserve">
+    <value>Игнорировать пользователей:</value>
+  </data>
+  <data name="Sm.Tts.UserVoices" xml:space="preserve">
+    <value>Голоса пользователей чата</value>
+  </data>
+  <data name="Sm.Tts.UserVoicesHint" xml:space="preserve">
+    <value>Пользователь выбирает себе голос командой выбора голоса; выбор сохраняется сразу</value>
+  </data>
+  <data name="Sm.Tts.UserLabel" xml:space="preserve">
+    <value>Пользователь:</value>
+  </data>
+  <data name="Sm.Tts.AddVoice" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Sm.Tts.RemoveVoice" xml:space="preserve">
+    <value>Убрать</value>
+  </data>
+  <data name="Sm.Tts.NeedUserAndVoice" xml:space="preserve">
+    <value>Введите пользователя и выберите голос</value>
+  </data>
+  <data name="Sm.Tts.UserVoiceAdded" xml:space="preserve">
+    <value>{0} будет говорить голосом {1}</value>
+  </data>
+  <data name="Sm.Tts.UserVoiceRemoved" xml:space="preserve">
+    <value>{0} возвращается к голосу по умолчанию</value>
+  </data>
+  <data name="Sm.Tts.Test" xml:space="preserve">
+    <value>Проверить разбор</value>
+  </data>
+  <data name="Sm.Tts.TestHint" xml:space="preserve">
+    <value>Введите реплику так, как её написал бы зритель, вместе с командой</value>
+  </data>
+  <data name="Sm.Tts.TestUser" xml:space="preserve">
+    <value>От пользователя:</value>
+  </data>
+  <data name="Sm.Tts.NeedTestText" xml:space="preserve">
+    <value>Введите реплику для проверки</value>
+  </data>
+  <data name="Sm.Tts.NotACommand" xml:space="preserve">
+    <value>Это не команда TTS — модуль такую реплику пропускает</value>
+  </data>
+  <data name="Sm.Tts.Stop" xml:space="preserve">
+    <value>Остановить сейчас</value>
+  </data>
+  <data name="Sm.Tts.ClearQueue" xml:space="preserve">
+    <value>Очистить очередь</value>
+  </data>
+  <data name="Sm.Tts.Saved" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="Sm.Tts.Queued" xml:space="preserve">
+    <value>В очереди: {0}</value>
+  </data>
+  <data name="Sm.Tts.EngineUnavailable" xml:space="preserve">
+    <value>Синтез речи недоступен: {0}</value>
+  </data>
+  <data name="Sm.Tts.NoVoices" xml:space="preserve">
+    <value>В Windows не установлено ни одного голоса — озвучивать нечем</value>
+  </data>
+  <data name="Sm.Tts.Status.Running" xml:space="preserve">
+    <value>Работает, ждёт сообщений</value>
+  </data>
+  <data name="Sm.Tts.Status.Off" xml:space="preserve">
+    <value>Модуль выключен</value>
+  </data>
+  <data name="Sm.Tts.Status.Stopped" xml:space="preserve">
+    <value>Остановлено</value>
+  </data>
+  <data name="Sm.Tts.Status.Queued" xml:space="preserve">
+    <value>В очереди: {0}</value>
+  </data>
+  <data name="Sm.Tts.Status.Speaking" xml:space="preserve">
+    <value>{0} говорит голосом {1}</value>
+  </data>
+  <data name="Sm.Tts.Status.VoiceAssigned" xml:space="preserve">
+    <value>{0}: голос {1} сохранён</value>
+  </data>
+  <data name="Sm.Tts.Status.VoiceChangeOff" xml:space="preserve">
+    <value>Выбор голоса из чата выключен в настройках</value>
+  </data>
+  <data name="Sm.Tts.Status.UnknownVoice" xml:space="preserve">
+    <value>Голоса «{0}» в системе нет</value>
+  </data>
+  <data name="Sm.Tts.Status.EmptyText" xml:space="preserve">
+    <value>{0}: команда есть, а сказать нечего</value>
+  </data>
+  <data name="Sm.Tts.Status.RateLimited" xml:space="preserve">
+    <value>{0}: больше {1} реплик в минуту, пропущено</value>
+  </data>
+  <data name="Sm.Tts.Status.NoTarget" xml:space="preserve">
+    <value>Озвучка невозможна: не выбран канал</value>
+  </data>
+  <data name="Sm.Tts.Status.NotDelivered" xml:space="preserve">
+    <value>Фраза не дошла до микшера: проверьте, что канал «{0}» включён в маршрут и движок запущен</value>
+  </data>
+  <data name="Sm.Tts.Status.NoVoices" xml:space="preserve">
+    <value>Озвучка невозможна: в Windows нет голосов</value>
+  </data>
+  <data name="Sm.Tts.Status.SynthesisFailed" xml:space="preserve">
+    <value>Синтез не удался: {0}</value>
+  </data>
+  <data name="Sm.Tts.Status.Ignored" xml:space="preserve">
+    <value>{0} в списке игнора</value>
+  </data>
+  <data name="Sm.Twitch.Title" xml:space="preserve">
+    <value>Twitch</value>
+  </data>
+  <data name="Sm.Twitch.Account" xml:space="preserve">
+    <value>Аккаунт</value>
+  </data>
+  <data name="Sm.Twitch.AccountLabel" xml:space="preserve">
+    <value>Вход выполнен как</value>
+  </data>
+  <data name="Sm.Twitch.Login" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="Sm.Twitch.Logout" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="Sm.Twitch.LoggedOut" xml:space="preserve">
+    <value>Выход выполнен</value>
+  </data>
+  <data name="Sm.Twitch.OpenConsole" xml:space="preserve">
+    <value>Открыть консоль Twitch</value>
+  </data>
+  <data name="Sm.Twitch.OpenActivation" xml:space="preserve">
+    <value>Открыть страницу активации</value>
+  </data>
+  <data name="Sm.Twitch.Chat" xml:space="preserve">
+    <value>Чат</value>
+  </data>
+  <data name="Sm.Twitch.Channel" xml:space="preserve">
+    <value>Канал</value>
+  </data>
+  <data name="Sm.Twitch.ChannelHint" xml:space="preserve">
+    <value>Канал, чей чат читается. Логин без @. Обязательно.</value>
+  </data>
+  <data name="Sm.Twitch.ChannelSet" xml:space="preserve">
+    <value>Чат этого канала читается. Трансляция: {0}</value>
+  </data>
+  <data name="Sm.Twitch.Enable" xml:space="preserve">
+    <value>Читать чат</value>
+  </data>
+  <data name="Sm.Twitch.ShowStreamStatus" xml:space="preserve">
+    <value>Показывать, идёт ли трансляция</value>
+  </data>
+  <data name="Sm.Twitch.StreamTitle" xml:space="preserve">
+    <value>Трансляция</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Live" xml:space="preserve">
+    <value>Идёт</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Offline" xml:space="preserve">
+    <value>Не идёт</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Unknown" xml:space="preserve">
+    <value>Состояние неизвестно</value>
+  </data>
+  <data name="Sm.Twitch.Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="Sm.Twitch.Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Sm.Twitch.NotConfigured" xml:space="preserve">
+    <value>В этой сборке нет client ID Twitch, поэтому войти нельзя. Зарегистрируйте приложение в консоли Twitch, впишите его client ID в код и пересоберите.</value>
+  </data>
+  <data name="Sm.Twitch.LoginStarting" xml:space="preserve">
+    <value>Запрашивается код входа…</value>
+  </data>
+  <data name="Sm.Twitch.LoginFailed" xml:space="preserve">
+    <value>Не удалось запросить код входа</value>
+  </data>
+  <data name="Sm.Twitch.LoginHint" xml:space="preserve">
+    <value>Введите этот код на странице Twitch:</value>
+  </data>
+  <data name="Sm.Twitch.LoginCodeShown" xml:space="preserve">
+    <value>Код {0}. Введите его на странице Twitch, затем дождитесь входа.</value>
+  </data>
+  <data name="Sm.Twitch.LoginDone" xml:space="preserve">
+    <value>Вход выполнен как {0}</value>
+  </data>
+  <data name="Sm.Twitch.LoginDenied" xml:space="preserve">
+    <value>Вход отклонён</value>
+  </data>
+  <data name="Sm.Twitch.LoginExpired" xml:space="preserve">
+    <value>Код входа истёк. Запросите новый</value>
+  </data>
+  <data name="Sm.Twitch.Saved" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="Sm.Twitch.SavedNeedLogin" xml:space="preserve">
+    <value>Сохранено. Войдите, чтобы начать читать чат</value>
+  </data>
+  <data name="Sm.Twitch.Status.NotAuthorized" xml:space="preserve">
+    <value>Вход не выполнен</value>
+  </data>
+  <data name="Sm.Twitch.Status.ChatConnected" xml:space="preserve">
+    <value>Чат подключён</value>
+  </data>
+  <data name="Sm.Twitch.Status.ChatDisconnected" xml:space="preserve">
+    <value>Чат не подключён</value>
+  </data>  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
+    <value>Twitch</value>
+  </data>
+  <data name="Sm.Toolbar.TwitchTip" xml:space="preserve">
+    <value>Twitch: вход, чтение чата, статус трансляции</value>
+  </data></root>

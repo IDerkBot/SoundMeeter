@@ -45,6 +45,16 @@ public class AppSettings
     /// <summary>Док-панель в OBS: порт сервера, автостарт и список каналов.</summary>
     public ObsDockSettings ObsDock { get; set; } = new();
 
+    /// <summary>Модуль синтеза речи: включён ли, куда отдавать голос и как его читать (SM-E01).</summary>
+    public TextToSpeechSettings TextToSpeech { get; set; } = new();
+
+    /// <summary>
+    /// Интеграция с Twitch: вход, канал для чтения чата и показ статуса трансляции
+    /// (SM-F01). Отдельный блок от <see cref="TextToSpeech"/>, потому что чат читается
+    /// не только ради озвучки.
+    /// </summary>
+    public TwitchSettings Twitch { get; set; } = new();
+
     /// <summary>
     /// Показывать значок в системном лотке (SM-D02). По умолчанию включено:
     /// микшер уходит на сверху окна и должен оставаться достижимым, а

@@ -110,6 +110,32 @@
                         </StackPanel>
                     </Button>
                     <Button
+                        Click="OnTextToSpeechClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="{DynamicResource Sm.Toolbar.TextToSpeechTip}">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,10,0"
+                                Fill="#9A9A9A"
+                                Kind="TextToSpeech" />
+                            <TextBlock VerticalAlignment="Center" Text="{DynamicResource Sm.Toolbar.TextToSpeech}" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Click="OnTwitchClick"
+                        Style="{StaticResource MenuRow}"
+                        ToolTip="{DynamicResource Sm.Toolbar.TwitchTip}">
+                        <StackPanel Orientation="Horizontal">
+                            <icon:Icon
+                                Width="16"
+                                Fill="#9A9A9A"
+                                Kind="Twitch" />
+                            <TextBlock VerticalAlignment="Center" Text="{DynamicResource Sm.Toolbar.Twitch}" />
+                        </StackPanel>
+                    </Button>
+                    <Button
                         Click="OnCheckUpdatesClick"
                         Style="{StaticResource MenuRow}"
                         ToolTip="{DynamicResource Sm.Toolbar.CheckUpdatesTip}">

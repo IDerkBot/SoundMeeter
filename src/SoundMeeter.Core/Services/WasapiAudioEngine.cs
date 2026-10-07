@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -49,7 +49,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
     // Открытые во время работы объекты
     private readonly Dictionary<string, BusOutput> _openBuses = new();          // по bus.Id
-    private readonly Dictionary<string, InputSource> _sources = new();          // по input.Id
+    private readonly Dictionary<string, ISampleSource> _sources = new();          // по input.Id
     private readonly Dictionary<(string InputId, string BusId), BusTap> _taps = new();
 
     private sealed class BusOutput
@@ -98,7 +98,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
             var catalogIds = new HashSet<string>(_catalog.Select(d => d.DeviceId));
             foreach (var input in InputsInternal)
             {
-                input.IsAvailable = !string.IsNullOrEmpty(input.DeviceId) && catalogIds.Contains(input.DeviceId);
+                input.IsAvailable = input.IsGenerated || IsCatalogued(input.DeviceId, catalogIds);
             }
             foreach (var bus in BusesInternal)
             {
@@ -115,6 +115,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
             // сменилось направление. Тогда возвращаем автоматическое определение.
             foreach (var input in InputsInternal)
             {
+                if (input.IsGenerated) continue;
                 if (string.IsNullOrEmpty(input.AppTargetDeviceId)) continue;
 
                 var target = _catalog.FirstOrDefault(d => SameDevice(d.DeviceId, input.AppTargetDeviceId));
@@ -125,6 +126,13 @@ public sealed class WasapiAudioEngine : IAudioEngine
         ChannelsChanged?.Invoke();
         if (wasRunning) Start();
     }
+
+    /// <summary>
+    /// Есть ли стрип в каталоге устройств. Сгенерированные стрипы проверяются не
+    /// по каталогу: у них нет устройства, и «доступен» такой стрип всегда.
+    /// </summary>
+    private bool IsCatalogued(string deviceId, HashSet<string> catalogIds) =>
+        !string.IsNullOrEmpty(deviceId) && catalogIds.Contains(deviceId);
 
     /// <summary>
     /// Убирает входные стрипы, снимающие loopback'ом выход виртуального кабеля,
@@ -168,6 +176,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
         {
             if (_openBuses.TryGetValue(key.BusId, out var busOut))
                 busOut.Dsp.RemoveInput(_taps[key]);
+            _taps[key].ReleaseExternalReader();
             _taps.Remove(key);
         }
     }
@@ -202,6 +211,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
                 if (_openBuses.TryGetValue(key.BusId, out var busOut))
                     busOut.Dsp.RemoveInput(_taps[key]);
             }
+            foreach (var tap in _taps.Values) tap.ReleaseExternalReader();
             _taps.Clear();
 
             foreach (var source in _sources.Values) source.Dispose();
@@ -313,6 +323,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
             {
                 if (_openBuses.TryGetValue(key.BusId, out var busOut))
                     busOut.Dsp.RemoveInput(_taps[key]);
+                _taps[key].ReleaseExternalReader();
                 _taps.Remove(key);
             }
 
@@ -385,6 +396,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
                 foreach (var key in _taps.Keys.Where(k => k.BusId == busId).ToList())
                 {
                     busOut.Dsp.RemoveInput(_taps[key]);
+                    _taps[key].ReleaseExternalReader();
                     _taps.Remove(key);
                 }
                 try { busOut.Out.Stop(); } catch { }
@@ -439,6 +451,13 @@ public sealed class WasapiAudioEngine : IAudioEngine
                 : (device!.IsMicrophone ? $"MIC {device.Name}" : $"SPK {device.Name}");
             input.IsAvailable = deviceId != null;
 
+            // Назначение устройства возвращает стрипу обычный источник: он больше
+            // не «наполняется кодом», и оставить его сгенерированным значило бы
+            // услышать в миксере два разных источника на одном стрипе — звук
+            // устройства и всё, что в него подмешивает модуль синтеза.
+            // Обратно флаг не ставится: сгенерированный стрип создаёт модуль.
+            input.IsGenerated = false;
+
             if (deviceId != null)
                 _removedDeviceIds.Remove(deviceId);
 
@@ -453,6 +472,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
                 {
                     if (_openBuses.TryGetValue(key.BusId, out var busOut))
                         busOut.Dsp.RemoveInput(_taps[key]);
+                    _taps[key].ReleaseExternalReader();
                     _taps.Remove(key);
                 }
                 if (!string.IsNullOrEmpty(input.DeviceId))
@@ -523,6 +543,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
                     foreach (var key in _taps.Keys.Where(k => k.BusId == busId).ToList())
                     {
                         oldOut.Dsp.RemoveInput(_taps[key]);
+                        _taps[key].ReleaseExternalReader();
                         _taps.Remove(key);
                     }
                     try { oldOut.Out.Stop(); } catch { }
@@ -598,7 +619,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
             // восстанавливаем доступность по текущему каталогу
             var catIds = new HashSet<string>(_catalog.Select(d => d.DeviceId));
             foreach (var input in InputsInternal)
-                input.IsAvailable = !string.IsNullOrEmpty(input.DeviceId) && catIds.Contains(input.DeviceId);
+                input.IsAvailable = input.IsGenerated || IsCatalogued(input.DeviceId, catIds);
             foreach (var bus in BusesInternal)
                 bus.IsAvailable = !string.IsNullOrEmpty(bus.DeviceId) && catIds.Contains(bus.DeviceId);
 
@@ -613,6 +634,83 @@ public sealed class WasapiAudioEngine : IAudioEngine
     public void EnsureRoutingTable()
     {
         lock (_gate) EnsureRoutingTableUnlocked();
+    }
+
+    public string EnsureGeneratedInput(string name)
+    {
+        var wanted = string.IsNullOrWhiteSpace(name) ? "TTS" : name.Trim();
+
+        lock (_gate)
+        {
+            // Поиск по имени, а не по флагу: стрип создаётся один раз, но имя
+            // ему может задать и пользователь (двойной клик по заголовку). Если
+            // он переименовал канал, второй клик по «применить» не должен плодить
+            // ему копию.
+            var existing = InputsInternal.FirstOrDefault(input =>
+                input.IsGenerated &&
+                (string.Equals(input.Name, wanted, StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(input.ChannelName, wanted, StringComparison.OrdinalIgnoreCase)));
+
+            if (existing is not null) return existing.Id;
+
+            var created = new InputChannelModel
+            {
+                Name = wanted,
+                ChannelName = wanted,
+                IsGenerated = true,
+                IsAvailable = true,
+            };
+
+            InputsInternal.Add(created);
+            EnsureRoutingTableUnlocked();
+            _soloState.AnyInputSolo = InputsInternal.Any(i => i.IsSolo);
+
+            _logger.LogInformation("Создан генерируемый вход «{Strip}» (SM-E01)", wanted);
+            ChannelsChanged?.Invoke();
+            return created.Id;
+        }
+    }
+
+    public bool PushAudio(string inputId, ReadOnlySpan<float> samples)
+    {
+        if (samples.IsEmpty) return false;
+
+        lock (_gate)
+        {
+            // Источник есть только у маршрутизированного стрипа на работающем
+            // движке. Создавать его здесь нельзя: писать было бы некуда, и
+            // синтезатор зря потратил бы несколько секунд на фразу, которую
+            // никто не услышит.
+            if (!IsRunning) return false;
+            if (!_sources.TryGetValue(inputId, out var source)) return false;
+
+            source.PushAudio(samples);
+            return true;
+        }
+    }
+
+    public double GetBufferedSeconds(string inputId)
+    {
+        lock (_gate)
+        {
+            if (!IsRunning) return 0;
+            if (!_sources.TryGetValue(inputId, out var source)) return 0;
+
+            // Любой источник, а не только генерируемый: голос, подмешанный в кабельный
+            // стрип, тоже копится в очереди, и модулю речи нужно видеть этот остаток.
+            // Раньше здесь стояло «только генерируемый», и на кабельном стрипе ожидание
+            // конца фразы вырождалось в ноль: фразы копились в кольце и начало
+            // сообщения вытеснялось концом следующего.
+            return source.BufferedSeconds;
+        }
+    }
+
+    public bool ClearBufferedAudio(string inputId)
+    {
+        lock (_gate)
+        {
+            return _sources.TryGetValue(inputId, out var source) && source.ClearPending();
+        }
     }
 
     public void Dispose() => Stop();
@@ -710,7 +808,10 @@ public sealed class WasapiAudioEngine : IAudioEngine
 
         foreach (var input in InputsInternal)
         {
-            if (string.IsNullOrEmpty(input.DeviceId)) continue; // нет источника — не маршрутизируем
+            // Нет источника — не маршрутизируем. Исключение — сгенерированные
+            // стрипы (SM-E01): устройства у них нет и не будет, а звук в них
+            // кладёт код приложения, так что маршрут для них осмыслен.
+            if (!input.IsGenerated && string.IsNullOrEmpty(input.DeviceId)) continue;
 
             foreach (var pair in input.BusRouting)
             {
@@ -729,7 +830,11 @@ public sealed class WasapiAudioEngine : IAudioEngine
                     // Тап получает живой объект маршрута: посылка GainDb читается
                     // из него на каждом пакете, поэтому правка уровня в UI слышна
                     // без пересоздания тапа (SM-A02).
-                    var tap = new BusTap(source.OpenCursor(), input, pair.Value, _soloState);
+                    //
+                    // Очередь внешнего звука обязательна здесь, а не в источнике:
+                    // кольцо стрипа с устройством занято захватом, и подмешивать в
+                    // него нельзя (см. SampleQueue).
+                    var tap = new BusTap(source.OpenCursor(), input, pair.Value, _soloState, extra: source.External);
                     busOut.Dsp.AddInput(tap);
                     _taps[key] = tap;
                 }
@@ -746,6 +851,7 @@ public sealed class WasapiAudioEngine : IAudioEngine
         {
             if (_openBuses.TryGetValue(key.BusId, out var busOut))
                 busOut.Dsp.RemoveInput(_taps[key]);
+            _taps[key].ReleaseExternalReader();
             _taps.Remove(key);
         }
 
@@ -764,22 +870,38 @@ public sealed class WasapiAudioEngine : IAudioEngine
     private string NameOf(string stripId) =>
         InputsInternal.FirstOrDefault(i => i.Id == stripId)?.Name ?? stripId;
 
-    private InputSource? GetOrCreateSourceUnlocked(InputChannelModel input)
+    /// <summary>
+    /// Источник стрипа: устройство WASAPI либо, для сгенерированного стрипа
+    /// (SM-E01), источник, наполняемый кодом приложения. Оба реализуют
+    /// <see cref="ISampleSource"/>, поэтому дальше по коду разницы нет — различие
+    /// целиком внутри источника.
+    /// </summary>
+    private ISampleSource? GetOrCreateSourceUnlocked(InputChannelModel input)
     {
         if (_sources.TryGetValue(input.Id, out var existing)) return existing;
 
-        var source = new InputSource(input);
-        try
+        ISampleSource source;
+        if (input.IsGenerated)
         {
-            source.Start();
+            // Устройства нет, открывать нечего: источник просыпается сам, при
+            // первых сэмплах (см. SyntheticInputSource).
+            source = new SyntheticInputSource(input);
             _sources[input.Id] = source;
             return source;
+        }
+
+        var captured = new InputSource(input);
+        try
+        {
+            captured.Start();
+            _sources[input.Id] = captured;
+            return captured;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Source «{Strip}» (device={Device}) failed, HRESULT=0x{HResult:X8}: {Message}",
                 input.Name, input.DeviceId, ex.HResult, ex.Message);
-            source.Dispose();
+            captured.Dispose();
             return null;
         }
     }
@@ -858,12 +980,19 @@ public sealed class WasapiAudioEngine : IAudioEngine
         }
     }
 
+    /// <summary>
+    /// Копия стрипа для снимка и для пресета. Список полей перечислен явно, а не
+    /// через рефлексию: забытое здесь поле выглядит как «настройка есть в
+    /// интерфейсе, но после перезапуска сбросилась», и заметить это можно
+    /// только на живом микшере.
+    /// </summary>
     private static InputChannelModel CloneInput(InputChannelModel source) => new()
     {
         Id = source.Id,
         Name = source.Name,
         ChannelName = source.ChannelName,
         IsMicrophone = source.IsMicrophone,
+        IsGenerated = source.IsGenerated,
         DeviceId = source.DeviceId,
         AppTargetDeviceId = source.AppTargetDeviceId,
         VolumeDb = source.VolumeDb,

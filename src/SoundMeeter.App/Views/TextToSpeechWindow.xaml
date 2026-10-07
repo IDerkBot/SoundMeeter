@@ -1,0 +1,375 @@
+<Window
+    x:Class="SoundMeeter.Views.TextToSpeechWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{DynamicResource Sm.Tts.Title}"
+    Width="700"
+    Height="720"
+    MinWidth="620"
+    MinHeight="560"
+    Background="#1E1E1E"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+    <!--
+        Настройки модуля синтеза речи (SM-E01).
+
+        Отдельное окно, а не попап стрипа, по двум причинам. Первая: список голосов
+        пользователей растёт вместе с модераторами, и в попап он не помещается.
+        Вторая: проверка разбора команд на живой реплике — единственный способ
+        убедиться, что всё настроено верно, не дожидаясь подключения к чату, и для
+        неё нужны и логин, и текст, и кнопка.
+
+        Модесное (Show, а не ShowDialog): пока окно открыто, можно слышать
+        результат — иначе настраивать голос пришлось бы вслепую.
+
+        DataContext — TextToSpeechSettingsViewModel.
+    -->
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="GroupLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="#9A9A9A" />
+                <Setter Property="Margin" Value="2,0,0,4" />
+            </Style>
+
+            <Style x:Key="Hint" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="Foreground" Value="#8C8C8C" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="FieldLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Foreground" Value="#CCC" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+            </Style>
+
+            <Style x:Key="FieldValue" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Margin" Value="8,0,0,0" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Foreground" Value="#CCC" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Включение  -->
+        <StackPanel Grid.Row="0">
+            <CheckBox
+                Content="{DynamicResource Sm.Tts.Enable}"
+                IsChecked="{Binding Enabled}"
+                ToolTip="{DynamicResource Sm.Tts.EnableTip}" />
+            <TextBlock
+                Margin="22,4,0,0"
+                Style="{StaticResource Hint}"
+                Text="{Binding VoiceHint}" />
+        </StackPanel>
+
+        <!--  Куда отдавать голос  -->
+        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+            <TextBlock Style="{StaticResource GroupLabel}" Text="{DynamicResource Sm.Tts.Target}" />
+            <ComboBox
+                DisplayMemberPath="Title"
+                IsEnabled="{Binding Enabled}"
+                ItemsSource="{Binding Targets}"
+                SelectedItem="{Binding SelectedTarget}"
+                VerticalContentAlignment="Center" />
+            <TextBlock
+                Margin="2,4,0,0"
+                Style="{StaticResource Hint}"
+                Text="{Binding TargetHint}" />
+        </StackPanel>
+
+        <!--  Голос, темп, громкость  -->
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                <TextBlock Style="{StaticResource GroupLabel}" Text="{DynamicResource Sm.Tts.DefaultVoice}" />
+                <ComboBox
+                    DisplayMemberPath="Title"
+                    IsEnabled="{Binding Enabled}"
+                    ItemsSource="{Binding Voices}"
+                    SelectedItem="{Binding SelectedVoice}"
+                    VerticalContentAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Width="86"
+                        Style="{StaticResource FieldLabel}"
+                        Text="{DynamicResource Sm.Tts.Rate}" />
+                    <Slider
+                        Width="110"
+                        IsEnabled="{Binding Enabled}"
+                        IsSnapToTickEnabled="True"
+                        Maximum="10"
+                        Minimum="-10"
+                        TickFrequency="1"
+                        Value="{Binding Rate, Mode=TwoWay}" />
+                    <TextBlock
+                        Width="26"
+                        Style="{StaticResource FieldValue}"
+                        Text="{Binding Rate, Mode=OneWay, StringFormat={}{0}}" />
+                </StackPanel>
+                <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                    <TextBlock
+                        Width="86"
+                        Style="{StaticResource FieldLabel}"
+                        Text="{DynamicResource Sm.Tts.Volume}" />
+                    <Slider
+                        Width="110"
+                        IsEnabled="{Binding Enabled}"
+                        IsSnapToTickEnabled="True"
+                        Maximum="100"
+                        Minimum="0"
+                        TickFrequency="5"
+                        Value="{Binding Volume, Mode=TwoWay}" />
+                    <TextBlock
+                        Width="26"
+                        Style="{StaticResource FieldValue}"
+                        Text="{Binding Volume, Mode=OneWay, StringFormat={}{0}}" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!--  Команды чата и пределы  -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Style="{StaticResource GroupLabel}" Text="{DynamicResource Sm.Tts.SpeakCommand}" />
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Width="86"
+                    Style="{StaticResource FieldLabel}"
+                    Text="{DynamicResource Sm.Tts.SpeakCommand}" />
+                <TextBox
+                    Width="130"
+                    IsEnabled="{Binding Enabled}"
+                    Text="{Binding SpeakCommandText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Width="90"
+                    Margin="14,0,8,0"
+                    Style="{StaticResource FieldLabel}"
+                    Text="{DynamicResource Sm.Tts.VoiceCommand}" />
+                <TextBox
+                    Width="130"
+                    IsEnabled="{Binding Enabled}"
+                    Text="{Binding VoiceCommandText, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <CheckBox
+                Margin="0,6,0,0"
+                Content="{DynamicResource Sm.Tts.AllowVoiceChange}"
+                IsChecked="{Binding AllowVoiceChange}"
+                IsEnabled="{Binding Enabled}" />
+
+            <UniformGrid Margin="0,8,0,0" Columns="3">
+                <StackPanel Margin="0,0,6,0">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource Sm.Tts.MaxQueue}" />
+                    <TextBox
+                        IsEnabled="{Binding Enabled}"
+                        Text="{Binding MaxQueueLength, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="6,0">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource Sm.Tts.MaxPerMinute}" />
+                    <TextBox
+                        IsEnabled="{Binding Enabled}"
+                        Text="{Binding MaxMessagesPerMinute, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="6,0,0,0">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource Sm.Tts.MaxChars}" />
+                    <TextBox
+                        IsEnabled="{Binding Enabled}"
+                        Text="{Binding MaxMessageChars, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </UniformGrid>
+
+            <TextBlock
+                Margin="0,8,0,0"
+                Style="{StaticResource FieldLabel}"
+                Text="{DynamicResource Sm.Tts.IgnoredUsers}" />
+            <TextBox
+                IsEnabled="{Binding Enabled}"
+                Text="{Binding IgnoredUsersText, UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="{DynamicResource Sm.Tts.IgnoredUsers}" />
+        </StackPanel>
+
+        <!--  Голоса пользователей и проверка разбора команд  -->
+        <Grid Grid.Row="4" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.Column="0" Margin="0,0,6,0">
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Style="{StaticResource GroupLabel}"
+                    Text="{DynamicResource Sm.Tts.UserVoices}" />
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Margin="0,0,0,6"
+                    Style="{StaticResource Hint}"
+                    Text="{DynamicResource Sm.Tts.UserVoicesHint}" />
+
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <TextBlock
+                        Width="86"
+                        Style="{StaticResource FieldLabel}"
+                        Text="{DynamicResource Sm.Tts.UserLabel}" />
+                    <TextBox
+                        Width="120"
+                        IsEnabled="{Binding Enabled}"
+                        Text="{Binding NewUserText, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        Width="120"
+                        Margin="6,0,0,0"
+                        DisplayMemberPath="Title"
+                        IsEnabled="{Binding Enabled}"
+                        ItemsSource="{Binding Voices}"
+                        SelectedItem="{Binding NewUserVoice}"
+                        VerticalContentAlignment="Center" />
+                    <Button
+                        Margin="6,0,0,0"
+                        Command="{Binding AddUserVoiceCommand}"
+                        Content="{DynamicResource Sm.Tts.AddVoice}" />
+                </StackPanel>
+
+                <ListBox
+                    Background="#2B2B2B"
+                    BorderBrush="#3F3F46"
+                    IsEnabled="{Binding Enabled}"
+                    ItemsSource="{Binding UserVoices}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="10"
+                                    Text="{Binding DisplayName}"
+                                    TextTrimming="CharacterEllipsis"
+                                    ToolTip="{Binding DisplayName}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Command="{Binding RemoveCommand}"
+                                    Content="{DynamicResource Sm.Tts.RemoveVoice}"
+                                    Style="{StaticResource MenuRow}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <DockPanel Grid.Column="1" Margin="6,0,0,0">
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Style="{StaticResource GroupLabel}"
+                    Text="{DynamicResource Sm.Tts.Test}" />
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Margin="0,0,0,6"
+                    Style="{StaticResource Hint}"
+                    Text="{DynamicResource Sm.Tts.TestHint}" />
+
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <TextBlock
+                        Width="86"
+                        Style="{StaticResource FieldLabel}"
+                        Text="{DynamicResource Sm.Tts.TestUser}" />
+                    <TextBox
+                        Width="130"
+                        IsEnabled="{Binding Enabled}"
+                        Text="{Binding TestUserText, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button
+                        Margin="6,0,0,0"
+                        Command="{Binding TestMessageCommand}"
+                        Content="{DynamicResource Sm.Tts.Test}"
+                        IsEnabled="{Binding CanSpeakNow}" />
+                </StackPanel>
+
+                <TextBox
+                    AcceptsReturn="True"
+                    IsEnabled="{Binding Enabled}"
+                    Text="{Binding TestTextText, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="Wrap"
+                    VerticalContentAlignment="Top" />
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="11"
+                        Foreground="#9A9A9A"
+                        Text="{Binding Status}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Margin="8,0,0,0"
+                        Command="{Binding StopSpeakingCommand}"
+                        Content="{DynamicResource Sm.Tts.Stop}"
+                        IsEnabled="{Binding Enabled}" />
+                    <Button
+                        Margin="6,0,0,0"
+                        Command="{Binding ClearQueueCommand}"
+                        Content="{DynamicResource Sm.Tts.ClearQueue}" />
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+
+        <!--  Результат последнего действия и кнопки  -->
+        <StackPanel Grid.Row="5" Margin="0,12,0,0">
+            <TextBlock
+                FontSize="10"
+                Foreground="#7CC48B"
+                Text="{Binding Feedback}"
+                TextWrapping="Wrap"
+                Visibility="{Binding IsStatusOk, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock
+                Margin="0,4,0,0"
+                FontSize="10"
+                Foreground="#E08A8A"
+                Text="{Binding Feedback}"
+                TextWrapping="Wrap"
+                Visibility="{Binding IsStatusOk, Converter={StaticResource InverseBoolToVisibility}}" />
+
+            <StackPanel
+                Margin="0,12,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Command="{Binding ApplyCommand}"
+                    Content="{DynamicResource Sm.Common.Apply}"
+                    IsDefault="True" />
+                <Button
+                    Margin="8,0,0,0"
+                    Click="OnCloseClick"
+                    Content="{DynamicResource Sm.Common.Close}"
+                    IsCancel="True" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

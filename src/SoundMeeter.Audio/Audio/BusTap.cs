@@ -37,13 +37,34 @@ public sealed class BusTap : ISampleProvider
     private readonly RingCursor _cursor;
     private readonly float[] _scratch;
 
+    /// <summary>
+    /// Звук, подмешанный в стрип снаружи (модуль синтеза речи), либо null.
+    ///
+    /// Складывается здесь, а не пишется в кольцо источника, и это единственно
+    /// возможное место. Кольцо стрипа с устройством уже занято: loopback-захват
+    /// кладёт в него ровно столько, сколько шина забирает, — свободной полосы
+    /// нет. Добавление туда второй полосы переполняло бы кольцо мгновенно, и
+    /// читатель перескакивал бы к последней секунде сообщения.
+    ///
+    /// Полосу здесь задаёт выходное устройство, поэтому внешний звук забирается
+    /// ровно в том темпе, в котором уходит в шину, и отдельный поток-задающий-
+    /// темп не нужен вовсе.
+    /// </summary>
+    private readonly SampleQueue.Reader? _extra;
+
+    private float[]? _extraBuffer;
+
     public BusTap(RingCursor cursor, InputChannelModel input, BusRouting routing, SoloState solo,
-        int readBlockSize = 4096)
+        int readBlockSize = 4096, SampleQueue? extra = null)
     {
         _cursor = cursor;
         _input = input;
         _routing = routing;
         _solo = solo;
+
+        // Свой читатель на каждый тап: иначе две шины разделили бы фразу между собой
+        // (см. SampleQueue). Ни одного читателя не остаётся — речь копить незачем.
+        _extra = extra?.OpenReader();
         _scratch = new float[Math.Max(readBlockSize, 512)];
     }
 
@@ -73,17 +94,27 @@ public sealed class BusTap : ISampleProvider
         return requested;
     }
 
-    /// <summary>
-    /// Один блок чтения: кольцо → scratch → gain → <paramref name="target"/>.
+/// <summary>
+    /// Один блок чтения: кольцо + внешний звук → gain → <paramref name="target"/>.
     /// </summary>
     private void ReadInto(Span<float> target, int count)
     {
-        // Читаем из кольца столько, сколько есть; остальное — тишина.
-        int read = _cursor.Read(_scratch, count);
-        if (read < count)
-            Array.Clear(_scratch, read, count - read);
+        // Читаем из кольца сколько есть; остальное — тишина.
+        int fromRing = _cursor.Read(_scratch, count);
+        if (fromRing < count)
+            Array.Clear(_scratch, fromRing, count - fromRing);
 
-        var source = _scratch.AsSpan(0, count);
+        // Внешний звук складываем с кольцом в target: держать ради этого ещё один
+        // буфер на каждый тап дороже лишнего сложения.
+        int fromExtra = 0;
+        if (_extra is not null)
+        {
+            if (_extraBuffer is null || _extraBuffer.Length < count) _extraBuffer = new float[count];
+            fromExtra = _extra.Read(_extraBuffer, count);
+            if (fromExtra < count) Array.Clear(_extraBuffer, fromExtra, count - fromExtra);
+        }
+
+        var ring = _scratch.AsSpan(0, count);
 
         bool blockedBySolo = _solo.AnyInputSolo && !_input.IsSolo;
         bool muted = _input.IsMuted || blockedBySolo;
@@ -99,12 +130,21 @@ public sealed class BusTap : ISampleProvider
         if (!float.IsFinite(gain) || gain == 0f) gain = 0f;
         else if (gain > 4f) gain = 4f; // +12 дБ — предел разумного для одной посылки
 
-        // Всегда перезаписываем буфер целиком — микшер суммирует входы сам.
+        // ВАЖНО: my input должен ПЕРЕЗАПИСЫВАТЬ буфер образца для MixingSampleProvider
+        // (микшер сам суммирует все входы в общий буфер). Накопление через `+=` по
+        // самому буферу запрещено — микшер переиспользует один общий sourceBuffer без
+        // очистки, поэтому `+=` прибавил бы каждый кадр к остатку предыдущего и сигнал
+        // ушёл бы в клипп. Сложение ниже — это сложение ДВУХ разных источников
+        // (кольцо стрипа и внешний звук), а не накопление по блокам.
         float peak = 0f;
         for (int i = 0; i < count; i++)
         {
-            float s = source[i] * gain;
+            float s = ring[i];
+            if (fromExtra > i) s += _extraBuffer![i];
+
+            s *= gain;
             if (!float.IsFinite(s)) s = 0f;
+
             target[i] = s;
             float abs = MathF.Abs(s);
             if (abs > peak) peak = abs;
@@ -113,6 +153,13 @@ public sealed class BusTap : ISampleProvider
         // VU-уровень входа (обновляется аудио-потоком, читается UI)
         _input.PeakLevel = peak;
     }
+
+    /// <summary>
+    /// Тап снят с шины — его читатель больше не нужен. Пока тап жив, читатель держит
+    /// очередь от разрастания, а после удаления его позиция перестаёт удерживать
+    /// данные, и они освобождаются (см. <see cref="SampleQueue"/>).
+    /// </summary>
+    public void ReleaseExternalReader() => _extra?.Owner.CloseReader(_extra);
 
     /// <summary>дБ -> линейный коэффициент с защитой от нечисловых значений.</summary>
     internal static float DbToLinear(float db)

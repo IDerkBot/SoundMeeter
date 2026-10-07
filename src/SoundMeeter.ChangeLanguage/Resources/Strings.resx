@@ -1188,4 +1188,278 @@
   <data name="Sm.Tray.Exit" xml:space="preserve">
    <value>Exit</value>
   </data>
-</root>
+  <data name="Sm.Toolbar.TextToSpeech" xml:space="preserve">
+    <value>Text to speech</value>
+  </data>
+  <data name="Sm.Toolbar.TextToSpeechTip" xml:space="preserve">
+    <value>Text to speech: target input strip, voices and chat commands</value>
+  </data>
+  <data name="Sm.Tts.Title" xml:space="preserve">
+    <value>Text to speech</value>
+  </data>
+  <data name="Sm.Tts.Enable" xml:space="preserve">
+    <value>Speak messages from chat</value>
+  </data>
+  <data name="Sm.Tts.EnableTip" xml:space="preserve">
+    <value>The module accepts chat messages while SoundMeeter is running</value>
+  </data>
+  <data name="Sm.Tts.Target" xml:space="preserve">
+    <value>Send voice to:</value>
+  </data>
+  <data name="Sm.Tts.TargetHintStrip" xml:space="preserve">
+    <value>Voice goes to the channel {0}. Route it to an output as any other strip.</value>
+  </data>
+  <data name="Sm.Tts.TargetHintGenerated" xml:space="preserve">
+    <value>Voice goes to its own channel {0}. It has no device - enable its route to an output.</value>
+  </data>
+  <data name="Sm.Tts.GeneratedTarget" xml:space="preserve">
+    <value>Own channel TTS (created automatically)</value>
+  </data>
+  <data name="Sm.Tts.NoTarget" xml:space="preserve">
+    <value>No channel selected. Speech has nowhere to go.</value>
+  </data>
+  <data name="Sm.Tts.DefaultVoice" xml:space="preserve">
+    <value>Default voice:</value>
+  </data>
+  <data name="Sm.Tts.NoVoicesHint" xml:space="preserve">
+    <value>Windows reports no installed voices</value>
+  </data>
+  <data name="Sm.Tts.RussianVoiceFound" xml:space="preserve">
+    <value>{0} of {1} installed voices speak Russian</value>
+  </data>
+  <data name="Sm.Tts.NoRussianVoice" xml:space="preserve">
+    <value>{0} installed voices, none of them Russian - speech will sound wrong. Install a Russian voice in Windows Settings &gt; Time &amp; language &gt; Speech.</value>
+  </data>
+  <data name="Sm.Tts.Rate" xml:space="preserve">
+    <value>Speech rate:</value>
+  </data>
+  <data name="Sm.Tts.Volume" xml:space="preserve">
+    <value>Volume:</value>
+  </data>
+  <data name="Sm.Tts.SpeakCommand" xml:space="preserve">
+    <value>Speech command:</value>
+  </data>
+  <data name="Sm.Tts.VoiceCommand" xml:space="preserve">
+    <value>Voice command:</value>
+  </data>
+  <data name="Sm.Tts.AllowVoiceChange" xml:space="preserve">
+    <value>Let chat pick a voice with the voice command</value>
+  </data>
+  <data name="Sm.Tts.MaxQueue" xml:space="preserve">
+    <value>Queue length:</value>
+  </data>
+  <data name="Sm.Tts.MaxPerMinute" xml:space="preserve">
+    <value>Messages per minute per user:</value>
+  </data>
+  <data name="Sm.Tts.MaxChars" xml:space="preserve">
+    <value>Message length:</value>
+  </data>
+  <data name="Sm.Tts.IgnoredUsers" xml:space="preserve">
+    <value>Ignored users:</value>
+  </data>
+  <data name="Sm.Tts.UserVoices" xml:space="preserve">
+    <value>Voices of chat users</value>
+  </data>
+  <data name="Sm.Tts.UserVoicesHint" xml:space="preserve">
+    <value>A user picks a voice with the voice command; the choice is saved right away</value>
+  </data>
+  <data name="Sm.Tts.UserLabel" xml:space="preserve">
+    <value>User:</value>
+  </data>
+  <data name="Sm.Tts.AddVoice" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Sm.Tts.RemoveVoice" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Sm.Tts.NeedUserAndVoice" xml:space="preserve">
+    <value>Enter a user name and pick a voice</value>
+  </data>
+  <data name="Sm.Tts.UserVoiceAdded" xml:space="preserve">
+    <value>{0} will speak with the voice {1}</value>
+  </data>
+  <data name="Sm.Tts.UserVoiceRemoved" xml:space="preserve">
+    <value>{0} returns to the default voice</value>
+  </data>
+  <data name="Sm.Tts.Test" xml:space="preserve">
+    <value>Check parsing</value>
+  </data>
+  <data name="Sm.Tts.TestHint" xml:space="preserve">
+    <value>Enter a chat line exactly as a viewer would write it, commands included</value>
+  </data>
+  <data name="Sm.Tts.TestUser" xml:space="preserve">
+    <value>From user:</value>
+  </data>
+  <data name="Sm.Tts.NeedTestText" xml:space="preserve">
+    <value>Enter a message to check</value>
+  </data>
+  <data name="Sm.Tts.NotACommand" xml:space="preserve">
+    <value>Not a TTS command - the module ignores this line</value>
+  </data>
+  <data name="Sm.Tts.Stop" xml:space="preserve">
+    <value>Stop now</value>
+  </data>
+  <data name="Sm.Tts.ClearQueue" xml:space="preserve">
+    <value>Clear queue</value>
+  </data>
+  <data name="Sm.Tts.Saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="Sm.Tts.Queued" xml:space="preserve">
+    <value>Queued: {0}</value>
+  </data>
+  <data name="Sm.Tts.EngineUnavailable" xml:space="preserve">
+    <value>Speech synthesis is unavailable: {0}</value>
+  </data>
+  <data name="Sm.Tts.NoVoices" xml:space="preserve">
+    <value>No voices are installed in Windows - there is nothing to speak with</value>
+  </data>
+  <data name="Sm.Tts.Status.Running" xml:space="preserve">
+    <value>Running, waiting for messages</value>
+  </data>
+  <data name="Sm.Tts.Status.Off" xml:space="preserve">
+    <value>Module is off</value>
+  </data>
+  <data name="Sm.Tts.Status.Stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="Sm.Tts.Status.Queued" xml:space="preserve">
+    <value>In queue: {0}</value>
+  </data>
+  <data name="Sm.Tts.Status.Speaking" xml:space="preserve">
+    <value>{0} speaks with the voice {1}</value>
+  </data>
+  <data name="Sm.Tts.Status.VoiceAssigned" xml:space="preserve">
+    <value>{0}: voice {1} saved</value>
+  </data>
+  <data name="Sm.Tts.Status.VoiceChangeOff" xml:space="preserve">
+    <value>Picking a voice from chat is turned off in the settings</value>
+  </data>
+  <data name="Sm.Tts.Status.UnknownVoice" xml:space="preserve">
+    <value>There is no voice named {0} in this system</value>
+  </data>
+  <data name="Sm.Tts.Status.EmptyText" xml:space="preserve">
+    <value>{0}: the command is there but there is nothing to say</value>
+  </data>
+  <data name="Sm.Tts.Status.RateLimited" xml:space="preserve">
+    <value>{0}: more than {1} messages a minute, skipped</value>
+  </data>
+  <data name="Sm.Tts.Status.NoTarget" xml:space="preserve">
+    <value>Speech is not possible: no target channel is selected</value>
+  </data>
+  <data name="Sm.Tts.Status.NotDelivered" xml:space="preserve">
+    <value>The phrase did not reach the mixer: check that channel {0} is routed and the engine is running</value>
+  </data>
+  <data name="Sm.Tts.Status.NoVoices" xml:space="preserve">
+    <value>Speech is not possible: no voices in Windows</value>
+  </data>
+  <data name="Sm.Tts.Status.SynthesisFailed" xml:space="preserve">
+    <value>Synthesis failed: {0}</value>
+  </data>
+  <data name="Sm.Tts.Status.Ignored" xml:space="preserve">
+    <value>{0} is on the ignore list</value>
+  </data>
+  <data name="Sm.Twitch.Title" xml:space="preserve">
+    <value>Twitch</value>
+  </data>
+  <data name="Sm.Twitch.Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Sm.Twitch.AccountLabel" xml:space="preserve">
+    <value>Signed in as</value>
+  </data>
+  <data name="Sm.Twitch.Login" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="Sm.Twitch.Logout" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="Sm.Twitch.LoggedOut" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="Sm.Twitch.OpenConsole" xml:space="preserve">
+    <value>Open Twitch console</value>
+  </data>
+  <data name="Sm.Twitch.OpenActivation" xml:space="preserve">
+    <value>Open activation page</value>
+  </data>
+  <data name="Sm.Twitch.Chat" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="Sm.Twitch.Channel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="Sm.Twitch.ChannelHint" xml:space="preserve">
+    <value>Channel whose chat is read. Fill in the login without @. Required.</value>
+  </data>
+  <data name="Sm.Twitch.ChannelSet" xml:space="preserve">
+    <value>Chat of this channel is read. Stream: {0}</value>
+  </data>
+  <data name="Sm.Twitch.Enable" xml:space="preserve">
+    <value>Read chat</value>
+  </data>
+  <data name="Sm.Twitch.ShowStreamStatus" xml:space="preserve">
+    <value>Show whether the stream is live</value>
+  </data>
+  <data name="Sm.Twitch.StreamTitle" xml:space="preserve">
+    <value>Stream</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="Sm.Twitch.Stream.Unknown" xml:space="preserve">
+    <value>Status unknown</value>
+  </data>
+  <data name="Sm.Twitch.Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Sm.Twitch.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Sm.Twitch.NotConfigured" xml:space="preserve">
+    <value>This build has no Twitch client ID, so signing in is impossible. Register an application in the Twitch console and add its client ID to the code, then rebuild.</value>
+  </data>
+  <data name="Sm.Twitch.LoginStarting" xml:space="preserve">
+    <value>Requesting a sign-in code…</value>
+  </data>
+  <data name="Sm.Twitch.LoginFailed" xml:space="preserve">
+    <value>Could not request a sign-in code</value>
+  </data>
+  <data name="Sm.Twitch.LoginHint" xml:space="preserve">
+    <value>Enter this code on the Twitch page:</value>
+  </data>
+  <data name="Sm.Twitch.LoginCodeShown" xml:space="preserve">
+    <value>Code {0}. Enter it on the Twitch page, then wait for the sign-in.</value>
+  </data>
+  <data name="Sm.Twitch.LoginDone" xml:space="preserve">
+    <value>Signed in as {0}</value>
+  </data>
+  <data name="Sm.Twitch.LoginDenied" xml:space="preserve">
+    <value>Sign-in was rejected</value>
+  </data>
+  <data name="Sm.Twitch.LoginExpired" xml:space="preserve">
+    <value>The sign-in code expired. Request a new one</value>
+  </data>
+  <data name="Sm.Twitch.Saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="Sm.Twitch.SavedNeedLogin" xml:space="preserve">
+    <value>Saved. Sign in to start reading chat</value>
+  </data>
+  <data name="Sm.Twitch.Status.NotAuthorized" xml:space="preserve">
+    <value>Not signed in</value>
+  </data>
+  <data name="Sm.Twitch.Status.ChatConnected" xml:space="preserve">
+    <value>Chat connected</value>
+  </data>
+  <data name="Sm.Twitch.Status.ChatDisconnected" xml:space="preserve">
+    <value>Chat not connected</value>
+  </data>  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
+    <value>Twitch</value>
+  </data>
+  <data name="Sm.Toolbar.TwitchTip" xml:space="preserve">
+    <value>Twitch: sign in, read chat, show whether the stream is live</value>
+  </data></root>

@@ -69,9 +69,97 @@ public class LocTests
         }
     }
 
-    [Fact]
-    public void SwitchingLanguageChangesTheText()
+    /// <summary>
+    /// Строки модуля синтеза речи (SM-E01) — и в разметке, и в коде, причём
+    /// половина считается в ViewModel, а не берётся из словаря. Пропавшая строка
+    /// показывается как ⟨Sm.Tts.Ключ⟩, и для строки статуса это выглядит как
+    /// «модуль сломан», а не как «забыли перевод».
+    /// </summary>
+    [Theory]
+    [InlineData("Sm.Toolbar.TextToSpeech")]
+    [InlineData("Sm.Toolbar.TextToSpeechTip")]
+    [InlineData("Sm.Tts.Title")]
+    [InlineData("Sm.Tts.Enable")]
+    [InlineData("Sm.Tts.Target")]
+    [InlineData("Sm.Tts.TargetHintStrip")]
+    [InlineData("Sm.Tts.TargetHintGenerated")]
+    [InlineData("Sm.Tts.GeneratedTarget")]
+    [InlineData("Sm.Tts.NoTarget")]
+    [InlineData("Sm.Tts.DefaultVoice")]
+    [InlineData("Sm.Tts.NoVoicesHint")]
+    [InlineData("Sm.Tts.RussianVoiceFound")]
+    [InlineData("Sm.Tts.NoRussianVoice")]
+    [InlineData("Sm.Tts.Rate")]
+    [InlineData("Sm.Tts.Volume")]
+    [InlineData("Sm.Tts.SpeakCommand")]
+    [InlineData("Sm.Tts.VoiceCommand")]
+    [InlineData("Sm.Tts.AllowVoiceChange")]
+    [InlineData("Sm.Tts.MaxQueue")]
+    [InlineData("Sm.Tts.MaxPerMinute")]
+    [InlineData("Sm.Tts.MaxChars")]
+    [InlineData("Sm.Tts.IgnoredUsers")]
+    [InlineData("Sm.Tts.UserVoices")]
+    [InlineData("Sm.Tts.UserLabel")]
+    [InlineData("Sm.Tts.AddVoice")]
+    [InlineData("Sm.Tts.RemoveVoice")]
+    [InlineData("Sm.Tts.UserVoiceAdded")]
+    [InlineData("Sm.Tts.UserVoiceRemoved")]
+    [InlineData("Sm.Tts.Test")]
+    [InlineData("Sm.Tts.TestHint")]
+    [InlineData("Sm.Tts.TestUser")]
+    [InlineData("Sm.Tts.NeedTestText")]
+    [InlineData("Sm.Tts.NeedUserAndVoice")]
+    [InlineData("Sm.Tts.NotACommand")]
+    [InlineData("Sm.Tts.Stop")]
+    [InlineData("Sm.Tts.ClearQueue")]
+    [InlineData("Sm.Tts.Saved")]
+    [InlineData("Sm.Tts.Queued")]
+    [InlineData("Sm.Tts.EngineUnavailable")]
+    [InlineData("Sm.Tts.NoVoices")]
+    [InlineData("Sm.Tts.Status.Running")]
+    [InlineData("Sm.Tts.Status.Off")]
+    [InlineData("Sm.Tts.Status.Stopped")]
+    [InlineData("Sm.Tts.Status.Queued")]
+    [InlineData("Sm.Tts.Status.Speaking")]
+    [InlineData("Sm.Tts.Status.VoiceAssigned")]
+    [InlineData("Sm.Tts.Status.VoiceChangeOff")]
+    [InlineData("Sm.Tts.Status.UnknownVoice")]
+    [InlineData("Sm.Tts.Status.EmptyText")]
+    [InlineData("Sm.Tts.Status.RateLimited")]
+    [InlineData("Sm.Tts.Status.NoTarget")]
+    [InlineData("Sm.Tts.Status.NotDelivered")]
+    [InlineData("Sm.Tts.Status.NoVoices")]
+    [InlineData("Sm.Tts.Status.SynthesisFailed")]
+    public void TextToSpeechStringsExistInBothLanguages(string key)
     {
+        // Язык — статическое состояние на весь процесс: без возврата следующий тест
+        // в этом же процессе читал бы чужой язык.
+        string original = Loc.Culture.Name;
+        try
+        {
+            foreach (string code in new[] { Loc.English, Loc.Russian })
+            {
+                Loc.ForceLanguage(code);
+
+                // Аргументы подставляются всегда: у части строк есть {0}, и без них
+                // проверка «не осталось плейсхолдера» ловила бы их как ошибку.
+                // Лишние аргументы строке без плейсхолдеров не мешают.
+                string value = Loc.Get(key, "1", "2");
+
+                Assert.NotEqual($"⟨{key}⟩", value);
+                Assert.NotEmpty(value);
+                Assert.DoesNotContain("{0}", value);
+                Assert.DoesNotContain("{1}", value);
+            }
+        }
+        finally
+        {
+            Loc.ForceLanguage(original);
+        }
+    }
+
+    [Fact]
+    public void SwitchingLanguageChangesTheText()    {
         // Ключ взят из Sm.Common.*, а не Sm.Strip.*: там есть русские переводы.
         // На «MUTE» проверка была бы пустой — «MUTE» по-русски тоже «MUTE».
         const string Key = "Sm.Common.Ok";

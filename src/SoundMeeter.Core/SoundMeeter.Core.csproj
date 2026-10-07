@@ -60,6 +60,11 @@
     <!-- WasapiAudioEngine, AudioService и MidiService живут здесь, поэтому NAudio
          нужен ядру напрямую (в приложении кода на NAudio больше нет). -->
     <PackageReference Include="NAudio" Version="3.1.0" />
+    <!-- Модуль синтеза речи (SM-E01): SAPI — системный синтезатор Windows с
+         голосами, установленными в системе (в том числе русскими). Своих моделей
+         пакет не тянет: System.Speech — это обёртка над SAPI5, поэтому модуль
+         работает офлайн и не требует ни ключей, ни сети. -->
+    <PackageReference Include="System.Speech" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>

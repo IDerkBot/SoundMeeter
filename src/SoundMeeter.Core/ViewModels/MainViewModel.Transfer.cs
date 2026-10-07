@@ -58,6 +58,13 @@ public partial class MainViewModel
         // выключении. Само значение порта уже в снимке.
         ApplyDockSettings(_settings.Settings.ObsDock, saveNow: false);
 
+        // Модуль синтеза речи (SM-E01): настройки уже в живом снимке, но модуль
+        // надо перевключить под них — как сервер дока. Отдельно от ApplyDockSettings
+        // ещё и потому, что ApplyPreset пересоздал стрипы: если файл пришёл с
+        // другой машины, целевой канал мог смениться, и без этого модуль продолжил
+        // бы говорить в старый.
+        RestoreTts();
+
         // MIDI-устройство из файла — как при старте, в Restore.
         _midi.Open(_engine.Midi.DeviceName);
 
