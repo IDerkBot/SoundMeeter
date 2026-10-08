@@ -1,44 +1,69 @@
 <Solution>
   <Project Path="SoundMeeter.App\SoundMeeter.App.csproj" />
-  <Folder Name="/Modules/">
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/AppRouting/">
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.UseCases\SoundMeeter.AppRouting.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Audio/">
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.UseCases\SoundMeeter.Audio.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/ChangeLanguage/">
     <Project Path="Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Contract\SoundMeeter.ChangeLanguage.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Core/">
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract.Implementation\SoundMeeter.Core.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Docking/">
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Framework/">
     <Project Path="Modules\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
     <Project Path="Modules\SoundMeeter.Framework\SoundMeeter.Framework.Utils\SoundMeeter.Framework.Utils.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Infrastructure/">
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Clipboard\SoundMeeter.Infrastructure.Clipboard.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Dispatcher\SoundMeeter.Infrastructure.Dispatcher.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.UiTimer\SoundMeeter.Infrastructure.UiTimer.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Midi/">
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract.Implementation\SoundMeeter.Midi.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract\SoundMeeter.Midi.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/StartUp/">
     <Project Path="Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.Contract.Implementation\SoundMeeter.StartUp.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.Contract\SoundMeeter.StartUp.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/TextToSpeech/">
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/TrayIcon/">
     <Project Path="Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.Contract\SoundMeeter.TrayIcon.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.UseCases\SoundMeeter.TrayIcon.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Twitch/">
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Update/">
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Contract.Implementation\SoundMeeter.Update.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Contract\SoundMeeter.Update.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Entities\SoundMeeter.Update.Entities.csproj" />
