@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!--
+      RootNamespace = SoundMeeter: Loc ищет строки по базовому имени
+      "SoundMeeter.Resources.Strings", а SDK по умолчанию включает
+      Resources\Strings.resx как SoundMeeter.Resources.Strings.resources.
+    -->
+    <RootNamespace>SoundMeeter</RootNamespace>
+    <AssemblyName>SoundMeeter.ChangeLanguage.UseCases</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.ChangeLanguage.Contract\SoundMeeter.ChangeLanguage.Contract.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.ChangeLanguage.Tests" />
+    <InternalsVisibleTo Include="SoundMeeter.Audio" />
+    <InternalsVisibleTo Include="SoundMeeter.Update" />
+    <InternalsVisibleTo Include="SoundMeeter.TrayIcon" />
+    <InternalsVisibleTo Include="SoundMeeter.Core" />
+    <InternalsVisibleTo Include="SoundMeeter" />
+  </ItemGroup>
+
+</Project>

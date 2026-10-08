@@ -12,10 +12,10 @@
     WindowStartupLocation="CenterOwner">
     <!--
         Подключение к Twitch (SM-F01).
-
+        
         Отдельное окно, а не секция в настройках синтеза речи: вход в Twitch нужен и
         сам по себе, без озвучки, а индикатор трансляции — не свойство синтезатора.
-
+        
         Порядок сверху вниз повторяет путь пользователя: сначала приложение
         зарегистрировано (или уже зарегистрировано), потом вход, потом канал, и
         только затем — показатели в эфире. Каждый шаг зависит от предыдущего, и
@@ -71,15 +71,13 @@
                 там.
             -->
             <Border
-                DockPanel.Dock="Top"
                 Margin="0,0,0,8"
                 Padding="8"
                 Background="#33241F"
+                DockPanel.Dock="Top"
                 Visibility="{Binding IsConfigured, Converter={StaticResource InverseBoolToVisibility}}">
                 <StackPanel>
-                    <TextBlock
-                        Style="{StaticResource Hint}"
-                        Text="{DynamicResource Sm.Twitch.NotConfigured}" />
+                    <TextBlock Style="{StaticResource Hint}" Text="{DynamicResource Sm.Twitch.NotConfigured}" />
                     <Button
                         Margin="0,6,0,0"
                         HorizontalAlignment="Left"
@@ -111,15 +109,13 @@
                 ушёл в браузер, чтобы ввести код, и вернулся — код на месте.
             -->
             <Border
-                DockPanel.Dock="Top"
                 Margin="0,8,0,0"
                 Padding="8"
                 Background="#1F2933"
+                DockPanel.Dock="Top"
                 Visibility="{Binding HasLoginCode, Converter={StaticResource BoolToVisibility}}">
                 <StackPanel>
-                    <TextBlock
-                        Style="{StaticResource Hint}"
-                        Text="{DynamicResource Sm.Twitch.LoginHint}" />
+                    <TextBlock Style="{StaticResource Hint}" Text="{DynamicResource Sm.Twitch.LoginHint}" />
                     <TextBlock
                         Margin="0,4,0,0"
                         FontSize="22"
@@ -127,19 +123,17 @@
                         Foreground="#7CC48B"
                         Text="{Binding LoginCode}" />
                     <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
-                        <Button
-                            Command="{Binding OpenActivationPageCommand}"
-                            Content="{DynamicResource Sm.Twitch.OpenActivation}" />
+                        <Button Command="{Binding OpenActivationPageCommand}" Content="{DynamicResource Sm.Twitch.OpenActivation}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <Button
-                DockPanel.Dock="Bottom"
                 Margin="0,8,0,0"
                 HorizontalAlignment="Left"
                 Command="{Binding LoginCommand}"
                 Content="{DynamicResource Sm.Twitch.Login}"
+                DockPanel.Dock="Bottom"
                 IsEnabled="{Binding CanStartLogin}"
                 Visibility="{Binding IsAuthorized, Converter={StaticResource InverseBoolToVisibility}}" />
         </DockPanel>
@@ -156,26 +150,24 @@
                     Width="120"
                     Style="{StaticResource FieldLabel}"
                     Text="{DynamicResource Sm.Twitch.Channel}" />
-                <TextBox
-                    Width="200"
-                    Text="{Binding ChannelLogin, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="200" Text="{Binding ChannelLogin, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
             <CheckBox
-                DockPanel.Dock="Top"
                 Margin="0,6,0,0"
                 Content="{DynamicResource Sm.Twitch.Enable}"
+                DockPanel.Dock="Top"
                 IsChecked="{Binding Enabled}" />
 
             <CheckBox
-                DockPanel.Dock="Top"
                 Margin="0,4,0,0"
                 Content="{DynamicResource Sm.Twitch.ShowStreamStatus}"
+                DockPanel.Dock="Top"
                 IsChecked="{Binding ShowStreamStatus}" />
 
             <TextBlock
-                DockPanel.Dock="Bottom"
                 Margin="0,4,0,0"
+                DockPanel.Dock="Bottom"
                 Style="{StaticResource Hint}"
                 Text="{Binding ChannelHint}" />
         </DockPanel>
@@ -184,7 +176,10 @@
             Состояние в эфире. Здесь важно, что «неизвестно» и «не в эфире» — разные
             состояния: обрыв сети не должен выглядеть как завершившаяся трансляция.
         -->
-        <Border Grid.Row="2" Padding="10" Background="#242424">
+        <Border
+            Grid.Row="2"
+            Padding="10"
+            Background="#242424">
             <StackPanel VerticalAlignment="Center">
                 <TextBlock
                     HorizontalAlignment="Center"
@@ -222,14 +217,12 @@
                 TextWrapping="Wrap" />
 
             <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                <Button
-                    Command="{Binding ApplyCommand}"
-                    Content="{DynamicResource Sm.Twitch.Apply}" />
+                <Button Command="{Binding ApplyCommand}" Content="{DynamicResource Sm.Twitch.Apply}" />
                 <Button
                     Margin="8,0,0,0"
-                    IsCancel="True"
                     Click="OnCloseClick"
-                    Content="{DynamicResource Sm.Twitch.Close}" />
+                    Content="{DynamicResource Sm.Twitch.Close}"
+                    IsCancel="True" />
             </StackPanel>
         </StackPanel>
     </Grid>

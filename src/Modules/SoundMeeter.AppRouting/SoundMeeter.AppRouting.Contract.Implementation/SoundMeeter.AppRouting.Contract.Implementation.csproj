@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SoundMeeter.AudioPolicy</RootNamespace>
+    <AssemblyName>SoundMeeter.AppRouting.Contract.Implementation</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

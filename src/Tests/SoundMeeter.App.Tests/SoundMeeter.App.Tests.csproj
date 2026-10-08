@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      РўРѕС‚ Р¶Рµ RID, С‡С‚Рѕ Сѓ SoundMeeter: Р±РµР· РЅРµРіРѕ РїСЂРѕРµРєС‚ СЃРѕР±РёСЂР°РµС‚СЃСЏ РєР°Рє MSIL, Р°
+      СЃСЃС‹Р»РєР° РЅР° win-x64-СЃР±РѕСЂРєСѓ РґР°С‘С‚ MSB3270 Рё СЂР°СЃС…РѕР¶РґРµРЅРёРµ Р°СЂС…РёС‚РµРєС‚СѓСЂ.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- РўРµСЃС‚С‹ РґС‘СЂРіР°СЋС‚ СѓСЃС‚Р°СЂРµРІС€РёРµ API NAudio (MmDevice, WasapiCapture) С‚Р°Рє Р¶Рµ,
+         РєР°Рє Рё СЃР°Рј РјРѕРґСѓР»СЊ: РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ Рѕ РЅРёС… РїРѕРІС‚РѕСЂСЏСЋС‚ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ СЃР±РѕСЂРєРё
+         SoundMeeter.Core Рё РЅРµ РґР°СЋС‚ РЅРёС‡РµРіРѕ РЅРѕРІРѕРіРѕ. -->
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      РџСЂРёР»РѕР¶РµРЅРёРµ С†РµР»РёРєРѕРј: СЌС‚РёРј С‚РµСЃС‚Р°Рј РЅСѓР¶РµРЅ XAML (pack-URI РЅР° MixerTheme.xaml),
+      UserControl-С‹ СЃС‚СЂРёРїРѕРІ Рё STA-С…РѕСЃС‚ СЃ РЅР°СЃС‚РѕСЏС‰РёРј Application. Core РїСЂРёРµР·Р¶Р°РµС‚
+      С‚СЂР°РЅР·РёС‚РёРІРЅРѕ вЂ” РІРёРґРЅРѕ РµРіРѕ Рё СЏРІРЅРѕ, СЂР°Р· App РµРіРѕ СЃСЃС‹Р»Р°РµС‚СЃСЏ.
+
+      РЎСЃС‹Р»РєРё РЅР° SoundMeeter.App РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ, С‡С‚РѕР±С‹ ModuleBoundaryTests СѓРІРёРґРµР» Р’РЎР•
+      СЃР±РѕСЂРєРё СЂРµС€РµРЅРёСЏ: App в†’ Core в†’ {Audio, Logger, ChangeLanguage, Update, StartUp}
+      Рё App в†’ TrayIcon. Р Р°РЅСЊС€Рµ С‚РѕС‚ Р¶Рµ СЌС„С„РµРєС‚ РґР°РІР°Р» РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ SoundMeeter.Tests.
+    -->
+    <ProjectReference Include="..\..\SoundMeeter.App\SoundMeeter.App.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Р¤РёРєСЃС‚СѓСЂС‹ ViewModel-РѕРІ (Strips, FakeAudioEngine) Р¶РёРІСѓС‚ РІ SoundMeeter.Core.Tests
+      вЂ” РѕРЅРё РїСЂРёРЅР°РґР»РµР¶Р°С‚ СЏРґСЂСѓ. Р”СѓР±Р»РёСЂРѕРІР°С‚СЊ РёС… СЂР°РґРё App.Tests РЅРµР»СЊР·СЏ: FakeAudioEngine
+      вЂ” СЌС‚Рѕ СЂРµР°Р»РёР·Р°С†РёСЏ IAudioEngine, Рё РІС‚РѕСЂР°СЏ РєРѕРїРёСЏ СЂР°РЅРѕ РёР»Рё РїРѕР·РґРЅРѕ СЂР°Р·РѕР№РґС‘С‚СЃСЏ СЃ
+      РїРµСЂРІРѕР№ РїРѕ СЃРёРіРЅР°С‚СѓСЂРµ, Р° С‚РµСЃС‚С‹ Р±СѓРґСѓС‚ РїР°РґР°С‚СЊ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ, РєР°РєРѕР№ РїСЂРѕРµРєС‚
+      РёС… Р·Р°РїСѓСЃС‚РёР». РџРѕСЌС‚РѕРјСѓ Р»РёРЅРєСѓРµРј РёСЃС…РѕРґРЅРёРєРё: РѕРґРЅР° РїСЂР°РІРєР° вЂ” РґРІР° РїСЂРѕРµРєС‚Р°.
+
+      РџСЂРѕ СЃСЃС‹Р»РєСѓ РЅР° РїСЂРѕРµРєС‚ С‚РµСЃС‚РѕРІ РІРјРµСЃС‚Рѕ СЌС‚РѕРіРѕ вЂ” РЅРµР»СЊР·СЏ: С‚РµСЃС‚РѕРІС‹Р№ РїСЂРѕРµРєС‚ РЅРµ РґРѕР»Р¶РµРЅ
+      Р±С‹С‚СЊ Р·Р°РІРёСЃРёРјРѕСЃС‚СЊСЋ РґСЂСѓРіРѕРіРѕ С‚РµСЃС‚РѕРІРѕРіРѕ РїСЂРѕРµРєС‚Р° (РёРЅР°С‡Рµ App.Tests СѓС‚Р°С‰РёР» Р±С‹ РІ
+      РІС‹С…РѕРґ РµС‰С‘ Рё СЂР°РЅРЅРµСЂ, Р° Core.Tests вЂ” С‚РµСЃС‚С‹, РєРѕС‚РѕСЂС‹Рј РЅРµ РЅСѓР¶РµРЅ UI).
+
+      Namespace РѕСЃС‚Р°С‘С‚СЃСЏ SoundMeeter.Tests.Infrastructure: С„Р°Р№Р»С‹ С‚Рµ Р¶Рµ СЃР°РјС‹Рµ, РјРµРЅСЏРµС‚СЃСЏ
+      С‚РѕР»СЊРєРѕ СЃР±РѕСЂРєР°, РІ РєРѕС‚РѕСЂСѓСЋ РѕРЅРё РїРѕРїР°Р»Рё. РћР±Р° С‚РµСЃС‚РѕРІС‹С… РїСЂРѕРµРєС‚Р° РІ РѕРґРЅРѕРј РїСЂРѕРіРѕРЅРµ РЅРµ
+      Р±С‹РІР°СЋС‚ (РЅРёРєР°РєРѕР№ РїСЂРѕРµРєС‚ РЅРµ СЃСЃС‹Р»Р°РµС‚СЃСЏ РЅР° РѕР±Р°), С‚Р°Рє С‡С‚Рѕ СЃРѕРІРїР°РґРµРЅРёРµ РёРјС‘РЅ РЅРµ
+      СЃРѕР·РґР°С‘С‚ РЅРµРѕРґРЅРѕР·РЅР°С‡РЅРѕСЃС‚Рё.
+    -->
+    <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\Strips.cs" Link="Infrastructure\Strips.cs" />
+    <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\FakeAudioEngine.cs" Link="Infrastructure\FakeAudioEngine.cs" />
+    <!-- Р—Р°РіР»СѓС€РєР° ITextToSpeechHost: РѕРєРЅРѕ РЅР°СЃС‚СЂРѕРµРє TTS РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РЅР°СЃС‚РѕСЏС‰РµР№ СЂР°Р·РјРµС‚РєРѕР№,
+         Рё Р±РµР· РЅРµС‘ РїСЂРѕРІРµСЂРєСѓ РїСЂРёС€Р»РѕСЃСЊ Р±С‹ РїРѕРґРЅРёРјР°С‚СЊ РІСЃС‘ РїСЂРёР»РѕР¶РµРЅРёРµ С†РµР»РёРєРѕРј. -->
+    <Compile Include="..\SoundMeeter.Core.Tests\Infrastructure\FakeTextToSpeechHost.cs" Link="Infrastructure\FakeTextToSpeechHost.cs" />
+  </ItemGroup>
+
+</Project>
+
+
+
