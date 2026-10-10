@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Реверберация в цепочке стрипа: insert с регулятором Wet, алгоритмическая

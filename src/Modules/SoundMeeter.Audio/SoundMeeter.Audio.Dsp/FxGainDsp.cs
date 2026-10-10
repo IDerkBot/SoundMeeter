@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Уровень стрипа после компрессора: отдельный, двусторонний Trim. В отличие от

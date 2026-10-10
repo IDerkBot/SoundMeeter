@@ -1,9 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Twitch;
 using SoundMeeter.Services.TextToSpeech;
-using SoundMeeter.ViewModels;
 using Xunit;
+using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Update.Contract;
+using SoundMeeter.Update.UseCases;
+using SoundMeeter.Twitch.Contract.Implementation;
+using SoundMeeter.Update.Contract.Implementation;
 
 namespace SoundMeeter.App.Tests;
 
@@ -91,5 +96,53 @@ public class ServiceRegistrationTests
         using var _ = provider;
 
         Assert.IsType<CompositeTtsMessageSource>(provider.GetRequiredService<ITtsMessageSource>());
+    }
+
+    /// <summary>
+    /// Каждая реализация контракта резолвится и по своему типу, и по интерфейсу,
+    /// и это один и тот же объект.
+    ///
+    /// Проверяются именно те модули, где интерфейс раньше был реализован, но не
+    /// зарегистрирован: <c>ITtsModule</c>, <c>ITextToSpeechHost</c>,
+    /// <c>ITwitchHost</c> и concrete-тип <c>GithubUpdateService</c>. Такие места
+    /// не ловятся ни сборкой, ни функциональными проверками — модуль работает,
+    /// потому что окно создаётся вручную и передаёт <c>MainViewModel</c>
+    /// напрямую. Первое же <c>GetRequiredService</c> по такому имени упало бы на
+    /// старте приложения.
+    /// </summary>
+    [Fact]
+    public void TheModuleInterfacesAndTheirClassesShareOneInstance()
+    {
+        var provider = AppServices.Create().BuildServiceProvider();
+        using var _ = provider;
+
+        Assert.Same(provider.GetRequiredService<TextToSpeechService>(),
+            provider.GetRequiredService<ITtsModule>());
+
+        Assert.Same(provider.GetRequiredService<GithubUpdateService>(),
+            provider.GetRequiredService<IUpdateService>());
+
+        // Окна передают MainViewModel как host, и регистрация указывает на тот
+        // же экземпляр — иначе окно и модуль видели бы разное состояние.
+        Assert.Same(provider.GetRequiredService<MainViewModel>(),
+            provider.GetRequiredService<ITextToSpeechHost>());
+
+        Assert.Same(provider.GetRequiredService<MainViewModel>(),
+            provider.GetRequiredService<ITwitchHost>());
+    }
+
+    /// <summary>
+    /// Составной источник реплик — тот же объект, что и по своему типу.
+    /// Регистрировался только анонимной фабрикой, поэтому
+    /// <c>GetRequiredService&lt;CompositeTtsMessageSource&gt;()</c> падало бы.
+    /// </summary>
+    [Fact]
+    public void TheCompositeMessageSourceIsResolvableByName()
+    {
+        var provider = AppServices.Create().BuildServiceProvider();
+        using var _ = provider;
+
+        Assert.Same(provider.GetRequiredService<CompositeTtsMessageSource>(),
+            provider.GetRequiredService<ITtsMessageSource>());
     }
 }

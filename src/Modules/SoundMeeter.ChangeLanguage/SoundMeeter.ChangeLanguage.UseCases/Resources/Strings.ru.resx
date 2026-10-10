@@ -666,6 +666,18 @@
   <data name="Sm.Midi.Status.NoInput" xml:space="preserve">
     <value>MIDI-ввод не выбран</value>
   </data>
+  <data name="Sm.Midi.Error.DeviceNotFound" xml:space="preserve">
+    <value>MIDI-устройство не подключено. Всё заработает, когда вернёте его.</value>
+  </data>
+  <data name="Sm.Midi.Error.DeviceOpenFailed" xml:space="preserve">
+    <value>Не удалось открыть MIDI-устройство — возможно, его держит другая программа.</value>
+  </data>
+  <data name="Sm.Midi.Error.StripMissing" xml:space="preserve">
+    <value>Канал, на который указывала привязка, больше не существует.</value>
+  </data>
+  <data name="Sm.Midi.Error.ParameterUnsupported" xml:space="preserve">
+    <value>Этим элементом управления нельзя управлять выбранным параметром.</value>
+  </data>
   <data name="Sm.Midi.Param.VolumeDb" xml:space="preserve">
     <value>Громкость</value>
   </data>

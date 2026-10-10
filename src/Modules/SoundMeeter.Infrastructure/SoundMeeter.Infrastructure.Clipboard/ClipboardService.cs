@@ -1,7 +1,7 @@
+using SoundMeeter.Core.Contract;
 using System.Windows;
-using System.Windows.Threading;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.Infrastructure.Clipboard;
 
 /// <summary>
 /// Реализация <see cref="IClipboardService"/> поверх WPF (SM-A10).
@@ -23,6 +23,6 @@ public sealed class ClipboardService : IClipboardService
             throw new InvalidOperationException(
                 "Буфер обмена доступен только с UI-потока: вызывайте из команды ViewModel.");
 
-        Clipboard.SetText(text);
+        System.Windows.Clipboard.SetText(text);
     }
 }

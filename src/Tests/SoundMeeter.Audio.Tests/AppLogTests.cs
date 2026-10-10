@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Infrastructure.Logger;
 using System.Text;
 using Xunit;
 

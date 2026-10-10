@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services.Twitch</RootNamespace>
+    <RootNamespace>SoundMeeter.Twitch.Entities</RootNamespace>
     <AssemblyName>SoundMeeter.Twitch.Entities</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -20,8 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- DTO-ответов OAuth ушли в Contract.Implementation вместе с клиентом, который
+         их разбирает: формат ответа Twitch — деталь реализации, а не доменный
+         тип. Видимого изнутри здесь больше не осталось. -->
     <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
-    <InternalsVisibleTo Include="SoundMeeter.Twitch.UseCases" />
   </ItemGroup>
 
 </Project>

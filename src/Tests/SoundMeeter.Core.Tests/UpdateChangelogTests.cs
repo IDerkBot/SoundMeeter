@@ -1,5 +1,5 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.UseCases;
 using Xunit;
 
 namespace SoundMeeter.Tests;

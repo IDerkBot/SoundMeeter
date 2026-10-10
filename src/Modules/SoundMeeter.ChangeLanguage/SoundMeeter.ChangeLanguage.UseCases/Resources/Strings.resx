@@ -666,6 +666,18 @@
   <data name="Sm.Midi.Status.NoInput" xml:space="preserve">
     <value>No MIDI input selected</value>
   </data>
+  <data name="Sm.Midi.Error.DeviceNotFound" xml:space="preserve">
+    <value>MIDI device is not connected. It will work when you plug it back in.</value>
+  </data>
+  <data name="Sm.Midi.Error.DeviceOpenFailed" xml:space="preserve">
+    <value>Could not open the MIDI device. Another application may be using it.</value>
+  </data>
+  <data name="Sm.Midi.Error.StripMissing" xml:space="preserve">
+    <value>The channel this binding pointed to no longer exists.</value>
+  </data>
+  <data name="Sm.Midi.Error.ParameterUnsupported" xml:space="preserve">
+    <value>This control cannot drive the selected parameter.</value>
+  </data>
   <data name="Sm.Midi.Param.VolumeDb" xml:space="preserve">
     <value>Volume</value>
   </data>

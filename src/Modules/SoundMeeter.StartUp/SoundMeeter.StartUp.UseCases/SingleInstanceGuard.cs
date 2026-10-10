@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
-using System.Runtime.InteropServices;
+using SoundMeeter.Infrastructure.Logger;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.StartUp.UseCases;
 
 /// <summary>
 /// Гарантия одного работающего экземпляра (SM-D03).

@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
-using System.Linq;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Пользовательская кнопка FUNC на входном стрипе: назначенный набор выходов

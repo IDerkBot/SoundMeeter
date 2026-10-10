@@ -1,17 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
-using System.Linq;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Входной стрип (микрофон/loopback): громкость, мут, моно, соло, VU-метр
 /// и два списка выходов — аппаратные (OUT, для прослушивания) и виртуальные (VIRT).
 /// </summary>
-public partial class InputChannelViewModel : LocalizedViewModel
+public partial class InputChannelViewModel : LocalizedViewModel, IInputStrip
 {
     private readonly IAudioEngine _engine;
     private readonly Action _markDirty;
@@ -199,6 +201,24 @@ public partial class InputChannelViewModel : LocalizedViewModel
 
     /// <summary>Эквалайзер стрипа: кнопка в колонке и отдельное окно настроек.</summary>
     public EqualizerViewModel Equalizer { get; private set; } = null!;
+
+    bool IInputStrip.Func1Engaged
+    {
+        get => Func1.IsEngaged;
+        set => Func1.IsEngaged = value;
+    }
+
+    bool IInputStrip.Func2Engaged
+    {
+        get => Func2.IsEngaged;
+        set => Func2.IsEngaged = value;
+    }
+
+    string IInputStrip.DeviceId => Model.DeviceId;
+    string IInputStrip.Name => Name;
+    float IInputStrip.PeakLevel => PeakLevel;
+    bool IInputStrip.IsAvailable => Model.IsAvailable;
+    bool IInputStrip.IsGenerated => Model.IsGenerated;
 
     /// <summary>Компрессор: порог, сжатие, атака, отпускание, makeup.</summary>
     public StripEffectViewModel Compressor { get; private set; } = null!;

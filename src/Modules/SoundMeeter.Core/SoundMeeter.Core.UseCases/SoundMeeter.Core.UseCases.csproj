@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter</RootNamespace>
+    <RootNamespace>SoundMeeter.Core.UseCases</RootNamespace>
     <AssemblyName>SoundMeeter.Core.UseCases</AssemblyName>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);CS0618</NoWarn>
@@ -16,14 +16,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Midi\SoundMeeter.Midi.Presentation\SoundMeeter.Midi.Presentation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Midi\SoundMeeter.Midi.Contract\SoundMeeter.Midi.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Twitch\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.UseCases\SoundMeeter.AppRouting.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Docking\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
@@ -41,8 +44,7 @@
     <None Update="Resources\system_apps_filter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="Resources\system_apps_filter.json"
-                      LogicalName="soundmeeter.system-apps-filter.json" />
+    <EmbeddedResource Include="Resources\system_apps_filter.json" LogicalName="soundmeeter.system-apps-filter.json" />
   </ItemGroup>
 
 </Project>

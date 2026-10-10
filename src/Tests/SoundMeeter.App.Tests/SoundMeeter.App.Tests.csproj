@@ -35,6 +35,10 @@
       Рё App в†’ TrayIcon. Р Р°РЅСЊС€Рµ С‚РѕС‚ Р¶Рµ СЌС„С„РµРєС‚ РґР°РІР°Р» РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ SoundMeeter.Tests.
     -->
     <ProjectReference Include="..\..\SoundMeeter.App\SoundMeeter.App.csproj" />
+    <!-- VM модальных окон живут в SoundMeeter.Core.Presentation: App.Tests
+         подключает их заглушки (FakeTextToSpeechHost) общим файлом, поэтому
+         ссылка нужна напрямую, а не транзитивно через App. -->
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

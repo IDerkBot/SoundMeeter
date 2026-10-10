@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 
-namespace SoundMeeter.Models;
+namespace SoundMeeter.Update.Entities;
 
 /// <summary>
 /// Версия приложения в semver-виде: три числа + необязательный пре-релизный суффикс.

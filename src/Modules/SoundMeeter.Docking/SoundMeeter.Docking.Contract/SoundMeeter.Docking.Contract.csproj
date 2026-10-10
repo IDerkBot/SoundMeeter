@@ -4,13 +4,18 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <RootNamespace>SoundMeeter.Docking.Contract</RootNamespace>
     <AssemblyName>SoundMeeter.Docking.Contract</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!--
+    Контракт сервера. В сигнатурах — типы протокола (ObsDockState,
+    ObsDockCommand), поэтому отдаёт их слой DTO, а не сам контракт:
+    Contract → Entities, как в Update и Twitch.
+  -->
   <ItemGroup>
-    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
   </ItemGroup>
 </Project>
 

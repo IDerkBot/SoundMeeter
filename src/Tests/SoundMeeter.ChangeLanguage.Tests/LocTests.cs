@@ -1,4 +1,4 @@
-using SoundMeeter.Services;
+using SoundMeeter.ChangeLanguage.UseCases;
 using Xunit;
 
 namespace SoundMeeter.ChangeLanguage.Tests;

@@ -1,7 +1,8 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Twitch;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Entities;
 using Xunit;
 
 namespace SoundMeeter.Tests;

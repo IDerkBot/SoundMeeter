@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Источник стрипа, который наполняет код приложения, а не устройство.

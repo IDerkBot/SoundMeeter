@@ -1,0 +1,209 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Infrastructure.Settings;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
+
+/// <summary>
+/// Окно просмотра журнала: текущий файл, уровень детализации, копирование
+/// диагностики в буфер обмена (SM-A03).
+///
+/// Пользователю сдаётся не «лог-файл вообще», а связка «журнал + версия +
+/// список устройств»: по отдельности ни один из кусков ничего не объясняет,
+/// а вместе их достаточно, чтобы понять состояние машины без разработчика.
+/// </summary>
+public partial class LogViewModel : LocalizedViewModel
+{
+    private readonly IAudioEngine _engine;
+    private readonly IClipboardService _clipboard;
+
+    [ObservableProperty]
+    private string _content = "";
+
+    [ObservableProperty]
+    private string _status = "";
+
+    [ObservableProperty]
+    private LogFile _selectedFile;
+
+    [ObservableProperty]
+    private bool _isRefreshing;
+
+    public LogViewModel(IAudioEngine engine, SettingsService settings, IClipboardService clipboard)
+    {
+        _engine = engine;
+        _clipboard = clipboard;
+        Settings = settings;
+        LogLevels = AppLog.AvailableLevels;
+        SelectedLogLevel = AppLog.Level.ToString();
+        Files = AppLog.LogFiles();
+        SelectedFile = new LogFile(AppLog.CurrentFilePath);
+        if (SelectedFile == null && Files.Count > 0) SelectedFile = Files[0];
+        Refresh();
+    }
+
+    public SettingsService Settings { get; }
+
+    public IReadOnlyList<string> LogLevels { get; }
+
+    public IReadOnlyList<LogFile> Files { get; }
+
+    public string LogDirectory => AppLog.DirectoryPath;
+
+    /// <summary>Куда физически пишется журнал — показываем пользователю открытый путь.</summary>
+    public string CurrentFile => AppLog.CurrentFilePath;
+
+    /// <summary>
+    /// Уровень детализации. Переключается на лету: провайдер проверяет порог
+    /// при каждой записи, перезапускать приложение не нужно.
+    ///
+    /// Это же значение фильтрует просмотр (<see cref="Refresh"/>): показываются
+    /// записи выбранного уровня и выше. Одно поле на оба смысла, а не два, —
+    /// иначе «уровень» в одном месте влиял бы на запись, а в другом на вид, и
+    /// пользователь гадал бы, почему переключение ничего не меняет.
+    /// </summary>
+    [ObservableProperty]
+    private string _selectedLogLevel;
+
+    partial void OnSelectedLogLevelChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        AppLog.SetLevel(AppLog.ParseLevel(value));
+        Settings.Settings.LogLevel = value;
+        Settings.Save();
+        Status = Loc.Get("Sm.Log.Status.LevelSet", AppLog.Level);
+        Refresh();
+    }
+
+    partial void OnSelectedFileChanged(LogFile value)
+    {
+        if (value == null) return;
+        Refresh();
+    }
+
+    [RelayCommand]
+    public void Refresh()
+    {
+        IsRefreshing = true;
+        try
+        {
+            var file = SelectedFile == null ? new LogFile(AppLog.CurrentFilePath) : SelectedFile;
+            // Фильтр по уровню обязателен здесь, а не только в провайдере: файл
+            // на диске уже полон записей, и переключатель уровня обязан менять то,
+            // что пользователь видит, — иначе он выглядит как нерабочий.
+            Content = string.IsNullOrEmpty(file.Fullname) || !File.Exists(file.Fullname)
+                ? Loc.Get("Sm.Log.NotCreated")
+                : AppLog.ReadLog(file.Fullname, minimumLevel: AppLog.Level);
+            Status = Loc.Get("Sm.Log.Status.Size", Path.GetFileName(file.Fullname), Content.Length);
+        }
+        finally
+        {
+            IsRefreshing = false;
+        }
+    }
+
+    [RelayCommand]
+    private void CopyDiagnostics()
+    {
+        var text = AppLog.BuildDiagnosticsText(DescribeDevices());
+        try
+        {
+            _clipboard.SetText(text);
+            Status = Loc.Get("Sm.Log.Status.Copied");
+        }
+        catch (Exception ex)
+        {
+            Status = Loc.Get("Sm.Log.Status.CopyFailed", ex.Message);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenLogFolder()
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(LogDirectory)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Status = Loc.Get("Sm.Log.Status.FolderFailed", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Список устройств для диагностики: тот же каталог, что использует движок,
+    /// плюс состояние стрипов. Снимок берём один раз, чтобы отчёт соответствовал
+    /// моменту копирования.
+    /// </summary>
+    private string DescribeDevices()
+    {
+        var lines = new List<string>();
+        var catalog = _engine.Catalog.ToList();
+        var names = catalog.ToDictionary(d => d.DeviceId, d => d.Name);
+        foreach (var device in catalog.OrderBy(d => d.IsMicrophone).ThenBy(d => d.Name))
+        {
+            // Для половины кабеля важно видеть и пару: по ней приложения
+            // направляются в выход, а снимается вход.
+            var cable = device.IsVirtualCable
+                ? device.CablePeerId != null && names.TryGetValue(device.CablePeerId, out var peer)
+                    ? $"  cable-peer={peer}"
+                    : "  cable-peer=(none)"
+                : "";
+
+            lines.Add($"{(device.IsMicrophone ? "capture" : "render ")}  {device.Name}  " +
+                      $"[{device.DeviceId}]{cable}");
+        }
+
+        lines.Add(string.Empty);
+        lines.Add("--- стрипы ---");
+        foreach (var input in _engine.Inputs)
+        {
+            // apps-> — реальная цель переноса приложений на стрип; у входа
+            // виртуального кабеля это его выход, а не сам стрип.
+            var appTarget = CablePairing.GetAppRenderDeviceId(
+                catalog.FirstOrDefault(d => d.DeviceId == input.DeviceId),
+                input.IsMicrophone,
+                input.AppTargetDeviceId);
+            var apps = appTarget == null
+                ? ""
+                : $" apps->[{appTarget}]{(names.TryGetValue(appTarget, out var n) ? " " + n : "")}";
+
+            lines.Add($"INPUT  {StripTitle(input)}  device={input.DeviceId} " +
+                      $"vol={input.VolumeDb:0.0} dB gain={input.GainDb:0.0} dB mute={input.IsMuted} " +
+                      $"mono={input.IsMono} solo={input.IsSolo} denoise={input.DenoiserEnabled}{apps}");
+        }
+        foreach (var bus in _engine.Buses)
+        {
+            lines.Add($"OUTPUT {StripTitle(bus)}  device={bus.DeviceId} " +
+                      $"vol={bus.VolumeDb:0.0} dB mute={bus.IsMuted} mono={bus.IsMono} solo={bus.IsSolo}");
+        }
+
+        lines.Add(string.Empty);
+        lines.Add("--- маршруты ---");
+        foreach (var input in _engine.Inputs)
+        {
+            foreach (var route in input.BusRouting.Where(r => r.Value.Enabled))
+            {
+                var bus = _engine.Buses.FirstOrDefault(b => b.Id == route.Key);
+                lines.Add($"{StripTitle(input)} -> {bus?.Name ?? route.Key}: посылка {route.Value.GainDb:0.0} dB");
+            }
+        }
+
+        return string.Join(Environment.NewLine, lines) + Environment.NewLine;
+    }
+
+    private static string StripTitle(InputChannelModel model) =>
+        string.IsNullOrWhiteSpace(model.ChannelName) ? model.Name : model.ChannelName;
+
+    private static string StripTitle(OutputBusModel model) =>
+        string.IsNullOrWhiteSpace(model.ChannelName) ? model.Name : model.ChannelName;
+}

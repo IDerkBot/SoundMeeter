@@ -1,4 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Twitch.Entities;
 using Xunit;
 
 namespace SoundMeeter.Audio.Tests;

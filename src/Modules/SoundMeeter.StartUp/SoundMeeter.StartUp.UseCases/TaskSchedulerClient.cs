@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
-using System.IO;
-using System.Runtime.InteropServices;
+using SoundMeeter.Infrastructure.Logger;
 using System.Security.Principal;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.StartUp.UseCases;
 
 /// <summary>
 /// Обёртка над COM-планировщиком Windows (<c>Schedule.Service</c>) для автозапуска

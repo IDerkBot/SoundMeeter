@@ -1,6 +1,6 @@
-﻿using SoundMeeter.Models;
+﻿using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Core.Contract
 {
     public interface ISettingsService
     {

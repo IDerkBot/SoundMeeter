@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SoundMeeter.Core.Presentation</RootNamespace>
+    <AssemblyName>SoundMeeter.Core.Presentation</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <!-- UseWPF намеренно НЕ включён: здесь пока только ViewModel'ы модальных
+         окон, и ни один не трогает System.Windows. Окна переедут сюда позже, и
+         тогда флаг понадобится — но включать его на пустом месте нельзя:
+         сборка объявила бы зависимость от PresentationFramework, которую
+         граничные проверки справедливо сочли бы утечкой. -->
+  </PropertyGroup>
+
+  <!--
+    ViewModel'ы окон, которые открываются поверх главного: синтез речи, Twitch,
+    журнал.
+
+    Что НЕ здесь и почему. MainViewModel и полосы микшера (InputChannelViewModel,
+    OutputBusViewModel, FuncButtonViewModel) остаются в UseCases: к ним привязана
+    разметка главного окна через MainViewModel, и вынеся их, пришлось бы либо
+    вернуть Core.UseCases → Presentation, либо переписать привязки. Это отдельная
+    задача (см. weaks.md, H-6/H-7), а не механический перенос.
+
+    UseCases, как всегда, смотрит только вниз — на этот проект ссылок нет.
+  -->
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
+  <!-- Вход в Twitch проверяется через StartLoginAsync/PollOnceAsync. Они
+       internal не по недосмотру, а чтобы окно не дёргало их случайно, и
+       InternalsVisibleTo был у старого проекта Core.UseCases — после переноса
+       его нужно объявить заново, иначе проверки входа перестают собираться. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
+    <InternalsVisibleTo Include="SoundMeeter.App.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Core.Entities\SoundMeeter.Core.Entities.csproj" />
+    <!-- SoundMeeter.Core.UseCases намеренно НЕ подключён. Ни один из трёх
+         ViewModel'ов не берёт тип оттуда: окно синтеза речи работает через
+         ITextToSpeechHost, окно Twitch — через ITwitchHost и ITwitchState,
+         журнал — через IAudioEngine, SettingsService и IClipboardService.
+         Объявленная впустую ссылка только создавала бы впечатление, что
+         представление зависит от сценариев, а на деле не зависит. -->
+    <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Twitch\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

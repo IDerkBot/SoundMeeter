@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Audio</RootNamespace>
+    <RootNamespace>SoundMeeter.Audio.Contract</RootNamespace>
     <AssemblyName>SoundMeeter.Audio.Contract</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Entities\SoundMeeter.Core.Entities.csproj" />
   </ItemGroup>
 </Project>
 

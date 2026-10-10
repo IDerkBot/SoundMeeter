@@ -1,9 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.StartUp.Contract;
+using SoundMeeter.StartUp.UseCases;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 // Поведение приложения: значок в трее (SM-D02) и автозапуск вместе с Windows (SM-D01).
 public partial class MainViewModel

@@ -9,8 +9,24 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- Синтез, каталог голосов и потоковый хелпер — то есть всё, что работает
+       через SAPI. Пакет System.Speech намеренно живёт здесь, а не в UseCases:
+       контракт синтезатора нужен модулю и его проверкам, а сама платформенная
+       реализация — нет. -->
+  <ItemGroup>
+    <PackageReference Include="System.Speech" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+  </ItemGroup>
+
+  <!-- Pcm16MonoStream внутренний, но проверяется напрямую: конвертация байтов
+       SAPI в сэмплы — тот кусок, который дешевле проверить, чем услышать. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
   </ItemGroup>
 
 </Project>

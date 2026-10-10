@@ -71,5 +71,4 @@
 	      Register an Application → Copy Client ID). Пока строка пустая, окно честно
 	      пишет «в этой сборке нет client ID», а в сеть не ходит.
 - [ ] Проверка обновления через Hash
-- [ ] Разделить `IAudioEngine` (25 членов) на IRoutingTable / IDeviceCatalog / IRStripTopology / IPresetStore
 - [ ] Нажатие клавишь MIDI миксера не сразу обрабатывается, а после нескольких нажатий.

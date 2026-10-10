@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SoundMeeter.Docking.Presentation</RootNamespace>
+    <AssemblyName>SoundMeeter.Docking.Presentation</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Окно настроек док-панели и его ViewModel'ы. Здесь только представление:
+       свойства для привязки, команды и переводы. Всё, что меняет состояние,
+       — в SoundMeeter.Docking.UseCases (DockController), и обратной ссылки на
+       представление оттуда нет. -->
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

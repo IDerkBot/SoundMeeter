@@ -1,6 +1,7 @@
-using SoundMeeter.Models;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.ViewModels;
 using SoundMeeter.Views.Controls;
 using Xunit;
 
@@ -145,7 +146,7 @@ public class StripEffectTests
             model,
             new FakeAudioEngine(),
             Strips.Buses(),
-            new List<SoundMeeter.Services.DeviceInfo>(),
+            new List<DeviceInfo>(),
             () => { });
 
         Assert.True(vm.CompressorEnabled);

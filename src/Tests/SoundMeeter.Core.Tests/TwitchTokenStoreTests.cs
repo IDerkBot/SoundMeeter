@@ -1,4 +1,6 @@
-using SoundMeeter.Services.Twitch;
+using SoundMeeter.Twitch.Entities;
+using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Twitch.Contract.Implementation;
 using Xunit;
 
 namespace SoundMeeter.Tests;

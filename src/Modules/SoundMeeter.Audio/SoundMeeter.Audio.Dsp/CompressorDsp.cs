@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Компрессор входного стрипа (SM-B05): огибающая по пику со сглаживанием

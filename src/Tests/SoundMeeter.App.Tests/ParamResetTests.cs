@@ -1,7 +1,7 @@
 using SoundMeeter.Controls;
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.ViewModels;
 using SoundMeeter.Views.Controls;
 using System.Windows.Controls;
 using Xunit;

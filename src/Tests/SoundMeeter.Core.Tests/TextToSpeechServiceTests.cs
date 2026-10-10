@@ -1,8 +1,8 @@
-using SoundMeeter.Audio;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using SoundMeeter.Services.TextToSpeech;
 using SoundMeeter.Tests.Infrastructure;
+using SoundMeeter.TextToSpeech.Entities;
 using Xunit;
 
 namespace SoundMeeter.Tests;

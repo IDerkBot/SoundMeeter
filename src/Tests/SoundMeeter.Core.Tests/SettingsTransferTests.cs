@@ -1,5 +1,8 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract.Implementation;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Docking.Entities;
+using SoundMeeter.Infrastructure.Settings;
 using System.Text.Json;
 using Xunit;
 

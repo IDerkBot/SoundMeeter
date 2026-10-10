@@ -1,11 +1,12 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
-using System.IO;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
 using System.Security;
 using System.Text.Json;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Infrastructure.Settings
 {
     /// <summary>Итог экспорта настроек в файл.</summary>
     public sealed record SettingsExportResult(bool Success, string Message);

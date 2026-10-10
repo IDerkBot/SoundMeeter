@@ -1,4 +1,6 @@
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.ChangeLanguage.UseCases;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;

@@ -4,13 +4,32 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Models</RootNamespace>
+    <RootNamespace>SoundMeeter.Update.Contract.Implementation</RootNamespace>
     <AssemblyName>SoundMeeter.Update.Contract.Implementation</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- Внешние системы обновления: HTTP к GitHub, скачивание и распаковка,
+       файловая система, запуск powershell.exe и robocopy, проверка подписи
+       Authenticode (X509). Оркестрации здесь нет — она в
+       SoundMeeter.Update.UseCases, и она собирается без этой сборки. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Update.Contract\SoundMeeter.Update.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Update.Entities\SoundMeeter.Update.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+    <!-- Локализация здесь не по выбору, а по необходимости: текст подтверждения
+         и названия файлов запекаются в сценарий powershell, который
+         показывается пользователю после перезапуска приложения. Вынести его
+         отсюда нельзя — скрипт должен быть готов на диске. -->
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Update.Tests" />
   </ItemGroup>
 
 </Project>

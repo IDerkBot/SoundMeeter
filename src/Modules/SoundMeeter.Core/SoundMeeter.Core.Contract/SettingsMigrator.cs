@@ -1,7 +1,12 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Midi.Entities;
+using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.Twitch.Entities;
 
-namespace SoundMeeter.Models;
+namespace SoundMeeter.Core.Contract;
 
 /// <summary>
 /// Результат применения миграций к загруженному файлу настроек.
@@ -48,7 +53,7 @@ public static class SettingsMigrator
 
         if (settings.SchemaVersion > CurrentSchemaVersion)
         {
-            message = Services.Loc.Get("Sm.Settings.NewerSchema", settings.SchemaVersion, CurrentSchemaVersion);
+            message = Loc.Get("Sm.Settings.NewerSchema", settings.SchemaVersion, CurrentSchemaVersion);
             return MigrationOutcome.UnsupportedNewerVersion;
         }
 
@@ -61,7 +66,7 @@ public static class SettingsMigrator
 
         if (from != CurrentSchemaVersion)
         {
-            message = Services.Loc.Get("Sm.Settings.Migrated", from, CurrentSchemaVersion);
+            message = Loc.Get("Sm.Settings.Migrated", from, CurrentSchemaVersion);
             logger.LogInformation("{Message}", message);
         }
         else

@@ -1,4 +1,4 @@
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Задержка аудиопути микшера. Значения управляют буферами устройств (endpoint)

@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace SoundMeeter.ViewModels
+namespace SoundMeeter.Core.UseCases
 {
     /// <summary>
     /// Постоянное правило роутинга: приложение, которое всегда играет в

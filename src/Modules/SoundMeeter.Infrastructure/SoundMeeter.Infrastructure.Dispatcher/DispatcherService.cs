@@ -1,7 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Threading;
+﻿using SoundMeeter.Core.Contract;
+using System.Windows;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Infrastructure.Dispatcher
 {
     /// <summary>
     /// Реализация <see cref="IDispatcherService"/> поверх WPF (SM-A10).
@@ -13,7 +13,7 @@ namespace SoundMeeter.Services
     /// </summary>
     public class DispatcherService : IDispatcherService
     {
-        private readonly Dispatcher _dispatcher;
+        private readonly System.Windows.Threading.Dispatcher _dispatcher;
 
         public DispatcherService()
         {

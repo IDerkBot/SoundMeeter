@@ -1,4 +1,4 @@
-﻿using SoundMeeter.Models;
+﻿using SoundMeeter.Update.Entities;
 using Xunit;
 
 namespace SoundMeeter.Update.Tests;

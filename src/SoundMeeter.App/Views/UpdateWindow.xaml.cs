@@ -1,6 +1,8 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Update.Contract;
+using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.Presentation.ViewModels;
 using System.Windows;
 
 namespace SoundMeeter.Views
@@ -16,7 +18,7 @@ namespace SoundMeeter.Views
         {
             InitializeComponent();
             Language = LocResources.XmlLanguage;
-            ViewModel = new UpdateViewModel(updates, update);
+            ViewModel = new UpdateInstallViewModel(updates, update);
             DataContext = ViewModel;
 
             // План обновления показываем диалогом: удаление файлов необратимо,
@@ -29,7 +31,7 @@ namespace SoundMeeter.Views
                 Dispatcher.BeginInvoke(new Action(() => Application.Current?.Shutdown()));
         }
 
-        public UpdateViewModel ViewModel { get; }
+        public UpdateInstallViewModel ViewModel { get; }
 
         private void OnCloseClick(object sender, RoutedEventArgs e) => Close();
     }

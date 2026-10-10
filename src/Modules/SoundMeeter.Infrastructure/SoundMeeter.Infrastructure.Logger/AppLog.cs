@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Text;
 
-namespace SoundMeeter.Services.Logging;
+namespace SoundMeeter.Infrastructure.Logger;
 
 /// <summary>
 /// Централизованная точка входа в журнал приложения (SM-A03).

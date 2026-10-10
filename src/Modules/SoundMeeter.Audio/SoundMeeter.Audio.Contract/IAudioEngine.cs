@@ -1,6 +1,7 @@
-﻿using SoundMeeter.Models;
+﻿using SoundMeeter.Core.Entities;
+using SoundMeeter.Midi.Entities;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.Audio.Contract;
 
 public interface IAudioEngine : IDisposable
 {

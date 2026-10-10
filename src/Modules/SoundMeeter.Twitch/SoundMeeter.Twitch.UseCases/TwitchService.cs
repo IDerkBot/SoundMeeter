@@ -1,16 +1,19 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Entities;
 
-namespace SoundMeeter.Services.Twitch;
+using SoundMeeter.TextToSpeech.Entities;
+namespace SoundMeeter.Twitch.UseCases;
 
 /// <summary>
 /// Интеграция с Twitch целиком (SM-F01): вход, чтение чата, статус трансляции.
 ///
 /// Здесь и только здесь решается, когда подключаться и когда отключаться. Всё
-/// остальное уже написано и проверено по отдельности: <see cref="TwitchAuthService"/>
-/// умеет входить, <see cref="TwitchApiClient"/> — спрашивать, <see cref="TwitchChatReader"/>
+/// остальное уже написано и проверено по отдельности: <see cref="ITwitchAuth"/>
+/// умеет входить, <see cref="ITwitchApi"/> — спрашивать, <see cref="ITwitchChatReader"/>
 /// — читать. Смешивать их в одном классе означало бы, что правка любой части тянет
 /// за собой остальные и не проверяется по отдельности.
 ///
@@ -63,7 +66,12 @@ public sealed class TwitchService : ITwitchState, IDisposable
     public string LastError => _chat.LastError;
 
     /// <summary>Приложение собрано: в коде есть client ID. Без него вход невозможен.</summary>
-    public static bool IsConfigured => TwitchAuthService.IsConfigured;
+    ///
+    /// Факт читается из <see cref="TwitchAppConfig"/>, а не из реализации входа:
+    /// сервис лежит в слое сценариев, а реализация — в Contract.Implementation,
+    /// и ссылка вверх по слоям означала бы, что UseCases нельзя собрать без
+    /// реализации. Слой должен знать контракт.
+    public static bool IsConfigured => TwitchAppConfig.IsConfigured;
 
     public TwitchService(
         ITwitchAuth auth,
@@ -402,17 +410,4 @@ public sealed class TwitchService : ITwitchState, IDisposable
         MessageReceived = null;
         StatusChanged = null;
     }
-}
-
-/// <summary>Что известно о трансляции канала.</summary>
-public enum TwitchStreamState
-{
-    /// <summary>Неизвестно: сеть недоступна или статус ещё не спрошен.</summary>
-    Unknown,
-
-    /// <summary>Трансляция не идёт.</summary>
-    Offline,
-
-    /// <summary>Идёт трансляция.</summary>
-    Live,
 }

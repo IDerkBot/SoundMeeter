@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Infrastructure.Settings;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 // Импорт и экспорт всех настроек одним файлом (SM-C09). Файл пишет и читает
 // SettingsTransferService, а применяет его здесь: применение затрагивает и
@@ -56,7 +56,7 @@ public partial class MainViewModel
 
         // Док OBS: сервер перезапускается, если изменился порт, и глушится при
         // выключении. Само значение порта уже в снимке.
-        ApplyDockSettings(_settings.Settings.ObsDock, saveNow: false);
+        _dock.ApplyDockSettings(_settings.Settings.ObsDock, saveNow: false);
 
         // Модуль синтеза речи (SM-E01): настройки уже в живом снимке, но модуль
         // надо перевключить под них — как сервер дока. Отдельно от ApplyDockSettings
@@ -66,7 +66,7 @@ public partial class MainViewModel
         RestoreTts();
 
         // MIDI-устройство из файла — как при старте, в Restore.
-        _midi.Open(_engine.Midi.DeviceName);
+        _selectMidiDevice.Execute(_engine.Midi.DeviceName);
 
         // Поведение приложения. Источник истины по автозапуску — система: файл
         // из чужой машины не должен молча регистрировать автозапуск здесь, поэтому

@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.TextToSpeech.Entities;
 
 namespace SoundMeeter.Services.TextToSpeech;
 
@@ -26,7 +29,7 @@ namespace SoundMeeter.Services.TextToSpeech;
 /// Дроссель по пользователю обязателен: без него «<c>!tts</c>» в цикле от
 /// одного аккаунта занимает эфир на всё время стрима.
 /// </summary>
-public sealed class TextToSpeechService : IDisposable
+public sealed class TextToSpeechService : ITtsModule
 {
     private readonly IAudioEngine _engine;
     private readonly ITtsSpeechEngine _speech;

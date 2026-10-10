@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.ChangeLanguage.UseCases;
 
 /// <summary>
 /// Локализация интерфейса (SM-C07), часть без UI.

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Infrastructure.Logger;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.TrayIcon.UseCases;
 
 /// <summary>
 /// Значок в системном лотке и поведение окна при закрытии (SM-D02).

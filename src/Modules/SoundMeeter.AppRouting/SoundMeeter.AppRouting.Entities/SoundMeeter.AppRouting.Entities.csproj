@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SoundMeeter.AppRouting.Entities</RootNamespace>
+    <AssemblyName>SoundMeeter.AppRouting.Entities</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Чистые правила: как узнать половинку виртуального кабеля по имени
+       устройства и с кем её соединить. Ни COM, ни файловой системы — только
+       разбор имён, поэтому знать их можно откуда угодно, в том числе из
+       Audio и ядра. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

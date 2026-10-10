@@ -1,6 +1,5 @@
-using SoundMeeter.Audio;
 using SoundMeeter.Controls;
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 

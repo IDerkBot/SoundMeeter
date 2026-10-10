@@ -1,84 +1,58 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.UseCases;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
-// Проверка обновлений SoundMeeter через GitHub Releases. Окно установки открывает
-// код- behind (Views/UpdateWindow.xaml) — так же, как это сделано для MIDI-привязок.
+// Проверка обновлений SoundMeeter через GitHub Releases вынесена в
+// UpdateViewModel (SoundMeeter.Update.UseCases). Этот partial оставлен для
+// совместимости: все вызовы делегируются.
 public partial class MainViewModel
 {
-    private readonly IUpdateService _updateService;
+    /// <summary>Доступ к VM модуля обновлений (для окна установки и баннера).</summary>
+    public UpdateViewModel Update => _updateVm;
 
     /// <summary>Релиз, найденный последней проверкой. null — обновлений нет.</summary>
-    public UpdateInfo? PendingUpdate { get; private set; }
+    public UpdateInfo? PendingUpdate => _updateVm.PendingUpdate;
 
-    [ObservableProperty]
-    private bool _isUpdateAvailable;
-
-    [ObservableProperty]
-    private string _updateBanner = "";
-
-    [ObservableProperty]
-    private string _updateStatus = "";
-
-    /// <summary>
-    /// Тихая проверка после показа окна: только баннер, без модальных окон.
-    /// </summary>
-    public async Task CheckUpdatesOnStartupAsync()
+    /// <summary>Обновление найдено — интерфейс показывает баннер.</summary>
+    public bool IsUpdateAvailable
     {
-        try
+        get => _updateVm.IsUpdateAvailable;
+        set
         {
-            UpdateStatus = Loc.Get("Sm.Update.Status.Checking", _updateService.CurrentVersion);
-            var result = await _updateService.CheckAsync();
-            await _dispatcherService.InvokeAsync(() => ApplyCheckResult(result));
-        }
-        catch (Exception ex)
-        {
-            // Задача запускается fire-and-forget: исключение here уйдёт в unobserved.
-            _logger.LogError(ex, "Тихая проверка обновлений не удалась: {Message}", ex.Message);
+            if (_updateVm.IsUpdateAvailable != value)
+                _updateVm.IsUpdateAvailable = value;
         }
     }
+
+    /// <summary>Текст баннера обновления.</summary>
+    public string UpdateBanner
+    {
+        get => _updateVm.UpdateBanner;
+        set
+        {
+            if (_updateVm.UpdateBanner != value)
+                _updateVm.UpdateBanner = value;
+        }
+    }
+
+    /// <summary>Статусная строка проверки обновлений.</summary>
+    public string UpdateStatus
+    {
+        get => _updateVm.UpdateStatus;
+        set
+        {
+            if (_updateVm.UpdateStatus != value)
+                _updateVm.UpdateStatus = value;
+        }
+    }
+
+    /// <summary>Тихая проверка после показа окна: только баннер, без модальных окон.</summary>
+    public Task CheckUpdatesOnStartupAsync() => _updateVm.CheckUpdatesOnStartupAsync();
 
     /// <summary>Ручная проверка по кнопке: сообщаем и про обновление, и про его отсутствие.</summary>
-    public async Task CheckUpdatesAsync()
-    {
-        UpdateStatus = Loc.Get("Sm.Update.Status.Checking", _updateService.CurrentVersion);
-        var result = await _updateService.CheckAsync();
-        await _dispatcherService.InvokeAsync(() => ApplyCheckResult(result));
-    }
+    public Task CheckUpdatesAsync() => _updateVm.CheckUpdatesAsync();
 
     /// <summary>Скрыть баннер до следующей проверки.</summary>
-    [RelayCommand]
-    private void DismissUpdate() => IsUpdateAvailable = false;
-
-    private void ApplyCheckResult(UpdateCheckResult result)
-    {
-        if (!result.Success)
-        {
-            PendingUpdate = null;
-            IsUpdateAvailable = false;
-            UpdateBanner = "";
-            UpdateStatus = Loc.Get("Sm.Update.Status.CheckFailed", result.Message);
-            return;
-        }
-
-        if (!result.UpdateAvailable || result.Update is not { } update)
-        {
-            PendingUpdate = null;
-            IsUpdateAvailable = false;
-            UpdateBanner = "";
-            UpdateStatus = Loc.Get("Sm.Update.Status.UpToDate", _updateService.CurrentVersion);
-            return;
-        }
-
-        PendingUpdate = update;
-        IsUpdateAvailable = true;
-        UpdateBanner = update.CanInstall
-            ? Loc.Get("Sm.Update.Banner.Installable", update.Version, _updateService.CurrentVersion)
-            : Loc.Get("Sm.Update.Banner.NoPortable", update.Version, _updateService.CurrentVersion);
-        UpdateStatus = Loc.Get("Sm.Update.Status.Available");
-    }
+    public void DismissUpdate() => _updateVm.DismissUpdateCommand.Execute(null);
 }

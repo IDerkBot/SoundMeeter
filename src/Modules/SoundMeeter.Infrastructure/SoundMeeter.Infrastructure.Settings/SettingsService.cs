@@ -1,11 +1,16 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
-using System.IO;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Docking.Entities;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.Twitch.Entities;
 using System.Security;
 using System.Text.Json;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Infrastructure.Settings
 {
     /// <summary>
     /// Персистентное хранилище настроек. Реализует <see cref="ISettingsService"/> —

@@ -4,13 +4,29 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services.Twitch</RootNamespace>
+    <RootNamespace>SoundMeeter.Twitch.Contract.Implementation</RootNamespace>
     <AssemblyName>SoundMeeter.Twitch.Contract.Implementation</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- Только внешние системы Twitch: HTTP к OAuth и Helix, WebSocket к чату,
+       DPAPI и файловое хранилище токена. Никакой оркестрации — она в
+       SoundMeeter.Twitch.UseCases, и она собирается без этой сборки. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <!-- ProtectedData: токен лежит на диске зашифрованным под текущим
+         пользователем Windows. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Биквад-фильтр второго порядка (RBJ cookbook), Direct Form I.

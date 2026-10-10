@@ -1,5 +1,7 @@
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.StartUp.Contract;
+using SoundMeeter.TrayIcon.UseCases;
 using System.ComponentModel;
 using System.Windows;
 

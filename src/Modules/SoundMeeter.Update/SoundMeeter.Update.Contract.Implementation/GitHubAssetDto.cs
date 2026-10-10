@@ -1,0 +1,16 @@
+using System.Text.Json.Serialization;
+
+namespace SoundMeeter.Update.Contract.Implementation;
+
+/// <summary>Файл, приложенный к релизу.</summary>
+internal sealed class GitHubAssetDto
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("size")]
+    public long Size { get; set; }
+
+    [JsonPropertyName("browser_download_url")]
+    public string? BrowserDownloadUrl { get; set; }
+}

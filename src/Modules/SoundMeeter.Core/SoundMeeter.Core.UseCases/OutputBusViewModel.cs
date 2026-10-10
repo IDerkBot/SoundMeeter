@@ -1,14 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Выходная шина (стрип вывода): громкость, мут, моно, соло, VU-метр.
 /// </summary>
-public partial class OutputBusViewModel : LocalizedViewModel
+public partial class OutputBusViewModel : LocalizedViewModel, IOutputStrip
 {
     private readonly IAudioEngine _engine;
     private readonly Action _markDirty;
@@ -130,4 +131,9 @@ public partial class OutputBusViewModel : LocalizedViewModel
         float displayed = MathF.Max(raw, decayed);
         PeakLevel = displayed > 0.002f ? displayed : 0f;
     }
+
+    string IOutputStrip.DeviceId => Model.DeviceId;
+    string IOutputStrip.Name => Name;
+    float IOutputStrip.PeakLevel => PeakLevel;
+    bool IOutputStrip.IsAvailable => IsAvailable;
 }

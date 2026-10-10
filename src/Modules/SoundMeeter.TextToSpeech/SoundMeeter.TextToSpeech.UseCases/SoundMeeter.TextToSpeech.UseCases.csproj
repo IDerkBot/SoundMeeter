@@ -9,13 +9,18 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- Только оркестрация и представление: очередь озвучки, разбор реплик,
+       жизненный цикл модуля и VM. Ни синтезатора, ни SAPI здесь нет — это
+       Contract.Implementation, а всё, чем модуль договаривается с внешним
+       миром, лежит в Contract. -->
   <ItemGroup>
-    <PackageReference Include="System.Speech" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
   </ItemGroup>
@@ -29,5 +34,3 @@
 
 
 </Project>
-
-

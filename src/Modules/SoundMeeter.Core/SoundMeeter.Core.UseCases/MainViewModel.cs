@@ -1,12 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Docking.UseCases;
+using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Midi.UseCases;
 using SoundMeeter.Services.TextToSpeech;
-using SoundMeeter.Services.Twitch;
+using SoundMeeter.StartUp.Contract;
+using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Update.UseCases;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Пункт переключателя языка в меню настроек (SM-C07). Название языка
@@ -45,10 +52,17 @@ public sealed partial class LanguageOptionViewModel : LocalizedViewModel
 /// Главная VM: жизненный цикл и управление микшером.
 /// MIDI, маршрутизация приложений и сохранение вынесены в тематические partial-файлы.
 /// </summary>
-public partial class MainViewModel : LocalizedViewModel
+public partial class MainViewModel : LocalizedViewModel, IStripProvider
 {
     private readonly IAudioEngine _engine;
     private readonly IUiTimer _meterTimer;
+    private readonly MidiController _midi;
+    private readonly SelectMidiDeviceUseCase _selectMidiDevice;
+    private readonly StripProvider _strips;
+    private readonly DockController _dock;
+    private readonly TtsViewModel _ttsVm;
+    private readonly TwitchViewModel _twitchVm;
+    private readonly UpdateViewModel _updateVm;
 
     /// <summary>
     /// Период обновления метров и снимка для дока. 33 мс — около 30 Гц: глаз
@@ -62,6 +76,9 @@ public partial class MainViewModel : LocalizedViewModel
     [ObservableProperty]
     private ObservableCollection<OutputBusViewModel> _buses = new();
 
+    IReadOnlyList<IInputStrip> IStripProvider.Inputs => _strips.Inputs;
+    IReadOnlyList<IOutputStrip> IStripProvider.Buses => _strips.Buses;
+
     [ObservableProperty]
     private bool _isRunning;
 
@@ -74,23 +91,25 @@ public partial class MainViewModel : LocalizedViewModel
     public MainViewModel(
         IAudioEngine engine,
         SettingsService settings,
-        IMidiService midi,
+        MidiController midi,
+        SelectMidiDeviceUseCase selectMidiDevice,
+        StripProvider strips,
+        DockController dock,
+        TtsViewModel ttsVm,
         IAudioService audioService,
         IInstalledAppsService installedAppsService,
         ISettingsService settingsService,
         IDispatcherService dispatcherService,
-        IUpdateService updateService,
-        IObsDockServer obsDock,
+        UpdateViewModel updateVm,
         IStartupService startup,
         IUiTimer meterTimer,
-        TextToSpeechService tts,
-        TwitchService twitch)
+        TwitchViewModel twitchVm)
     {
         _audioService = audioService;
         _installedAppsService = installedAppsService;
         _settingsService = settingsService;
         _dispatcherService = dispatcherService;
-        _updateService = updateService;
+        _updateVm = updateVm;
         _engine = engine;
         _settings = settings;
         // Импорт/экспорт настроек: нужен только SettingsService, поэтому собирается
@@ -98,18 +117,18 @@ public partial class MainViewModel : LocalizedViewModel
         // зависимостью ради двух методов над файлом.
         _transfer = new SettingsTransferService(settings);
         _midi = midi;
-        _dock = obsDock;
+        _selectMidiDevice = selectMidiDevice;
+        _strips = strips;
+        _dock = dock;
         _startup = startup;
-        // Модуль синтеза речи (SM-E01) берёт тот же SettingsService: его
-        // настройки лежат в том же settings.json, а команда !ttsvoice пишет их
-        // мимо кнопки «Применить», поэтому оба должны видеть один экземпляр.
-        _tts = tts;
-        _twitch = twitch;
+        // Модуль синтеза речи (SM-E01) вынесен в TtsViewModel; он берёт тот же
+        // SettingsService: его настройки лежат в том же settings.json, а команда
+        // !ttsvoice пишет их мимо кнопки «Применить», поэтому оба должны видеть
+        // один экземпляр.
+        _ttsVm = ttsVm;
+        _twitchVm = twitchVm;
         _engine.ChannelsChanged += OnChannelsChanged;
         _engine.StateChanged += OnStateChanged;
-        _midi.MessageReceived += OnMidiMessageReceived;
-        SubscribeDock();
-        SubscribeTts();
         SubscribeTwitch();
 
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
@@ -220,16 +239,13 @@ public partial class MainViewModel : LocalizedViewModel
         _saveTimer.Dispose();
         _meterTimer.Stop();
         _meterTimer.Ticked -= OnMeterTick;
-        _dock.Stop();
-        _dock.CommandReceived -= OnDockCommand;
-        _tts.StatusChanged -= OnTtsStatusChanged;
-        _tts.Dispose();
+        _dock.Dispose();
+        _ttsVm.Dispose();
         ShutdownTwitch();
         _engine.Stop();
         _engine.ChannelsChanged -= OnChannelsChanged;
         _engine.StateChanged -= OnStateChanged;
-        _midi.MessageReceived -= OnMidiMessageReceived;
-        _midi.Close();
+        _midi.Dispose();
     }
 
     private void OnMeterTick()
@@ -241,7 +257,7 @@ public partial class MainViewModel : LocalizedViewModel
 
         // Тот же тик отдаёт панели дока свежие метры: снимок собирается на UI-потоке,
         // поэтому гонок с командами дока не возникает.
-        PublishDockState();
+        _dock.PublishDockState();
     }
 
     private void OnChannelsChanged()
@@ -258,6 +274,10 @@ public partial class MainViewModel : LocalizedViewModel
         Buses.Clear();
         foreach (var model in _engine.Buses)
             Buses.Add(new OutputBusViewModel(_engine, model, MarkDirty, OnBusTitleChanged));
+
+        // Тот же состав отдаём наружу: MIDI, док и озвучка смотрят на стрипы через
+        // IStripProvider, а не на коллекции этой VM.
+        _strips.Reset(Inputs, Buses);
 
         HasVirtualCable = _engine.Catalog.Any(d => d.IsVirtualCable);
 

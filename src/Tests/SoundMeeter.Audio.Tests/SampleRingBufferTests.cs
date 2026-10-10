@@ -1,5 +1,4 @@
-using System.Linq;
-using SoundMeeter.Audio;
+using SoundMeeter.Audio.Dsp;
 using Xunit;
 
 namespace SoundMeeter.Audio.Tests;

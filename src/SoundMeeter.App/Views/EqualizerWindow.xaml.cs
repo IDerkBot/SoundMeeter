@@ -1,5 +1,5 @@
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.Core.UseCases;
 using System.Windows;
 
 namespace SoundMeeter.Views

@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Графический эквалайзер входного стрипа: десять пиков с шагом примерно в

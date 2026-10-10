@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Кольцевой буфер на float-сэмплы с поддержкой нескольких независимых читателей.

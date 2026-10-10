@@ -1,8 +1,9 @@
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using SoundMeeter.Models;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Обёртка микшера одной выходной шины. Применяет громкость/мут/моно/Solo шины,

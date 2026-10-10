@@ -1,5 +1,7 @@
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Docking.Presentation.ViewModels;
+using SoundMeeter.Docking.UseCases;
 using System.Windows;
 
 namespace SoundMeeter.Views
@@ -16,6 +18,14 @@ namespace SoundMeeter.Views
             Language = LocResources.XmlLanguage;
             DataContext = viewModel;
             Closed += (_, _) => viewModel.Dispose();
+        }
+
+        /// <summary>
+        /// Создание окна с DockViewModel (для MixerToolbarView).
+        /// </summary>
+        public static ObsDockSettingsWindow Create(DockController dock, IClipboardService clipboard)
+        {
+            return new ObsDockSettingsWindow(new ObsDockSettingsViewModel(dock, clipboard));
         }
 
         /// <summary>

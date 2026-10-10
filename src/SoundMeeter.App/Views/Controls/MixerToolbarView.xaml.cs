@@ -1,6 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.Docking.UseCases;
+using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Midi.Presentation;
+using SoundMeeter.Docking.Contract.Implementation;
+using SoundMeeter.Docking.Presentation.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,6 +24,16 @@ namespace SoundMeeter.Views.Controls
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Диспетчер берётся из контейнера приложения: представление создаётся
+        /// разметкой, а не контейнером, и взять его в конструкторе негде.
+        ///
+        /// Имя не <c>Dispatcher</c>: так называется и у самого WPF-объекта, и
+        /// перекрытие молча сбивало бы с толку при чтении.
+        /// </summary>
+        private static IDispatcherService UiDispatcher =>
+            App.ServiceProvider.GetRequiredService<IDispatcherService>();
+
         /// <summary>Показать/скрыть выпадающее меню настроек.</summary>
         private void OnSettingsClick(object sender, RoutedEventArgs e) => SettingsPopup.IsOpen = !SettingsPopup.IsOpen;
 
@@ -28,9 +45,11 @@ namespace SoundMeeter.Views.Controls
         {
             SettingsPopup.IsOpen = false;
 
-            if (DataContext is not MainViewModel main) return;
+            if (DataContext is not MainViewModel) return;
 
-            var window = new MidiBindingsWindow(main)
+            // Окно берёт сценарии из контейнера приложения: Composition Root —
+// единственное место, где модуль MIDI собирается целиком.
+            var window = new MidiBindingsWindow(App.ServiceProvider, UiDispatcher)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -59,7 +78,7 @@ namespace SoundMeeter.Views.Controls
             }
 
             new ObsDockSettingsWindow(new ObsDockSettingsViewModel(
-                main,
+                main.Dock,
                 App.ServiceProvider.GetRequiredService<IClipboardService>()))
             { Owner = owner }.Show();
         }

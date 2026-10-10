@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SoundMeeter.Update.Presentation</RootNamespace>
+    <AssemblyName>SoundMeeter.Update.Presentation</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Окно установки обновления и его ViewModel. Создаётся на каждое открытие
+       диалога и ни с чем в ядре не связан: UpdateViewModel (плашка и надпись в
+       главном окне) остаётся в UseCases, потому что к нему привязана разметка
+       главного окна через MainViewModel. -->
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundMeeter.Update.Contract\SoundMeeter.Update.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Update.Entities\SoundMeeter.Update.Entities.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+  </ItemGroup>
+
+</Project>

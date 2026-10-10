@@ -1,11 +1,14 @@
-using SoundMeeter.Models;
+using SoundMeeter.Midi.Entities;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.Midi.Contract;
 
-/// <summary>MIDI-сообщение в разобранном виде (для привязок).</summary>
-public readonly record struct MidiMessageInfo(MidiMessageKind Kind, int Channel, int Control, int Value);
-
-/// <summary>Сервис доступа к MIDI-устройству ввода.</summary>
+/// <summary>
+/// Сервис доступа к MIDI-устройству ввода.
+///
+/// Контракт отдельно от реализации (<c>Midi.Contract.Implementation</c>) и от
+/// ViewModel (<c>Midi.UseCases</c>): проверять привязки можно с заглушкой,
+/// не имея контроллера под рукой.
+/// </summary>
 public interface IMidiService : IDisposable
 {
     /// <summary>Доступные MIDI-устройства ввода (Index + ProductName).</summary>
@@ -21,6 +24,3 @@ public interface IMidiService : IDisposable
     /// <summary>Приходит с потока MIDI — НЕ с UI-потока. Нужен маршалинг на Dispatcher.</summary>
     event Action<MidiMessageInfo>? MessageReceived;
 }
-
-/// <summary>MIDI-устройство ввода.</summary>
-public sealed record MidiInputDevice(int Index, string Name);

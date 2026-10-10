@@ -1,7 +1,10 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using SoundMeeter.Services.TextToSpeech;
-using SoundMeeter.Services.Twitch;
+using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Entities;
+using SoundMeeter.Twitch.UseCases;
 using Xunit;
 
 namespace SoundMeeter.Tests;

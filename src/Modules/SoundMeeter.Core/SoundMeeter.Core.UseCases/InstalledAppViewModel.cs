@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.ViewModels
+namespace SoundMeeter.Core.UseCases
 {
     /// <summary>
     /// Установленная программа из реестра — то, что пользователь может

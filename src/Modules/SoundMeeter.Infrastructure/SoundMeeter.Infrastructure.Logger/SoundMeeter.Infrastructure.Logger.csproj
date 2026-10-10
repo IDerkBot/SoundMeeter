@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services.Logging</RootNamespace>
+    <RootNamespace>SoundMeeter.Infrastructure.Logger</RootNamespace>
     <AssemblyName>SoundMeeter.Infrastructure.Logger</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

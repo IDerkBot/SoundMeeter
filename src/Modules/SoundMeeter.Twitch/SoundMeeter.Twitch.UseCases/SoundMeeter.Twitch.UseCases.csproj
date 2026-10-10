@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services.Twitch</RootNamespace>
+    <RootNamespace>SoundMeeter.Twitch.UseCases</RootNamespace>
     <AssemblyName>SoundMeeter.Twitch.UseCases</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -16,7 +16,16 @@
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
+    <!-- Реализации контрактов (HTTP, WebSocket, DPAPI) намеренно НЕ подключены.
+         Сценарии работают с интерфейсами, а сборку реализаций знает только
+         Composition Root — он и регистрирует их в контейнере. Если ссылка
+         появится здесь, UseCases перестанет собираться без внешних систем:
+         проверить оркестрацию без сети станет невозможно. -->
+    <!-- Нужен только контракт источника реплик: коннектор к чату реализует
+         ITtsMessageSource и ничего не знает про синтез речи. Ссылка на
+         TextToSpeech.UseCases была бы лишней — затянула бы сюда и очередь
+         озвучки, и VM модуля. -->
+    <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
   </ItemGroup>

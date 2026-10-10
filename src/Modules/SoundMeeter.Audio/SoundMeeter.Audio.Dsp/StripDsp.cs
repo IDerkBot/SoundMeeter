@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 /// <summary>
 /// Последовательность обработки входного стрипа (SM-B05), собираемая один раз на
 /// источник: <c>денойзер → эквалайзер → компрессор → trim → задержка →

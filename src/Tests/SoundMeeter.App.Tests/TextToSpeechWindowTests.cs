@@ -1,6 +1,7 @@
-using SoundMeeter.Services;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.ViewModels;
 using SoundMeeter.Views;
 using System.Windows;
 using System.Windows.Controls;

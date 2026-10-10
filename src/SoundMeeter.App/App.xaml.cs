@@ -1,12 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Logging;
-using System.Net.Http;
-using SoundMeeter.Services.TextToSpeech;
-using SoundMeeter.Services.Twitch;
-using SoundMeeter.ViewModels;
 using SoundMeeter.Views;
 using System.Windows;
+using SoundMeeter.StartUp.UseCases;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Core.UseCases;
 
 namespace SoundMeeter
 {
@@ -56,7 +58,7 @@ namespace SoundMeeter
             var settingsService = ServiceProvider.GetRequiredService<SettingsService>();
             var engine = ServiceProvider.GetRequiredService<IAudioEngine>();
             var saved = await settingsService.LoadAsync();
-            settingsService.Settings = saved ?? new Models.AppSettings();
+            settingsService.Settings = saved ?? new AppSettings();
 
             // Уровень журнала — тоже настройка: подхватываем сохранённый.
             AppLog.SetLevel(AppLog.ParseLevel(settingsService.Settings.LogLevel));

@@ -1,3 +1,4 @@
+using SoundMeeter.Audio.Dsp;
 using System.Reflection;
 using Xunit;
 
@@ -78,7 +79,7 @@ public class AudioModuleBoundaryTests
     }
 
     private static Dictionary<string, Assembly> CoreGraph() =>
-        ReachableModules(typeof(SoundMeeter.Audio.StripDsp).Assembly);
+        ReachableModules(typeof(StripDsp).Assembly);
 
     private static string[] DirectReferences(Assembly assembly) =>
         assembly.GetReferencedAssemblies().Select(a => a.Name ?? string.Empty).ToArray();

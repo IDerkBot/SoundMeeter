@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Audio</RootNamespace>
+    <RootNamespace>SoundMeeter.Audio.Contract.Implementation</RootNamespace>
     <AssemblyName>SoundMeeter.Audio.Contract.Implementation</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -14,7 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
     <ProjectReference Include="..\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Audio.Entities\SoundMeeter.Audio.Entities.csproj" />
   </ItemGroup>
 
 </Project>

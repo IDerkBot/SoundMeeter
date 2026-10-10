@@ -4,11 +4,16 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.AudioPolicy</RootNamespace>
+    <RootNamespace>SoundMeeter.AppRouting.Contract.Implementation</RootNamespace>
     <AssemblyName>SoundMeeter.AppRouting.Contract.Implementation</AssemblyName>
     <IsPackable>false</IsPackable>
+    <!-- Объявления IAudioPolicyConfig — [ComImport] с Guid; сборка собирает их
+         как интероп-типы, и без unsafe-флага это не проходит. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <!-- COM-интероп Windows: RoGetActivationFactory из combase.dll и
+       IAudioPolicyConfig. Единственное место в solution, где есть P/Invoke. -->
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
   </ItemGroup>

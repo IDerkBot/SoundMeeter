@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
-using System.IO;
 using System.Text;
 
-namespace SoundMeeter.Services.Logging;
+namespace SoundMeeter.Infrastructure.Logger;
 
 /// <summary>
 /// Поставщик логирования в ротируемый текстовый файл.

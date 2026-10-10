@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
-using SoundMeeter.Services.Twitch;
+using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Twitch.Contract.Implementation;
 using Xunit;
 
 namespace SoundMeeter.Tests;

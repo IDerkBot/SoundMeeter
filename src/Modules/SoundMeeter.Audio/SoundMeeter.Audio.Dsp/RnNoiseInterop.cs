@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Прямая привязка к нативной библиотеке RNNoise (rnnoise.dll из пакета

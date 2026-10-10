@@ -1,5 +1,4 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract.Implementation;
 using Xunit;
 
 namespace SoundMeeter.Tests;

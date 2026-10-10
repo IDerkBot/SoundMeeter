@@ -1,4 +1,5 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using SoundMeeter.Services;
 using SoundMeeter.Tests.Infrastructure;
 using System.Text.Json;

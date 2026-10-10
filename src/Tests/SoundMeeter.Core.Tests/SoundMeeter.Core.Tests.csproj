@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -17,12 +17,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
-    <ProjectReference Include="..\..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.UseCases\SoundMeeter.Audio.UseCases.csproj" />
+    <!-- VM модальных окон: синтез речи, Twitch, журнал. -->
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
+    <!-- Граничные проверки модуля AppRouting смотрят на все три его сборки:
+         контракт, правила разбора имён и COM-реализацию. -->
+    <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
+    <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
+    <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
+    <!-- Pcm16MonoStream внутренний, но конвертация байтов SAPI в сэмплы проверяется
+         напрямую — дешевле, чем слушать. -->
+    <ProjectReference Include="..\..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
+    <!-- Проверки HTTP, WebSocket и DPAPI работают на конкретных реализациях
+         контрактов: подменить их интерфейсами здесь нельзя, проверяется именно
+         разбор ответов и шифрование токена. -->
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
   </ItemGroup>

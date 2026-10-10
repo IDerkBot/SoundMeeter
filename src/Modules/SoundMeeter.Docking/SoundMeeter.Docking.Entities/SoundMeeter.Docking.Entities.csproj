@@ -1,12 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <RootNamespace>SoundMeeter.Docking.Entities</RootNamespace>
     <AssemblyName>SoundMeeter.Docking.Entities</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <!--
+    DTO протокола дока: состояние, уходящее панели, и команды, приходящие от неё.
+    Отдельным слоем, как Update.Entities и Twitch.Entities: это данные, а не
+    поведение, и знать их должны и контракт сервера, и панель, и проверки —
+    но не весь остальной solution.
+
+    Ссылка на Core.Contract нужна ради ObsDockChannels: маркеры «вход»/«выход»
+    общие с настройками (ObsDockChannelRef.Kind), а те лежат в settings.json,
+    то есть в Core.Contract. Уводить их сюда значило бы заставить Core зависеть
+    от дока.
+  -->
 
 </Project>

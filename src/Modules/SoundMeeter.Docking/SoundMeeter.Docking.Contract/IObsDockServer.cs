@@ -1,6 +1,6 @@
-using SoundMeeter.Models;
+using SoundMeeter.Docking.Entities;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.Docking.Contract;
 
 /// <summary>
 /// Локальный сервер док-панели OBS: отдаёт страницу панели и гоняет по

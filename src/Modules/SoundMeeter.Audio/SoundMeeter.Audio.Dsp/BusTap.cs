@@ -1,7 +1,8 @@
 using NAudio.Wave;
-using SoundMeeter.Models;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Ответвление одного входа в одну шину: читает из кольцевого буфера источника

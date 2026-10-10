@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.Twitch;
+namespace SoundMeeter.Twitch.UseCases;
 
 /// <summary>
 /// Источник сообщений, объединяющий ручной ввод и чат Twitch (SM-F01).

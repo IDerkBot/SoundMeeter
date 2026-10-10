@@ -1,5 +1,7 @@
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Contract.Implementation;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.UseCases;
 using Xunit;
 
 namespace SoundMeeter.Tests;
@@ -129,7 +131,7 @@ public class AudioEnginePresetTests
         using var second = new WasapiAudioEngine();
         second.ApplyPreset(first.CreateSnapshot());
 
-        var strip = new ViewModels.InputChannelViewModel(
+        var strip = new InputChannelViewModel(
             second.Inputs[0], second, second.Buses, second.Catalog, () => { });
 
         Assert.True(strip.Func1.IsEngaged);

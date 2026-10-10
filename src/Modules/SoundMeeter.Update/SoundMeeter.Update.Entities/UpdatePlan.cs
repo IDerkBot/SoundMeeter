@@ -1,4 +1,4 @@
-namespace SoundMeeter.Models;
+namespace SoundMeeter.Update.Entities;
 
 /// <summary>
 /// План автообновления: проверенный распакованный payload, точный список файлов,

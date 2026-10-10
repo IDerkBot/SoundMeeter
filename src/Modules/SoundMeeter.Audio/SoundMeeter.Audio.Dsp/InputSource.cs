@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
 using System.Runtime.InteropServices;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Источник аудио для входного канала. Захватывает устройство

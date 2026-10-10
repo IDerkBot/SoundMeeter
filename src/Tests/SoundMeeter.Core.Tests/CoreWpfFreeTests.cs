@@ -1,3 +1,4 @@
+using SoundMeeter.Core.UseCases;
 using System.Reflection;
 using Xunit;
 
@@ -79,7 +80,7 @@ public class CoreWpfFreeTests
     }
 
     private static Dictionary<string, Assembly> CoreGraph() =>
-        ReachableModules(typeof(SoundMeeter.ViewModels.MainViewModel).Assembly);
+        ReachableModules(typeof(MainViewModel).Assembly);
 
     private static string[] DirectReferences(Assembly assembly) =>
         assembly.GetReferencedAssemblies().Select(a => a.Name ?? string.Empty).ToArray();
@@ -107,6 +108,6 @@ public class CoreWpfFreeTests
         // Проверка «у приложения точка входа есть» живёт в SoundMeeter.App.Tests
         // (ModuleBoundaryTests): этот проект видит только ядро, и сборки
         // SoundMeeter.dll рядом с ним просто нет.
-        Assert.Null(typeof(SoundMeeter.ViewModels.MainViewModel).Assembly.EntryPoint);
+        Assert.Null(typeof(MainViewModel).Assembly.EntryPoint);
     }
 }

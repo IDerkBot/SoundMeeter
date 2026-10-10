@@ -4,13 +4,14 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Models</RootNamespace>
+    <RootNamespace>SoundMeeter.Update.UseCases</RootNamespace>
     <AssemblyName>SoundMeeter.Update.UseCases</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
   </ItemGroup>
 </Project>
 

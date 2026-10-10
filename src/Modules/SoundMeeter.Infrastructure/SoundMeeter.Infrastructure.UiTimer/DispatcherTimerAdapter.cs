@@ -1,6 +1,7 @@
+using SoundMeeter.Core.Contract;
 using System.Windows.Threading;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.Infrastructure.UiTimer;
 
 /// <summary>
 /// Реализация <see cref="IUiTimer"/> поверх <see cref="DispatcherTimer"/> (SM-A10).

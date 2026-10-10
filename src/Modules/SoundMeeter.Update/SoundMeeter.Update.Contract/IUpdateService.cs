@@ -1,57 +1,56 @@
-using SoundMeeter.Models;
+using SoundMeeter.Update.Entities;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Update.Contract;
+
+/// <summary>
+/// Проверка обновлений по GitHub Releases и их установка поверх текущей копии.
+/// Реализация не бросает наружу исключений при проверке: о сбоях сети сообщает
+/// <see cref="UpdateCheckResult.Success"/>. Исключения возможны уже при скачивании
+/// и применении — их показывает диалог обновления.
+/// </summary>
+public interface IUpdateService
 {
+    /// <summary>Версия запущенной сборки.</summary>
+    AppVersion CurrentVersion { get; }
+
+    /// <summary>Папка, куда качается и распаковывается обновление.</summary>
+    string UpdateRoot { get; }
+
+    /// <summary>Каталог установленного приложения (рядом с exe).</summary>
+    string InstallDirectory { get; }
+
+    /// <summary>Путь к запущенному SoundMeeter.exe.</summary>
+    string ExecutablePath { get; }
+
+    Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Скачивает ассет и возвращает путь к локальному zip.</summary>
+    Task<string> DownloadAsync(UpdateAsset asset, IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Распаковывает zip и возвращает корень с payload'ом приложения.</summary>
+    string Extract(string zipPath, string versionTag);
+
     /// <summary>
-    /// Проверка обновлений по GitHub Releases и их установка поверх текущей копии.
-    /// Реализация не бросает наружу исключений при проверке: о сбоях сети сообщает
-    /// <see cref="UpdateCheckResult.Success"/>. Исключения возможны уже при скачивании
-    /// и применении — их показывает диалог обновления.
+    /// Проверяет целостность распакованной сборки и вычисляет точный список
+    /// файлов, которые обновление удалит из <see cref="InstallDirectory"/>.
+    /// Бросает исключение, если архив не является сборкой SoundMeeter.
     /// </summary>
-    public interface IUpdateService
-    {
-        /// <summary>Версия запущенной сборки.</summary>
-        AppVersion CurrentVersion { get; }
+    UpdatePlan PlanUpdate(string payloadDirectory, UpdateInfo update);
 
-        /// <summary>Папка, куда качается и распаковывается обновление.</summary>
-        string UpdateRoot { get; }
+    /// <summary>
+    /// Запускает фоновый скрипт, который дождётся выхода процесса, заменит файлы
+    /// в <see cref="InstallDirectory"/>, удалит ровно <see cref="UpdatePlan.FilesToDelete"/>
+    /// и перезапустит приложение. Возвращает сразу, дальше вызывающий обязан
+    /// закрыть приложение.
+    /// </summary>
+    void ApplyAndRestart(UpdatePlan plan);
 
-        /// <summary>Каталог установленного приложения (рядом с exe).</summary>
-        string InstallDirectory { get; }
+    /// <summary>
+    /// Диалог подтверждения: список удаляемых файлов, готовый к показу.
+    /// </summary>
+    string FormatPlanReport(UpdatePlan plan);
 
-        /// <summary>Путь к запущенному SoundMeeter.exe.</summary>
-        string ExecutablePath { get; }
-
-        Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>Скачивает ассет и возвращает путь к локальному zip.</summary>
-        Task<string> DownloadAsync(UpdateAsset asset, IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>Распаковывает zip и возвращает корень с payload'ом приложения.</summary>
-        string Extract(string zipPath, string versionTag);
-
-        /// <summary>
-        /// Проверяет целостность распакованной сборки и вычисляет точный список
-        /// файлов, которые обновление удалит из <see cref="InstallDirectory"/>.
-        /// Бросает исключение, если архив не является сборкой SoundMeeter.
-        /// </summary>
-        UpdatePlan PlanUpdate(string payloadDirectory, UpdateInfo update);
-
-        /// <summary>
-        /// Запускает фоновый скрипт, который дождётся выхода процесса, заменит файлы
-        /// в <see cref="InstallDirectory"/>, удалит ровно <see cref="UpdatePlan.FilesToDelete"/>
-        /// и перезапустит приложение. Возвращает сразу, дальше вызывающий обязан
-        /// закрыть приложение.
-        /// </summary>
-        void ApplyAndRestart(UpdatePlan plan);
-
-        /// <summary>
-        /// Диалог подтверждения: список удаляемых файлов, готовый к показу.
-        /// </summary>
-        string FormatPlanReport(UpdatePlan plan);
-
-        /// <summary>Открывает страницу релиза в браузере.</summary>
-        void OpenReleasePage(UpdateInfo update);
-    }
+    /// <summary>Открывает страницу релиза в браузере.</summary>
+    void OpenReleasePage(UpdateInfo update);
 }

@@ -4,23 +4,29 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <RootNamespace>SoundMeeter.Midi.UseCases</RootNamespace>
     <AssemblyName>SoundMeeter.Midi.UseCases</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NAudio" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
-  </ItemGroup>
-
+  <!-- Слой сценариев: разбор сообщений, привязки, выбор устройства, ошибки.
+       Ни WPF, ни ViewModel, ни порт MIDI здесь нет.
+       Взаимная ссылка на SoundMeeter.Midi.Presentation была перевёрнутой: пока
+       обработка привязок жила во ViewModel, UseCases приходилось тянуть
+       Presentation, а тот объявляет UseWPF — и WPF ехал в граф SoundMeeter.Core,
+       который ссылается на оба. Теперь Presentation → UseCases. -->
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Midi.Contract\SoundMeeter.Midi.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Midi.Contract.Implementation\SoundMeeter.Midi.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
   </ItemGroup>
-</Project>
 
+</Project>

@@ -1,7 +1,9 @@
-using SoundMeeter.Models;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Services.TextToSpeech;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.ViewModels;
+using SoundMeeter.TextToSpeech.Entities;
 
 namespace SoundMeeter.Tests.Infrastructure;
 
@@ -44,7 +46,7 @@ public sealed class FakeTextToSpeechHost : ITextToSpeechHost
             Find(preferred) ?? Installed.FirstOrDefault(voice => voice.IsRussian) ?? Installed.FirstOrDefault();
     }
 
-    private sealed class DirectDispatcher : Services.IDispatcherService
+    private sealed class DirectDispatcher : IDispatcherService
     {
         public bool HasThreadAccess => true;
         public void Post(Action action) => action();
@@ -85,9 +87,11 @@ public sealed class FakeTextToSpeechHost : ITextToSpeechHost
     /// <summary>Полосы, созданные за время жизни заглушки.</summary>
     public List<InputChannelViewModel> Strips { get; } = new();
 
-    IReadOnlyList<InputChannelViewModel> ITextToSpeechHost.Inputs => Strips;
+    IReadOnlyList<IInputStrip> ITextToSpeechHost.Inputs => Strips;
 
     public TextToSpeechService Tts { get; }
+
+    ITtsModule ITextToSpeechHost.Tts => Tts;
 
     public TextToSpeechSettings TtsSettings { get; }
 
@@ -98,10 +102,10 @@ public sealed class FakeTextToSpeechHost : ITextToSpeechHost
     {
         // Тот же маркер, что и у настоящей VM: пункт «отдельный канал» превращается
         // в реальный стрип ДО сохранения, иначе в settings.json уехал бы маркер.
-        if (updated.TargetInputId == ViewModels.TtsTargetItemViewModel.GeneratedId)
+        if (updated.TargetInputId == TtsTargetItemViewModel.GeneratedId)
         {
             updated.TargetInputId = Engine.EnsureGeneratedInput(
-                ViewModels.MainViewModel.TextToSpeechGeneratedStripName);
+                TtsViewModel.TextToSpeechGeneratedStripName);
             AddStrip(updated.TargetInputId);
 
             var created = Engine.Inputs.FirstOrDefault(input => input.Id == updated.TargetInputId);
@@ -120,7 +124,7 @@ public sealed class FakeTextToSpeechHost : ITextToSpeechHost
         Strips.Add(new InputChannelViewModel(model, Engine, [], Engine.Catalog, () => { }));
     }
 
-    private sealed class NoopSettingsService(AppSettings settings) : Services.ISettingsService
+    private sealed class NoopSettingsService(AppSettings settings) : ISettingsService
     {
         public AppSettings Settings { get; } = settings;
         public void Save() { }

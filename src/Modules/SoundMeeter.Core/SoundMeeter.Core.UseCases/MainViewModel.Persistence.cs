@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Infrastructure.Settings;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 // Восстановление пресета, отслеживание изменений и сохранение настроек микшера.
 public partial class MainViewModel
@@ -40,12 +41,17 @@ public partial class MainViewModel
                 _logger.LogInformation("{Report}", Loc.Get("Sm.Settings.NoPreset"));
         }
 
-        // Открываем MIDI-устройство, сохранённое в пресете.
-        _midi.Open(_engine.Midi.DeviceName);
+        // Открываем MIDI-устройство, сохранённое в пресете. Через сценарий, а не
+        // напрямую в порт: он проверяет, что устройство вообще есть, и откатывает
+        // зажатые PTT-кнопки. На старте их быть не может, но при смене пресета
+        // на живом движке — может, и без отката микрофон остался бы открытым.
+        var midi = _selectMidiDevice.Execute(_engine.Midi.DeviceName);
+        if (!midi.IsOpen && !string.IsNullOrWhiteSpace(_engine.Midi.DeviceName))
+            _logger.LogWarning("{Reason}", Loc.Get(midi.MessageKey));
 
         // Сервер док-панели поднимаем после восстановления стрипов: к моменту
         // первого подключения панели набор каналов уже настоящий.
-        if (DockSettings.Enabled) StartDock();
+        if (_dock.DockSettings.Enabled) _dock.StartDock();
 
         // Модуль синтеза речи (SM-E01) — по той же причине и в том же порядке:
         // «куда говорить» можно решить только после того, как стрипы на месте.

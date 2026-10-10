@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.Audio;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
+using SoundMeeter.Audio.Dsp;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Полоса графического эквалайзера стрипа: частота задана разметкой шага октавы,

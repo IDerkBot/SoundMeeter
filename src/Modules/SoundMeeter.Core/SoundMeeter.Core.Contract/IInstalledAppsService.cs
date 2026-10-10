@@ -1,10 +1,9 @@
-﻿using SoundMeeter.Models;
+﻿using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Core.Contract;
+
+public interface IInstalledAppsService
 {
-    public interface IInstalledAppsService
-    {
-        Task<List<InstalledApp>> GetInstalledAppsAsync();
-        string? GetAppIconPath(string? installLocation, string? executablePath);
-    }
+    Task<List<InstalledApp>> GetInstalledAppsAsync();
+    string? GetAppIconPath(string? installLocation, string? executablePath);
 }

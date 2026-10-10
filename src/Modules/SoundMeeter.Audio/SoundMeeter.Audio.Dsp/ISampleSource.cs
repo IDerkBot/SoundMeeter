@@ -1,4 +1,4 @@
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Источник сэмплов входного стрипа: владеет кольцевым буфером, из которого

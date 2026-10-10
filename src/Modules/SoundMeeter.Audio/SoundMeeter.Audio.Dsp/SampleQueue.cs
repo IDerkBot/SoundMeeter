@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Infrastructure.Logger;
 
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Очередь внешнего (подмешиваемого) звука стрипа — источник синтеза речи.

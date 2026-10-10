@@ -1,16 +1,50 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <RootNamespace>SoundMeeter.Docking.Contract.Implementation</RootNamespace>
     <AssemblyName>SoundMeeter.Docking.Contract.Implementation</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!--
+    Внешние системы док-панели: TcpListener и WebSocket поверх него, файловая
+    система (%APPDATA%\obs-studio\user.ini), список процессов Windows и встроенные
+    ресурсы сборки. Оркестрации здесь нет — она в SoundMeeter.Docking.UseCases,
+    и та собирается без этой сборки.
+
+    FrameworkReference на Microsoft.AspNetCore.App здесь стоял, хотя сервер
+    написан руками поверх TcpListener и ни одного ASP.NET API не вызывает:
+    при SelfContained-публикации такая ссылка тянет рантайм ASP.NET Core внутрь
+    single-file бандла. Убрано, размер exe уменьшился (замер в коммите).
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+  </ItemGroup>
+
+  <!-- Панель отдаётся пользователю теми же файлами, что лежат здесь: у него
+       нет ни папки с HTML, ни настройки OBS — есть один URL. Имена ресурсов
+       заданы явно, потому что сервер обращается к ним по строке, а не через
+       сгенерированный класс. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\obs-dock\index.html" LogicalName="obs-dock.index.html" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.css" LogicalName="obs-dock.dock.css" />
+    <EmbeddedResource Include="Resources\obs-dock\dock.js" LogicalName="obs-dock.dock.js" />
+  </ItemGroup>
+
+  <!-- IniValueReader внутренний, а ручная пересборка INI — ровно то место, где
+       ошибка на символе тихо ломает конфиг OBS. Проверяется на тексте в памяти. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
   </ItemGroup>
 
 </Project>

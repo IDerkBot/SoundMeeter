@@ -1,31 +1,34 @@
 <Solution>
-  <Project Path="SoundMeeter.App\SoundMeeter.App.csproj" />
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/AppRouting/">
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
-    <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.UseCases\SoundMeeter.AppRouting.UseCases.csproj" />
+    <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
   </Folder>
   <Folder Name="/Modules/Audio/">
+    <Project Path="Modules/SoundMeeter.Audio/SoundMeeter.Audio.Entities/SoundMeeter.Audio.Entities.csproj" Id="766a9255-0842-46b3-9671-bf447646f30b" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
-    <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.UseCases\SoundMeeter.Audio.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/ChangeLanguage/">
+    <Project Path="Modules/SoundMeeter.ChangeLanguage/SoundMeeter.ChangeLanguage.Presentation/SoundMeeter.ChangeLanguage.Presentation.csproj" Id="52d191a5-134b-4ee5-8dcb-a0431c46c2c6" />
     <Project Path="Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Contract\SoundMeeter.ChangeLanguage.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/Core/">
+    <Project Path="Modules/SoundMeeter.Core/SoundMeeter.Core.Entities/SoundMeeter.Core.Entities.csproj" Id="ae24243e-b065-47a5-a7aa-877fae6e7c55" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract.Implementation\SoundMeeter.Core.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
+    <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
   </Folder>
   <Folder Name="/Modules/Docking/">
-    <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
+    <Project Path="Modules/SoundMeeter.Docking/SoundMeeter.Docking.Presentation/SoundMeeter.Docking.Presentation.csproj" Id="690c2411-c243-4ea9-a408-2abd12a3522c" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
+    <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
   </Folder>
   <Folder Name="/Modules/Framework/">
     <Project Path="Modules\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
@@ -39,8 +42,10 @@
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.UiTimer\SoundMeeter.Infrastructure.UiTimer.csproj" />
   </Folder>
   <Folder Name="/Modules/Midi/">
+    <Project Path="Modules/SoundMeeter.Midi/SoundMeeter.Midi.Presentation/SoundMeeter.Midi.Presentation.csproj" Id="8d83a737-decc-40bb-8bef-82e87f657071" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract.Implementation\SoundMeeter.Midi.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract\SoundMeeter.Midi.Contract.csproj" />
+    <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/StartUp/">
@@ -49,6 +54,7 @@
     <Project Path="Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/TextToSpeech/">
+    <Project Path="Modules/SoundMeeter.TextToSpeech/SoundMeeter.TextToSpeech.Entities/SoundMeeter.TextToSpeech.Entities.csproj" Id="13c90d25-5953-45b5-a6f8-a7557ccdc800" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
@@ -67,6 +73,7 @@
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Contract.Implementation\SoundMeeter.Update.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Contract\SoundMeeter.Update.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Entities\SoundMeeter.Update.Entities.csproj" />
+    <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.Presentation\SoundMeeter.Update.Presentation.csproj" />
     <Project Path="Modules\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
   </Folder>
   <Folder Name="/Tests/">
@@ -76,6 +83,7 @@
     <Project Path="Tests\SoundMeeter.Core.Tests\SoundMeeter.Core.Tests.csproj" />
     <Project Path="Tests\SoundMeeter.Update.Tests\SoundMeeter.Update.Tests.csproj" />
   </Folder>
+  <Project Path="SoundMeeter.App\SoundMeeter.App.csproj" />
   <Project Path="StreamerTools.Style\StreamerTools.Style.csproj" />
 </Solution>
 

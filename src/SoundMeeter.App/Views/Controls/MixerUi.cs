@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Models;
-using SoundMeeter.Services;
-using SoundMeeter.ViewModels;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.Update.Contract;
+using SoundMeeter.Update.Entities;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;

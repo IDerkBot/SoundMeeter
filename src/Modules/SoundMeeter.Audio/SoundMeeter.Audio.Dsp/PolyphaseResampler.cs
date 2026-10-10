@@ -1,4 +1,4 @@
-namespace SoundMeeter.Audio;
+namespace SoundMeeter.Audio.Dsp;
 
 /// <summary>
 /// Потоковый ресемплер с полосой ограничения: интерполяция оконной sinc-функцией

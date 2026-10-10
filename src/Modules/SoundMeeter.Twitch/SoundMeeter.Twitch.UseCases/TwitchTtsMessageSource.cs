@@ -1,7 +1,7 @@
-using SoundMeeter.Models;
 using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.Twitch;
+namespace SoundMeeter.Twitch.UseCases;
 
 /// <summary>
 /// Источник сообщений для модуля синтеза речи, питаемый чатом Twitch (SM-F01).

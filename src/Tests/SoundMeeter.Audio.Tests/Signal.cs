@@ -1,4 +1,4 @@
-using SoundMeeter.Audio;
+using SoundMeeter.Audio.Dsp;
 
 namespace SoundMeeter.Tests.Infrastructure;
 

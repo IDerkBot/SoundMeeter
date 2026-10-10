@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using SoundMeeter.Models;
-using SoundMeeter.Services.Logging;
-using System.IO;
+using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Entities;
+using SoundMeeter.Infrastructure.Logger;
 using System.Reflection;
 using System.Text.Json;
 
-namespace SoundMeeter.Services
+namespace SoundMeeter.Core.UseCases
 {
     public class InstalledAppsService : IInstalledAppsService
     {

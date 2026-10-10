@@ -5,14 +5,34 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <!--
-      RootNamespace = SoundMeeter: Loc ищет строки по базовому имени
-      "SoundMeeter.Resources.Strings", а SDK по умолчанию включает
-      Resources\Strings.resx как SoundMeeter.Resources.Strings.resources.
+      Локализация: Loc ищет строки по базовому имени
+      "SoundMeeter.Resources.Strings" (см. ResourceManager в Loc.cs).
+
+      RootNamespace у этой сборки — SoundMeeter.ChangeLanguage.UseCases, а не
+      SoundMeeter, и MSBuild называет встраиваемый ресурс именно по нему.
+      Поэтому Strings.resx уезжал в сборку как
+      SoundMeeter.ChangeLanguage.UseCases.Resources.Strings.resources, Loc
+      ничего не находил, и весь интерфейс показывал ⟨Sm.Strip.Mute⟩ вместо
+      текста — при зелёной сборке и зелёных функциональных тестах.
+
+      Зависимость от RootNamespace молчаливая, поэтому LogicalName задан явно
+      (ниже). Иначе очередное переименование проекта снова тихо сломало бы всю
+      локализацию.
     -->
-    <RootNamespace>SoundMeeter</RootNamespace>
+    <RootNamespace>SoundMeeter.ChangeLanguage.UseCases</RootNamespace>
     <AssemblyName>SoundMeeter.ChangeLanguage.UseCases</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <!-- Имя ресурса задано явно: Loc.cs обращается к нему по имени, и оно не
+       должно зависеть от RootNamespace. Спутник ru обязан носить то же базовое
+       имя — ResourceManager ищет ресурс с ним и в папке языка. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx"
+                      LogicalName="SoundMeeter.Resources.Strings.resources" />
+    <EmbeddedResource Update="Resources\Strings.ru.resx"
+                      LogicalName="SoundMeeter.Resources.Strings.ru.resources" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.ChangeLanguage.Contract\SoundMeeter.ChangeLanguage.Contract.csproj" />

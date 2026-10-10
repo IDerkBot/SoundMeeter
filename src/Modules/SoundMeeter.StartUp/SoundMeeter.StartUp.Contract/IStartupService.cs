@@ -1,4 +1,4 @@
-﻿namespace SoundMeeter.Services;
+﻿namespace SoundMeeter.StartUp.Contract;
 
 /// <summary>
 /// Автозапуск вместе с Windows (SM-D01).

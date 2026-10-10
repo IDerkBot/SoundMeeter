@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using SoundMeeter.Services.Logging;
+using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.StartUp.Contract;
 
-namespace SoundMeeter.Services;
+namespace SoundMeeter.StartUp.UseCases;
 
 /// <summary>
 /// Реализация <see cref="IStartupService"/> поверх планировщика задач Windows.

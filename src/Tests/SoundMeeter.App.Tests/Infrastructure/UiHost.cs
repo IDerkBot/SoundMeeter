@@ -1,4 +1,5 @@
-using SoundMeeter.Services;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.ChangeLanguage.UseCases;
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;

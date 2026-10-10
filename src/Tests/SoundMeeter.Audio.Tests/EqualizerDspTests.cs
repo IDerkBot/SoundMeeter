@@ -1,5 +1,6 @@
-using SoundMeeter.Audio;
-using SoundMeeter.Models;
+using SoundMeeter.Audio.Dsp;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Entities;
 using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
@@ -224,7 +225,7 @@ public class EqualizerDspTests
     {
         foreach (var preset in EqualizerPresets.All)
         {
-            string name = Services.Loc.Get(preset.Key);
+            string name = Loc.Get(preset.Key);
             Assert.NotEqual($"⟨{preset.Key}⟩", name);
         }
     }

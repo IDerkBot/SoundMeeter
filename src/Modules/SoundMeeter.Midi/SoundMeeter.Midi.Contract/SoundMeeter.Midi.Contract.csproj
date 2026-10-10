@@ -4,13 +4,17 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services</RootNamespace>
+    <RootNamespace>SoundMeeter.Midi.Contract</RootNamespace>
     <AssemblyName>SoundMeeter.Midi.Contract</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!--
+    Контракт знает DTO модуля (MidiMessageInfo, MidiInputDevice), поэтому
+    отдаёт их слой Entities: Contract → Entities.
+  -->
   <ItemGroup>
-    <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
   </ItemGroup>
 
 </Project>
