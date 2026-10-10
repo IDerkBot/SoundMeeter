@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "c9f4eb0d62412943",
+        "id": "e76b84dd652c8000",
         "type": "tabs",
         "children": [
           {
-            "id": "46a240f7898e04b0",
+            "id": "31180e862d28e054",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "SoundMeeter/Tasks.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Tasks"
+              "title": "Новая вкладка"
             }
           }
         ]
@@ -188,12 +184,12 @@
       "bases:Создать новую базу": false
     }
   },
-  "active": "46a240f7898e04b0",
+  "active": "8863800971a80a9c",
   "lastOpenFiles": [
-    "SoundMeeter/weaks.md",
-    "SoundMeeter/Versions.md",
-    "SoundMeeter/Tasks.md",
     "SoundMeeter/Tests.md",
+    "SoundMeeter/Tasks.md",
+    "SoundMeeter/Versions.md",
+    "SoundMeeter/weaks.md",
     "StreamerTools/modules-summ.md",
     "StreamerTools/Tasks.md"
   ]
