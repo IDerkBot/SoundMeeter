@@ -1,4 +1,5 @@
 using SoundMeeter.Controls;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using System.Windows;
 using System.Windows.Controls;

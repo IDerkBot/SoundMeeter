@@ -2,18 +2,23 @@ using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 using SoundMeeter.Twitch.UseCases;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 // Интеграция с Twitch (SM-F01) вынесена в TwitchViewModel
 // (SoundMeeter.Twitch.UseCases). Этот partial оставлен для совместимости:
-// все вызовы делегируются.
-public partial class MainViewModel : ITwitchHost
+// все вызовы делегируются. Сам модуль теперь принадлежит оркестратору —
+// подписка на чат и опрос трансляции живут столько же, сколько живёт
+// приложение, а не столько же, сколько открыто главное окно.
+public partial class MainViewModel
 {
+    private TwitchViewModel TwitchVm => _coordinator.Twitch;
+
     /// <summary>Доступ к VM интеграции с Twitch.</summary>
-    public TwitchViewModel TwitchModule => _twitchVm;
+    public TwitchViewModel TwitchModule => TwitchVm;
 
     /// <summary>Интеграция с Twitch.</summary>
-    public TwitchService Twitch => _twitchVm.Twitch;
+    public TwitchService Twitch => TwitchVm.Twitch;
 
     /// <summary>
     /// Интеграция настроена: в коде есть client ID.
@@ -21,20 +26,20 @@ public partial class MainViewModel : ITwitchHost
     /// Пока его нет, вход невозможен, и об этом надо сказать прямо в окне — иначе
     /// кнопка «войти» молча ничего не делала бы.
     /// </summary>
-    public bool IsTwitchConfigured => _twitchVm.IsTwitchConfigured;
+    public bool IsTwitchConfigured => TwitchVm.IsTwitchConfigured;
 
     /// <summary>Начать вход. Возвращает код для ввода на странице Twitch либо null, если вход невозможен или сервер отказал.</summary>
     public Task<DeviceCodeChallenge?> BeginTwitchLoginAsync(CancellationToken cancellationToken = default) =>
-        _twitchVm.BeginTwitchLoginAsync(cancellationToken);
+        TwitchVm.BeginTwitchLoginAsync(cancellationToken);
 
     /// <summary>Спросить, подтвердил ли пользователь вход.</summary>
     public Task<DeviceAuthResult> ContinueTwitchLoginAsync(DeviceCodeChallenge challenge,
         CancellationToken cancellationToken = default) =>
-        _twitchVm.ContinueTwitchLoginAsync(challenge, cancellationToken);
+        TwitchVm.ContinueTwitchLoginAsync(challenge, cancellationToken);
 
     /// <summary>Выйти из аккаунта.</summary>
     public Task LogoutTwitchAsync(CancellationToken cancellationToken = default) =>
-        _twitchVm.LogoutTwitchAsync(cancellationToken);
+        TwitchVm.LogoutTwitchAsync(cancellationToken);
 
     /// <summary>
     /// Применяет настройки интеграции.
@@ -44,10 +49,10 @@ public partial class MainViewModel : ITwitchHost
     /// сейчас, на эфире.
     /// </summary>
     public void ApplyTwitchSettings(TwitchSettings updated, bool saveNow = true) =>
-        _twitchVm.ApplyTwitchSettings(updated, saveNow);
+        TwitchVm.ApplyTwitchSettings(updated, saveNow);
 
     /// <summary>Живые настройки интеграции (лежат в SettingsService, оттуда в settings.json).</summary>
-    public TwitchSettings TwitchSettings => _twitchVm.TwitchSettings;
+    public TwitchSettings TwitchSettings => TwitchVm.TwitchSettings;
 
     /// <summary>
     /// Восстановить вход при старте приложения.
@@ -56,15 +61,11 @@ public partial class MainViewModel : ITwitchHost
     /// канал известен и подписку можно создать сразу, не дожидаясь первого
     /// открытия окна.
     /// </summary>
-    public Task RestoreTwitchAsync() => _twitchVm.RestoreTwitchAsync();
+    public Task RestoreTwitchAsync() => TwitchVm.RestoreTwitchAsync();
 
     /// <summary>Открыть адрес в браузере по умолчанию.</summary>
-    public void OpenTwitchConsole() => _twitchVm.OpenTwitchConsole();
+    public void OpenTwitchConsole() => TwitchVm.OpenTwitchConsole();
 
     /// <summary>Открыть адрес страницы активации кода входа.</summary>
-    public void OpenTwitchActivation(string verificationUri) => _twitchVm.OpenTwitchActivation(verificationUri);
-
-    private void SubscribeTwitch() => _twitchVm.SubscribeTwitch();
-
-    private void ShutdownTwitch() => _twitchVm.Dispose();
+    public void OpenTwitchActivation(string verificationUri) => TwitchVm.OpenTwitchActivation(verificationUri);
 }

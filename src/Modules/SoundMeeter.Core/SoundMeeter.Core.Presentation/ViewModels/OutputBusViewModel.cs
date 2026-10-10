@@ -4,7 +4,8 @@ using SoundMeeter.Audio.Contract;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Выходная шина (стрип вывода): громкость, мут, моно, соло, VU-метр.

@@ -4,6 +4,8 @@ using SoundMeeter.Docking.UseCases;
 using System.Reflection;
 using Xunit;
 
+using SoundMeeter.Core.Presentation.ViewModels;
+
 namespace SoundMeeter.Tests;
 
 /// <summary>
@@ -53,8 +55,9 @@ public class DockingModuleBoundaryTests
     [Fact]
     public void CoreDoesNotDependOnTheDockPresentation()
     {
-        // Ядро собирает модуль дока и должно видеть только оркестрацию.
-        var core = typeof(SoundMeeter.Core.UseCases.MainViewModel).Assembly;
+        // Ядро собирает модуль дока и должно видеть только оркестрацию. Проверяется
+        // представление: именно главная VM открывает окно настроек дока.
+        var core = typeof(SoundMeeter.Core.Presentation.ViewModels.MainViewModel).Assembly;
 
         Assert.Empty(WithPrefix(core, "SoundMeeter.Docking.Presentation"));
         Assert.Contains("SoundMeeter.Docking.UseCases", ReferencesOf(core));

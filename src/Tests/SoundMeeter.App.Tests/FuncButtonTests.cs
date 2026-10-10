@@ -1,4 +1,5 @@
 using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Views.Controls;

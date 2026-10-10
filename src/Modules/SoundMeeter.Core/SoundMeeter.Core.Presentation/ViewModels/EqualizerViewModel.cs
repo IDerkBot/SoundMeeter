@@ -6,7 +6,8 @@ using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Полоса графического эквалайзера стрипа: частота задана разметкой шага октавы,

@@ -4,6 +4,7 @@ using SoundMeeter.TextToSpeech.UseCases;
 using Xunit;
 using SoundMeeter.Infrastructure.Settings;
 using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Update.Contract;

@@ -7,7 +7,8 @@ using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Входной стрип (микрофон/loopback): громкость, мут, моно, соло, VU-метр

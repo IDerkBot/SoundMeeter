@@ -6,7 +6,8 @@ using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Пользовательская кнопка FUNC на входном стрипе: назначенный набор выходов

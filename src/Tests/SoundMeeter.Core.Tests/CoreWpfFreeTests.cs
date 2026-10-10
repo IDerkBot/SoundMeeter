@@ -1,3 +1,4 @@
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using System.Reflection;
 using Xunit;

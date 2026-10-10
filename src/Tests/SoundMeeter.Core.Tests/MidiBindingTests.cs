@@ -1,5 +1,6 @@
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;

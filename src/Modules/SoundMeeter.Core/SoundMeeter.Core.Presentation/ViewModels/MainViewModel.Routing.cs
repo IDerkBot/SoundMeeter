@@ -6,7 +6,8 @@ using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 // Устройства, списки приложений, поиск и постоянные правила маршрутизации.
 public partial class MainViewModel

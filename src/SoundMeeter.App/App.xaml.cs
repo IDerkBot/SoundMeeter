@@ -8,6 +8,7 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.Core.Entities;
 using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 
 namespace SoundMeeter

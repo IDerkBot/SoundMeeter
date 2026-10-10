@@ -1,6 +1,6 @@
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Core.Presentation.ViewModels;
 
 namespace SoundMeeter.Tests.Infrastructure;
 

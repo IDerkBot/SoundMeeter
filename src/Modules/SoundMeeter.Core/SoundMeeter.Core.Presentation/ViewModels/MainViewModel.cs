@@ -4,17 +4,13 @@ using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
-using SoundMeeter.Docking.UseCases;
-using SoundMeeter.Infrastructure.Settings;
-using SoundMeeter.Midi.UseCases;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.TextToSpeech.Contract;
-using SoundMeeter.TextToSpeech.UseCases;
-using SoundMeeter.StartUp.Contract;
-using SoundMeeter.Twitch.UseCases;
+using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Update.UseCases;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases;
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Пункт переключателя языка в меню настроек (SM-C07). Название языка
@@ -50,35 +46,28 @@ public sealed partial class LanguageOptionViewModel : LocalizedViewModel
 }
 
 /// <summary>
-/// Главная VM: жизненный цикл и управление микшером.
+/// Главная VM: коллекции полос для разметки и команды главного окна.
+///
+/// Всё, что живёт без участия пользователя — подписки на движок, таймер метров,
+/// таймер сохранения, пресет, импорт и экспорт — ушло в <c>MixerCoordinator</c>.
+/// Разделение не косметическое: пока VM держала и то и другое, она не могла уйти
+/// из слоя сценариев, потому что создавала ViewModel'ы полос, а они нужны были
+/// оркестрации.
+///
 /// MIDI, маршрутизация приложений и сохранение вынесены в тематические partial-файлы.
 /// </summary>
-public partial class MainViewModel : LocalizedViewModel, IStripProvider
+public partial class MainViewModel : LocalizedViewModel, ITextToSpeechHost, ITwitchHost
 {
     private readonly IAudioEngine _engine;
-    private readonly IUiTimer _meterTimer;
-    private readonly MidiController _midi;
-    private readonly SelectMidiDeviceUseCase _selectMidiDevice;
-    private readonly StripProvider _strips;
-    private readonly DockController _dock;
-    private readonly TtsViewModel _ttsVm;
-    private readonly TwitchViewModel _twitchVm;
+    private readonly MixerCoordinator _coordinator;
+    private readonly AppBehaviourService _behaviour;
     private readonly UpdateViewModel _updateVm;
-
-    /// <summary>
-    /// Период обновления метров и снимка для дока. 33 мс — около 30 Гц: глаз
-    /// не отличает, а снимок дока не должен упираться в частоту разметки.
-    /// </summary>
-    private static readonly TimeSpan MeterInterval = TimeSpan.FromMilliseconds(33);
 
     [ObservableProperty]
     private ObservableCollection<InputChannelViewModel> _inputs = new();
 
     [ObservableProperty]
     private ObservableCollection<OutputBusViewModel> _buses = new();
-
-    IReadOnlyList<IInputStrip> IStripProvider.Inputs => _strips.Inputs;
-    IReadOnlyList<IOutputStrip> IStripProvider.Buses => _strips.Buses;
 
     [ObservableProperty]
     private bool _isRunning;
@@ -91,58 +80,35 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
 
     public MainViewModel(
         IAudioEngine engine,
-        SettingsService settings,
-        MidiController midi,
-        SelectMidiDeviceUseCase selectMidiDevice,
-        StripProvider strips,
-        DockController dock,
-        TtsViewModel ttsVm,
+        MixerCoordinator coordinator,
+        AppBehaviourService behaviour,
         IAudioService audioService,
         IInstalledAppsService installedAppsService,
         ISettingsService settingsService,
         IDispatcherService dispatcherService,
-        UpdateViewModel updateVm,
-        IStartupService startup,
-        IUiTimer meterTimer,
-        TwitchViewModel twitchVm)
+        UpdateViewModel updateVm)
     {
+        _engine = engine;
+        _coordinator = coordinator;
+        _behaviour = behaviour;
+        _updateVm = updateVm;
         _audioService = audioService;
         _installedAppsService = installedAppsService;
         _settingsService = settingsService;
         _dispatcherService = dispatcherService;
-        _updateVm = updateVm;
-        _engine = engine;
-        _settings = settings;
-        // Импорт/экспорт настроек: нужен только SettingsService, поэтому собирается
-        // здесь, а не через DI — отдельный сервис в контейнере был бы лишней
-        // зависимостью ради двух методов над файлом.
-        _transfer = new SettingsTransferService(settings);
-        _midi = midi;
-        _selectMidiDevice = selectMidiDevice;
-        _strips = strips;
-        _dock = dock;
-        _startup = startup;
-        // Модуль синтеза речи (SM-E01) вынесен в TtsViewModel; он берёт тот же
-        // SettingsService: его настройки лежат в том же settings.json, а команда
-        // !ttsvoice пишет их мимо кнопки «Применить», поэтому оба должны видеть
-        // один экземпляр.
-        _ttsVm = ttsVm;
-        _twitchVm = twitchVm;
-        _engine.ChannelsChanged += OnChannelsChanged;
-        _engine.StateChanged += OnStateChanged;
-        SubscribeTwitch();
+
+        // Оркестратор подписан на движок раньше нас (он создаётся раньше), поэтому
+        // он и поднимает эти события — подписаться надо на него, а не на движок
+        // напрямую: иначе два подписчика знали бы о смене состава стрипов, и
+        // рано или поздно разошлись бы.
+        _coordinator.ChannelsChanged += OnChannelsChanged;
+        _coordinator.StateChanged += OnStateChanged;
+        _coordinator.MeterTick += OnMeterTick;
 
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
         _audioService.AppsChanged += async (s, e) => await RefreshAppsAsync();
 
         _ = InitializeAsync();
-
-        _meterTimer = meterTimer;
-        _meterTimer.Interval = MeterInterval;
-        _meterTimer.Ticked += OnMeterTick;
-        _meterTimer.Start();
-
-        _saveTimer = new System.Threading.Timer(_ => SavePool(), null, 5000, 2000);
 
         BuildLanguages();
     }
@@ -176,8 +142,8 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
         MarkLanguageSelection();
 
         // Язык пишется только через SettingsService: снимок движка его не знает.
-        _settings.Settings.Language = normalized;
-        _settings.Save();
+        _settingsService.Settings.Language = normalized;
+        _settingsService.Save();
     }
 
     private void MarkLanguageSelection()
@@ -232,21 +198,13 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
     public IAudioEngine Engine => _engine;
 
     /// <summary>
-    /// Полное завершение: останавливает таймеры и движок, освобождает
-    /// NAudio-устройства, чтобы процесс мог корректно завершиться.
+    /// Полное завершение: останавливает оркестратор с его таймерами, модулями и
+    /// движком, чтобы процесс мог корректно завершиться.
     /// </summary>
     public void Shutdown()
     {
-        _saveTimer.Dispose();
-        _meterTimer.Stop();
-        _meterTimer.Ticked -= OnMeterTick;
-        _dock.Dispose();
-        _ttsVm.Dispose();
-        ShutdownTwitch();
-        _engine.Stop();
-        _engine.ChannelsChanged -= OnChannelsChanged;
-        _engine.StateChanged -= OnStateChanged;
-        _midi.Dispose();
+        _coordinator.MeterTick -= OnMeterTick;
+        _coordinator.Shutdown();
     }
 
     private void OnMeterTick()
@@ -255,10 +213,6 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
             vm.UpdatePeak(vm.Model.PeakLevel);
         foreach (var vm in Buses)
             vm.UpdatePeak(vm.Model.PeakLevel);
-
-        // Тот же тик отдаёт панели дока свежие метры: снимок собирается на UI-потоке,
-        // поэтому гонок с командами дока не возникает.
-        _dock.PublishDockState();
     }
 
     private void OnChannelsChanged()
@@ -270,26 +224,26 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
 
         Inputs.Clear();
         foreach (var model in _engine.Inputs)
-            Inputs.Add(new InputChannelViewModel(model, _engine, _engine.Buses, _engine.Catalog, MarkDirty));
+            Inputs.Add(new InputChannelViewModel(model, _engine, _engine.Buses, _engine.Catalog, _coordinator.MarkDirty));
 
         Buses.Clear();
         foreach (var model in _engine.Buses)
-            Buses.Add(new OutputBusViewModel(_engine, model, MarkDirty, OnBusTitleChanged));
+            Buses.Add(new OutputBusViewModel(_engine, model, _coordinator.MarkDirty, OnBusTitleChanged));
 
         // Тот же состав отдаём наружу: MIDI, док и озвучка смотрят на стрипы через
         // IStripProvider, а не на коллекции этой VM.
-        _strips.Reset(Inputs, Buses);
+        _coordinator.PublishStrips(Inputs, Buses);
 
         HasVirtualCable = _engine.Catalog.Any(d => d.IsVirtualCable);
 
         Status = Loc.Get("Sm.Toolbar.StripCounts", _engine.Inputs.Count, _engine.Buses.Count);
         RefreshStripApps();
-        MarkDirty();
+        _coordinator.MarkDirty();
     }
 
-    private void OnStateChanged()
+    private void OnStateChanged(bool isRunning)
     {
-        IsRunning = _engine.IsRunning;
+        IsRunning = isRunning;
         Status = IsRunning
             ? Loc.Get("Sm.Toolbar.EngineRunning")
             : Loc.Get("Sm.Toolbar.EngineStopped");
@@ -318,6 +272,10 @@ public partial class MainViewModel : LocalizedViewModel, IStripProvider
 
     protected override void DisposeCore()
     {
+        _coordinator.ChannelsChanged -= OnChannelsChanged;
+        _coordinator.StateChanged -= OnStateChanged;
+        _coordinator.MeterTick -= OnMeterTick;
+
         foreach (var input in Inputs) input.Dispose();
         foreach (var bus in Buses) bus.Dispose();
         foreach (var option in Languages) option.Dispose();

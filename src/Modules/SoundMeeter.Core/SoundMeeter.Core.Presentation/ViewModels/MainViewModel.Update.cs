@@ -1,7 +1,8 @@
 using SoundMeeter.Update.Entities;
 using SoundMeeter.Update.UseCases;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 // Проверка обновлений SoundMeeter через GitHub Releases вынесена в
 // UpdateViewModel (SoundMeeter.Update.UseCases). Этот partial оставлен для

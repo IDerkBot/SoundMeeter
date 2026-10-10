@@ -4,7 +4,8 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 /// <summary>
 /// Один параметр эффекта стрипа: подпись, диапазон и значение, которые крутилка

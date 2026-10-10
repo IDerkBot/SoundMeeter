@@ -1,6 +1,7 @@
 using SoundMeeter.Docking.UseCases;
 
-namespace SoundMeeter.Core.UseCases;
+
+namespace SoundMeeter.Core.Presentation.ViewModels;
 
 // Док-панель OBS вынесена в модуль SoundMeeter.Docking: оркестрация — в
 // DockController (SoundMeeter.Docking.UseCases), окно настроек — в
@@ -14,9 +15,9 @@ namespace SoundMeeter.Core.UseCases;
 //
 // Ядру от дока нужно ровно пять вещей, и все адресные: поднять сервер на
 // старте, применить настройки при импорте, публиковать снимок по таймеру
-// метров и освободиться при закрытии.
+// метров и освободиться при закрытии. Всё это делает MixerCoordinator.
 public partial class MainViewModel
 {
     /// <summary>Модуль док-панели OBS (для окна настроек).</summary>
-    public DockController Dock => _dock;
+    public DockController Dock => _coordinator.Dock;
 }

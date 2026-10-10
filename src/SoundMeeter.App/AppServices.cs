@@ -5,6 +5,7 @@ using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Contract.Implementation;
 using SoundMeeter.Audio.Contract.Implementation;
 using SoundMeeter.Core.Contract;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Docking.Contract;
 using SoundMeeter.Docking.UseCases;
@@ -149,17 +150,28 @@ internal static class AppServices
         // ITextToSpeechHost и ITwitchHost реализует и MainViewModel — окна
         // передают именно его, и регистрация на тот же экземпляр сохраняет
         // прежнее поведение. Цикла тут нет: сам MainViewModel эти интерфейсы
-        // не запрашивает, а получает модули конкретными типами.
+        // не запрашивает, а модули достаёт у MixerCoordinator поимённо.
         services.AddSingleton<ITextToSpeechHost>(sp => sp.GetRequiredService<MainViewModel>());
         services.AddSingleton<ITwitchHost>(sp => sp.GetRequiredService<MainViewModel>());
 
-        // Список стрипов для MIDI, дока и озвучки — отдельный объект, а не
-        // MainViewModel: тот сам реализует IStripProvider, но подставить его в
-        // контейнер значило бы замкнуть цикл MainViewModel → DockViewModel →
-        // IStripProvider → MainViewModel и упасть на старте. Наполняет его
-        // MainViewModel при каждой пересборке стрипов.
+        // Список стрипов для MIDI, дока и озвучки — отдельный объект. Подставить
+        // сюда MainViewModel было бы можно только будь он реализацией
+        // IStripProvider, а он ею не является: цикл
+        // MainViewModel → DockController → IStripProvider → MainViewModel
+        // замкнулся бы и контейнер не собрал ни одного из них. Наполняет
+        // реестр MixerCoordinator по вызову представления.
         services.AddSingleton<StripProvider>();
         services.AddSingleton<IStripProvider>(sp => sp.GetRequiredService<StripProvider>());
+
+        // Оркестрация микшера и поведение приложения. Оба — одиночные объекты,
+        // живущие столько же, сколько процесс: таймер метров, таймер сохранения и
+        // подписка на движок не должны пересоздаваться вместе с окном.
+        //
+        // Порядок регистрации не важен для контейнера, но важен для чтения:
+        // MixerCoordinator тянет DockController, TtsViewModel, TwitchViewModel и
+        // MidiController, а MainViewModel — сам оркестратор.
+        services.AddSingleton<AppBehaviourService>();
+        services.AddSingleton<MixerCoordinator>();
 
         // Singleton: OnStartup восстанавливает пресет через этот же экземпляр,
         // что и окно (transient давал окну второй экземпляр с пустыми стрипами).

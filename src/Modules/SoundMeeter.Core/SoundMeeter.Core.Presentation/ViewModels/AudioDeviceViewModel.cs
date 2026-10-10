@@ -4,7 +4,8 @@ using SoundMeeter.Audio.Contract;
 using SoundMeeter.Core.Entities;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.UseCases
+
+namespace SoundMeeter.Core.Presentation.ViewModels
 {
     public partial class AudioDeviceViewModel : ObservableObject
     {
