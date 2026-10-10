@@ -2,8 +2,10 @@ using System.Diagnostics;
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.Core.Entities;
-using SoundMeeter.Services.TextToSpeech;
+
 using Xunit;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
+using SoundMeeter.TextToSpeech.Contract;
 
 namespace SoundMeeter.Tests;
 

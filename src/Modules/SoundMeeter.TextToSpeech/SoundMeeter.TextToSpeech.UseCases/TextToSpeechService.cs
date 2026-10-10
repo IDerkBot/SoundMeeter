@@ -4,8 +4,9 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.Contract;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.UseCases;
 
 /// <summary>
 /// Модуль синтеза речи (SM-E01).

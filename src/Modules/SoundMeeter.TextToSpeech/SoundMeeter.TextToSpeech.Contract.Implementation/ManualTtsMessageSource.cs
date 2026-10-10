@@ -1,6 +1,6 @@
 using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract.Implementation;
 
 /// <summary>
 /// Источник, в который сообщения публикует сам пользователь — из окна настроек

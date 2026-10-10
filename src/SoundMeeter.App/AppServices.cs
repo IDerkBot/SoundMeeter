@@ -17,7 +17,8 @@ using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Contract.Implementation;
 using SoundMeeter.Midi.Presentation.ViewModels;
 using SoundMeeter.Midi.UseCases;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.StartUp.Contract;
 using SoundMeeter.StartUp.UseCases;
 using SoundMeeter.Twitch.Contract;
@@ -29,6 +30,7 @@ using SoundMeeter.Views;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Update.Contract.Implementation;
 using SoundMeeter.Docking.Contract.Implementation;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
 
 namespace SoundMeeter;
 

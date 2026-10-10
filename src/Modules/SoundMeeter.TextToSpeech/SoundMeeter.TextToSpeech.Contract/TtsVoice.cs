@@ -1,4 +1,4 @@
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract;
 
 /// <summary>
 /// Голос синтеза, доступный в системе. Плоский снимок того, что SAPI знает о

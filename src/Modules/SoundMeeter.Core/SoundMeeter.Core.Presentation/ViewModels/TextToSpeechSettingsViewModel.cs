@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using System.Collections.ObjectModel;
 using static SoundMeeter.TextToSpeech.Entities.TextToSpeechSettings;

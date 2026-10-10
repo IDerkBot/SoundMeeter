@@ -18,7 +18,6 @@
   </Folder>
   <Folder Name="/Modules/Core/">
     <Project Path="Modules/SoundMeeter.Core/SoundMeeter.Core.Entities/SoundMeeter.Core.Entities.csproj" Id="ae24243e-b065-47a5-a7aa-877fae6e7c55" />
-    <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract.Implementation\SoundMeeter.Core.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />

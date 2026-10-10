@@ -2,8 +2,10 @@ using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Core.Entities;
 using SoundMeeter.Core.UseCases;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
 
 namespace SoundMeeter.Tests.Infrastructure;
 

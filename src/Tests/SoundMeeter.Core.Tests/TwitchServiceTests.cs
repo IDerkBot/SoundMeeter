@@ -1,6 +1,6 @@
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;

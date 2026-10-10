@@ -1,7 +1,8 @@
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;
 using System.Reflection;
 using Xunit;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
 
 namespace SoundMeeter.Tests;
 
@@ -18,12 +19,11 @@ namespace SoundMeeter.Tests;
 /// слои, и 282 строки разбора команд туда не относились; теперь он в Entities,
 /// откуда его видно и синтезатору, и ядру.
 ///
-/// О НАЗВАНИЯХ ПРОСТРАНСТВ. Здесь один using на три сборки — Contract,
-/// Contract.Implementation и UseCases носят общее пространство
-/// <c>SoundMeeter.Services.TextToSpeech</c>, доставшееся от монолита. Разделение
-/// слоёв при этом есть (проверки ниже его и видят), но в коде не читается:
-/// using не различает сборки. Приведение пространств к именам проектов — отдельная
-/// правка, затрагивающая весь модуль разом.
+/// О НАЗВАНИЯХ ПРОСТРАНСТВ. До недавно Contract, Contract.Implementation и
+/// UseCases этого модуля делили одно пространство <c>SoundMeeter.Services.TextToSpeech</c>,
+/// доставшееся от монолита: разделение слоёв было, а в коде не читалось —
+/// using не различал сборки. Теперь у каждой своё имя, как у остальных модулей,
+/// и using наконец означает, ЧТО именно доступно слою.
 /// </summary>
 public class TextToSpeechModuleBoundaryTests
 {

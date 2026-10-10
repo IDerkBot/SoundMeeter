@@ -1,4 +1,4 @@
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 
 namespace SoundMeeter.Twitch.UseCases;

@@ -4,7 +4,7 @@ using SoundMeeter.Infrastructure.Logger;
 using System.Speech.AudioFormat;
 using System.Speech.Synthesis;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract.Implementation;
 
 /// <summary>
 /// Синтез речи через SAPI — системный синтезатор Windows.

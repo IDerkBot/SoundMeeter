@@ -1,4 +1,4 @@
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract.Implementation;
 
 /// <summary>
 /// Поток, который SAPI считает устройством вывода, а на деле конвертирует

@@ -1,6 +1,7 @@
 using System.Text;
-using SoundMeeter.Services.TextToSpeech;
+
 using Xunit;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
 
 namespace SoundMeeter.Tests;
 

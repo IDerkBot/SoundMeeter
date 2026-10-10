@@ -3,8 +3,9 @@ using SoundMeeter.Audio.Contract;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.Contract;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.UseCases;
 
 /// <summary>
 /// VM модуля синтеза речи (SM-E01): мост между <see cref="TextToSpeechService"/>

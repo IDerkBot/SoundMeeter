@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.UseCases;
 using Xunit;
 using SoundMeeter.Infrastructure.Settings;
 using SoundMeeter.Twitch.UseCases;

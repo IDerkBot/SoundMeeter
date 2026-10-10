@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Infrastructure.Logger;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 

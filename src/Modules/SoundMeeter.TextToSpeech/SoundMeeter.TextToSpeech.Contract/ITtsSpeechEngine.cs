@@ -1,6 +1,6 @@
 using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract;
 
 /// <summary>
 /// Как произносить фразу: голос, темп, громкость.

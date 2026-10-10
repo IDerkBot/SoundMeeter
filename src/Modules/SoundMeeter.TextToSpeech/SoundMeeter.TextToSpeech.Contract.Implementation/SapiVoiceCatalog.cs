@@ -3,7 +3,7 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Infrastructure.Logger;
 using System.Speech.Synthesis;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract.Implementation;
 
 /// <summary>
 /// Каталог голосов SAPI: что установлено в системе Windows.

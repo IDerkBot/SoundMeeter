@@ -1,7 +1,7 @@
 using SoundMeeter.Core.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract;
 
 /// <summary>
 /// То, что окну настроек синтеза речи нужно от приложения (SM-E01).

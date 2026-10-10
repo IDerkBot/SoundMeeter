@@ -1,5 +1,6 @@
 using SoundMeeter.Core.Contract;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;
 
 namespace SoundMeeter.Core.UseCases;

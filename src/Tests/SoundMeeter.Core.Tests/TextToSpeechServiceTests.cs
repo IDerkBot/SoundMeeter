@@ -1,9 +1,11 @@
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.Entities;
-using SoundMeeter.Services.TextToSpeech;
+using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.TextToSpeech.Entities;
 using Xunit;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
 
 namespace SoundMeeter.Tests;
 

@@ -1,6 +1,6 @@
 using SoundMeeter.TextToSpeech.Entities;
 
-namespace SoundMeeter.Services.TextToSpeech;
+namespace SoundMeeter.TextToSpeech.Contract;
 
 /// <summary>
 /// Источник сообщений чата для модуля синтеза речи (SM-E01).
