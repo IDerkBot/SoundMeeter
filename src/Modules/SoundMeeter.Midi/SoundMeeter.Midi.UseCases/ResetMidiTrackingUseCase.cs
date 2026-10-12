@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Infrastructure.Logger;
 using SoundMeeter.Midi.Contract;
+using SoundMeeter.Midi.Entities;
 
 namespace SoundMeeter.Midi.UseCases;
 

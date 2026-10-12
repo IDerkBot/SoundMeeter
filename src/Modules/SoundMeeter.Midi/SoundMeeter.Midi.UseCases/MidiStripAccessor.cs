@@ -1,4 +1,5 @@
 ﻿using SoundMeeter.Core.Contract;
+using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
 
 namespace SoundMeeter.Midi.UseCases;

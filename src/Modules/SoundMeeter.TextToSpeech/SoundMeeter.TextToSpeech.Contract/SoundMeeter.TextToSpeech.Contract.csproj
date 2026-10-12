@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SoundMeeter.Services.TextToSpeech</RootNamespace>
+    <RootNamespace>SoundMeeter.TextToSpeech.Contract</RootNamespace>
     <AssemblyName>SoundMeeter.TextToSpeech.Contract</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

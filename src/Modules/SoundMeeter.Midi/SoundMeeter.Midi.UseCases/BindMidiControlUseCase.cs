@@ -33,13 +33,13 @@ public sealed class BindMidiControlUseCase
     /// Привязывает параметр к сообщению контроллера.
     /// </summary>
     /// <returns>Снимок сохранённой привязки для показа в окне.</returns>
-    public MidiResult<MidiBindingDto> Execute(MidiBindingCommand command)
+    public MidiResult<MidiBinding> Execute(MidiBindingCommand command)
     {
         if (string.IsNullOrWhiteSpace(command.TargetType) ||
             string.IsNullOrWhiteSpace(command.StripId) ||
             string.IsNullOrWhiteSpace(command.Parameter))
         {
-            return MidiResult<MidiBindingDto>.Fail(MidiError.ParameterUnsupported);
+            return MidiResult<MidiBinding>.Fail(MidiError.ParameterUnsupported);
         }
 
         // Привязать можно только параметр, который есть в каталоге: иначе в
@@ -54,7 +54,7 @@ public sealed class BindMidiControlUseCase
             _logger.LogWarning(
                 "MIDI: параметр «{Parameter}» нельзя привязать к {Target} — привязка отклонена",
                 command.Parameter, command.TargetType);
-            return MidiResult<MidiBindingDto>.Fail(MidiError.ParameterUnsupported);
+            return MidiResult<MidiBinding>.Fail(MidiError.ParameterUnsupported);
         }
 
         _resetTracking.Execute();
@@ -68,6 +68,6 @@ public sealed class BindMidiControlUseCase
             binding.Channel, binding.Control, binding.Mode,
             binding.IsInverted ? ", обратная полярность" : string.Empty);
 
-        return MidiResult<MidiBindingDto>.Ok(MidiBindingDto.From(binding));
+        return MidiResult<MidiBinding>.Ok(binding);
     }
 }

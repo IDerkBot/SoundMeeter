@@ -3,6 +3,7 @@ using SoundMeeter.Core.Entities;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
 using SoundMeeter.Twitch.UseCases;
 using Xunit;

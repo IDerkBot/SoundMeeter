@@ -3,6 +3,9 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
+using SoundMeeter.Midi.Presentation.Dto;
+using SoundMeeter.Midi.Presentation.Helpers;
+using SoundMeeter.Midi.Presentation.UseCases;
 using SoundMeeter.Midi.UseCases;
 using System.Collections.ObjectModel;
 
@@ -31,7 +34,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
     private readonly BindMidiControlUseCase _bindControl;
     private readonly UpdateMidiBindingUseCase _updateBinding;
     private readonly ClearMidiBindingUseCase _clearBinding;
-    private readonly IMidiBindingStore _bindings;
+    private readonly GetMidiBindingQuery _getMidiBinding;
     private readonly IStripProvider _stripProvider;
 
     private MidiParamCell? _learning;
@@ -43,6 +46,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
         BindMidiControlUseCase bindControl,
         UpdateMidiBindingUseCase updateBinding,
         ClearMidiBindingUseCase clearBinding,
+        GetMidiBindingQuery getMidiBinding,
         IMidiBindingStore bindings,
         IStripProvider stripProvider)
     {
@@ -52,6 +56,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
         _bindControl = bindControl;
         _updateBinding = updateBinding;
         _clearBinding = clearBinding;
+        _getMidiBinding = getMidiBinding;
         _bindings = bindings;
         _stripProvider = stripProvider;
 
@@ -159,8 +164,8 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
     /// <summary>Текущая привязка параметра — для показа в ячейке.</summary>
     public MidiBindingDto? FindBinding(string targetType, string stripId, string parameter)
     {
-        var binding = _bindings.Find(targetType, stripId, parameter);
-        return binding is null ? null : MidiBindingDto.From(binding);
+        var record = _getMidiBinding.Execute(targetType, stripId, parameter);
+        return record is null ? null : MidiBindingDto.From(record);
     }
 
     public void BeginLearn(MidiParamCell cell)
@@ -242,7 +247,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
 
     private void UpdateStatus() =>
         Status = IsOpen
-            ? Loc.Get("Sm.Midi.Status.ListeningTo", _bindings.DeviceName)
+            ? Loc.Get("Sm.Midi.Status.ListeningTo", _getMidiBinding.DeviceName)
             : Loc.Get("Sm.Midi.Status.NoInput");
 
     /// <summary>

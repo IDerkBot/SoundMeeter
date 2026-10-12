@@ -14,24 +14,23 @@ using SoundMeeter.Infrastructure.Clipboard;
 using SoundMeeter.Infrastructure.Dispatcher;
 using SoundMeeter.Infrastructure.Settings;
 using SoundMeeter.Infrastructure.UiTimer;
-using SoundMeeter.Midi.Contract;
-using SoundMeeter.Midi.Contract.Implementation;
-using SoundMeeter.Midi.Presentation.ViewModels;
 using SoundMeeter.Midi.UseCases;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
-using SoundMeeter.StartUp.Contract;
-using SoundMeeter.StartUp.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.UseCases;
-using SoundMeeter.Update.Presentation.ViewModels;
 using SoundMeeter.Views;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Update.Contract.Implementation;
 using SoundMeeter.Docking.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
+using SoundMeeter.TrayIcon.UseCases;
+using SoundMeeter.StartUp.UseCases;
+using SoundMeeter.Twitch.Presentation;
+using SoundMeeter.Twitch;
+using SoundMeeter.Midi;
 
 namespace SoundMeeter;
 
@@ -64,10 +63,10 @@ internal static class AppServices
         services.AddSingleton<ISettingsService>(sp => sp.GetRequiredService<SettingsService>());
 
         // Перенаправление звука приложений (SM-B02): COM-интероп Windows за интерфейсом.
-    // Раньше был статическим классом и вызывался напрямую из AudioService —
-    // подменить его было нечем, и проверка уходила в систему по-настоящему.
-    services.AddSingleton<IAppRouter, AppRouter>();
-    services.AddSingleton<IAudioService, AudioService>();
+        // Раньше был статическим классом и вызывался напрямую из AudioService —
+        // подменить его было нечем, и проверка уходила в систему по-настоящему.
+        services.AddSingleton<IAppRouter, AppRouter>();
+        services.AddSingleton<IAudioService, AudioService>();
         services.AddSingleton<IInstalledAppsService, InstalledAppsService>();
         // Мост к UI-потоку и таймер метров: ядро знает только интерфейсы (SM-A10).
         services.AddSingleton<IDispatcherService, DispatcherService>();
@@ -82,8 +81,6 @@ internal static class AppServices
         // а падает только первое разрешение на старте.
         services.AddSingleton(sp => (GithubUpdateService)sp.GetRequiredService<IUpdateService>());
         services.AddSingleton<UpdateViewModel>();
-        // Автозапуск вместе с Windows (SM-D01).
-        services.AddSingleton<IStartupService, StartupService>();
         // Док-панель OBS: локальный сервер, отдающий страницу панели.
         services.AddSingleton<IObsDockServer, ObsDockServer>();
         // Правка user.ini. В контейнере, а не new() внутри VM: у установщика
@@ -97,35 +94,6 @@ internal static class AppServices
         // модуль singleton, потому что у него очередь и поток озвучки.
         services.AddSingleton<ITtsVoiceCatalog, SapiVoiceCatalog>();
         services.AddSingleton<ITtsSpeechEngine, SapiSpeechEngine>();
-
-        // Интеграция с Twitch (SM-F01). Порядок важен: токены и клиент API живут
-        // по одному экземпляру на процесс, потому что у них кэш и состояние входа,
-        // а сервис поднимает подписку на чат и опрос трансляции — и это тоже
-        // единственный в процессе.
-        services.AddSingleton<ITwitchTokenStore, TwitchTokenFileStore>();
-        services.AddSingleton(_ => new HttpClient());
-
-        // Сервис просит ИНТЕРФЕЙСЫ, а не конкретные классы: так его можно проверить
-        // с подменой без сети. Поэтому каждый интерфейс указывает на тот же
-        // экземпляр, что и сам класс, — регистрация через GetRequiredService.
-        // Регистрация класса без интерфейса дала бы «unable to resolve service».
-        services.AddSingleton<TwitchAuthService>();
-        services.AddSingleton<ITwitchAuth>(sp => sp.GetRequiredService<TwitchAuthService>());
-
-        services.AddSingleton<TwitchApiClient>();
-        services.AddSingleton<ITwitchApi>(sp => sp.GetRequiredService<TwitchApiClient>());
-
-        services.AddSingleton<TwitchChatReader>();
-        services.AddSingleton<ITwitchChatReader>(sp => sp.GetRequiredService<TwitchChatReader>());
-
-        services.AddSingleton<TwitchService>();
-        services.AddSingleton<TwitchViewModel>();
-
-        // Окно настроек получает состояние интеграции, а не сам сервис: окно
-        // показывает состояние и не должно получать ещё и право им управлять.
-        services.AddSingleton<ITwitchState>(sp => sp.GetRequiredService<TwitchService>());
-
-        services.AddSingleton<TwitchTtsMessageSource>();
 
         // Источник сообщений модуля озвучки: ручной ввод из окна настроек и чат
         // Twitch одновременно (CompositeTtsMessageSource сложит их). Ручной ввод
@@ -179,7 +147,24 @@ internal static class AppServices
 
         IModule[] modules =
         {
-            new MidiModule()
+            // AudioEngine
+
+            // AppRouting
+
+            // Update
+
+            // StartUp
+            new StartUpModule(),
+            // OBS
+
+            // Twitch
+            new TwitchModule(),
+            // TTS
+
+            // Midi
+            new MidiModule(),
+            // TrayIcon
+            new TrayIconModule()
         };
 
         foreach (var module in modules)

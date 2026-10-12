@@ -17,5 +17,8 @@
     <ProjectReference Include="..\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
     <ProjectReference Include="..\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UseCases\" />
+  </ItemGroup>
 
 </Project>

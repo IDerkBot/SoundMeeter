@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
+    <ProjectReference Include="..\SoundMeeter.StartUp.Contract.Implementation\SoundMeeter.StartUp.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.StartUp.Contract\SoundMeeter.StartUp.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
   </ItemGroup>

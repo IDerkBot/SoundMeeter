@@ -1,6 +1,8 @@
 using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.StartUp.Contract;
+using SoundMeeter.TrayIcon.Contract;
+using SoundMeeter.TrayIcon.Contract.Implementation;
 using SoundMeeter.TrayIcon.UseCases;
 using System.ComponentModel;
 using System.Windows;
@@ -13,7 +15,7 @@ namespace SoundMeeter.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly TrayIconService _tray;
+        private readonly ITrayIconService _tray;
         private bool _reallyClosing;
 
         public MainWindow(MainViewModel viewModel, IStartupService startup)

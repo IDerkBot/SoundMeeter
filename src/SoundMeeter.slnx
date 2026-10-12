@@ -42,6 +42,7 @@
   </Folder>
   <Folder Name="/Modules/Midi/">
     <Project Path="Modules/SoundMeeter.Midi/SoundMeeter.Midi.Presentation/SoundMeeter.Midi.Presentation.csproj" Id="8d83a737-decc-40bb-8bef-82e87f657071" />
+    <Project Path="Modules/SoundMeeter.Midi/SoundMeeter.Midi/SoundMeeter.Midi.csproj" Id="3699827f-6bd0-41da-b308-57654cff9e92" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract.Implementation\SoundMeeter.Midi.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Contract\SoundMeeter.Midi.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Midi\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
@@ -59,10 +60,13 @@
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/TrayIcon/">
+    <Project Path="Modules/SoundMeeter.TrayIcon/SoundMeeter.TrayIcon.Contract.Implementation/SoundMeeter.TrayIcon.Contract.Implementation.csproj" Id="3f34132e-9016-4f0e-87d5-a2c5aee97101" />
     <Project Path="Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.Contract\SoundMeeter.TrayIcon.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.UseCases\SoundMeeter.TrayIcon.UseCases.csproj" />
   </Folder>
   <Folder Name="/Modules/Twitch/">
+    <Project Path="Modules/SoundMeeter.Twitch/SoundMeeter.Twitch.Presentation/SoundMeeter.Twitch.Presentation.csproj" Id="f985cbd4-1ac0-4bc7-9004-d1e9505474d2" />
+    <Project Path="Modules/SoundMeeter.Twitch/SoundMeeter.Twitch/SoundMeeter.Twitch.csproj" Id="9aa4fc65-ba8a-4f94-8ff4-392a1730604d" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />

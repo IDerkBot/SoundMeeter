@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Update\SoundMeeter.Update.Presentation\SoundMeeter.Update.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
     <!-- Проверки отбора релизов и разбора ответа GitHub работают на конкретной
          реализации: подменить её интерфейсом здесь означало бы проверять

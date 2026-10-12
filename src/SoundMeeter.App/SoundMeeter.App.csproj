@@ -36,10 +36,12 @@
     <ProjectReference Include="..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.Presentation\SoundMeeter.Midi.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi\SoundMeeter.Midi.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
     <!-- Композиционный корень регистрирует SAPI-реализации контрактов синтеза,
          каталога голосов и источника реплик. -->
     <ProjectReference Include="..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.Presentation\SoundMeeter.Twitch.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Twitch\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
     <!-- Composition Root — единственное место, которое знает реализации контрактов
          Twitch: он и регистрирует их в контейнере. -->
@@ -49,6 +51,7 @@
     <!-- Composition Root регистрирует сервер и установщик дока. -->
     <ProjectReference Include="..\Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Twitch\SoundMeeter.Twitch\SoundMeeter.Twitch.csproj" />
     
     <ProjectReference Include="..\Modules\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
     <!-- Composition Root регистрирует реализацию контракта обновления. -->

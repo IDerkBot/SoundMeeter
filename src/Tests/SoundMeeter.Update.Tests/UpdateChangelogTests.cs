@@ -1,5 +1,4 @@
 using SoundMeeter.Update.Entities;
-using SoundMeeter.Update.UseCases;
 using SoundMeeter.Update.Contract.Implementation;
 using System.Net;
 using System.Text.Json;

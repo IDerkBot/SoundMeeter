@@ -1,5 +1,6 @@
-namespace SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
+
+namespace SoundMeeter.TextToSpeech.Contract;
 
 /// <summary>
 /// Модуль синтеза речи глазами окна настроек: всё, чем окно может управлять и
