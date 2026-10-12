@@ -22,7 +22,7 @@ namespace SoundMeeter.Twitch.Contract.Implementation;
 /// (<c>!tts</c>, <c>!ttsvoice</c>), очередь, дроссель и синтез остаются в модуле —
 /// он их уже написан и покрыт проверками, и переписывать их под Twitch незачем.
 /// </summary>
-public sealed class TwitchService : ITwitchState, IDisposable
+public sealed class TwitchService : ITwitchService, ITwitchState, IDisposable
 {
     private readonly ITwitchAuth _auth;
     private readonly ITwitchApi _api;
@@ -42,7 +42,7 @@ public sealed class TwitchService : ITwitchState, IDisposable
     private volatile TwitchStreamState _streamState = TwitchStreamState.Unknown;
 
     /// <summary>Новое сообщение из чата. Прилетает из потока чтения, не из UI.</summary>
-    public event Action<TtsChatMessage>? MessageReceived;
+    public event Action<ChatMessage>? MessageReceived;
 
     /// <summary>Состояние изменилось: чат подключился, отвалился, сменился канал.</summary>
     public event Action? StatusChanged;
@@ -339,7 +339,7 @@ public sealed class TwitchService : ITwitchState, IDisposable
     {
         try
         {
-            MessageReceived?.Invoke(new TtsChatMessage(message.User, message.Text));
+            MessageReceived?.Invoke(new ChatMessage(message.User, message.Text));
         }
         catch (Exception ex)
         {

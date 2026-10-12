@@ -92,7 +92,7 @@ public sealed class TwitchChatReader : ITwitchChatReader
     public string LastError { get; private set; } = "";
 
     /// <summary>Новое сообщение из чата. Прилетает из потока чтения, а не из UI.</summary>
-    public event Action<TwitchChatMessage>? MessageReceived;
+    public event Action<ChatMessage>? MessageReceived;
 
     /// <summary>Подписка отозвана: аккаунт удалён, доступ отозван или формат события больше не поддерживается.</summary>
     public event Action<string>? SubscriptionRevoked;
@@ -367,7 +367,7 @@ public sealed class TwitchChatReader : ITwitchChatReader
     /// приветствие: ограничивать его сроком keepalive нельзя, потому что keepalive
     /// приходит после него, и ожидание иначе всегда заканчивалось бы ошибкой.
     /// </summary>
-    private async Task<(EventSubFrame, TwitchChatMessage?, string?)> ReadFrameAsync(
+    private async Task<(EventSubFrame, ChatMessage?, string?)> ReadFrameAsync(
         ClientWebSocket socket, TimeSpan? silenceLimit, CancellationToken token)
     {
         var buffer = new byte[ReceiveBufferSize];
@@ -410,7 +410,7 @@ public sealed class TwitchChatReader : ITwitchChatReader
     /// Ошибка подписчика не должна ронять чтение: подписчик здесь один (модуль
     /// озвучки), и его сбой иначе остановил бы весь чат молча.
     /// </summary>
-    private void RaiseMessage(TwitchChatMessage message)
+    private void RaiseMessage(ChatMessage message)
     {
         try
         {

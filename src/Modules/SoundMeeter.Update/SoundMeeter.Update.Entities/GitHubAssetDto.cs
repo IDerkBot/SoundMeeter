@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SoundMeeter.Update.Contract.Implementation;
+namespace SoundMeeter.Update.Entities;
 
 /// <summary>Файл, приложенный к релизу.</summary>
 internal sealed class GitHubAssetDto

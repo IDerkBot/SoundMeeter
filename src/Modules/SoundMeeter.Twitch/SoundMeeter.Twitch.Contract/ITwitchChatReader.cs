@@ -19,7 +19,7 @@ public interface ITwitchChatReader : IDisposable
     string LastError { get; }
 
     /// <summary>Новое сообщение из чата. Прилетает из потока чтения, а не из UI.</summary>
-    event Action<TwitchChatMessage>? MessageReceived;
+    event Action<ChatMessage>? MessageReceived;
 
     /// <summary>Соединение поднялось или упало.</summary>
     event Action<bool>? ConnectionChanged;

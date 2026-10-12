@@ -1,8 +1,8 @@
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
-using SoundMeeter.Twitch.Contract.Implementation;
+using SoundMeeter.Twitch.Entities;
 
-namespace SoundMeeter.Twitch.Presentation;
+namespace SoundMeeter.Twitch.Contract.Implementation;
 
 /// <summary>
 /// Источник сообщений для модуля синтеза речи, питаемый чатом Twitch (SM-F01).
@@ -24,9 +24,9 @@ namespace SoundMeeter.Twitch.Presentation;
 /// </summary>
 public sealed class TwitchTtsMessageSource : ITtsMessageSource, IDisposable
 {
-    private readonly TwitchService _twitch;
+    private readonly ITwitchService _twitch;
 
-    public TwitchTtsMessageSource(TwitchService twitch)
+    public TwitchTtsMessageSource(ITwitchService twitch)
     {
         _twitch = twitch ?? throw new ArgumentNullException(nameof(twitch));
 
@@ -58,7 +58,7 @@ public sealed class TwitchTtsMessageSource : ITtsMessageSource, IDisposable
     /// </summary>
     public void Stop() { }
 
-    private void OnMessage(TtsChatMessage message) => MessageReceived?.Invoke(message);
+    private void OnMessage(ChatMessage message) => MessageReceived?.Invoke(new TtsChatMessage(message.User, message.Text));
 
     public void Dispose()
     {

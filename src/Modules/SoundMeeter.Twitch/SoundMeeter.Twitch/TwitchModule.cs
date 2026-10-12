@@ -2,7 +2,6 @@
 using SoundMeeter.Framework.Base.Modules;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
-using SoundMeeter.Twitch.Presentation;
 using SoundMeeter.Twitch.Presentation.ViewModels;
 using System;
 using System.Collections.Generic;

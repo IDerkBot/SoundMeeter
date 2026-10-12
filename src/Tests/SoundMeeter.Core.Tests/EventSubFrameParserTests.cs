@@ -1,3 +1,4 @@
+using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
 using SoundMeeter.Twitch.UseCases;
 using Xunit;

@@ -1,7 +1,7 @@
 ﻿using SoundMeeter.Twitch.Entities;
 using System.Text.Json;
 
-namespace SoundMeeter.Twitch.Entities;
+namespace SoundMeeter.Twitch.Contract.Implementation;
 
 /// <summary>
 /// Разбор кадров EventSub WebSocket (SM-F01).
@@ -45,7 +45,7 @@ public static class EventSubFrameParser
     /// Возвращает null для всего, что не является сообщением чата, — это обычное
     /// дело: на каждый кадр с сообщением приходит множество служебных.
     /// </summary>
-    public static (EventSubFrame Kind, TwitchChatMessage? Message, string? Value) Parse(string json)
+    public static (EventSubFrame Kind, ChatMessage? Message, string? Value) Parse(string json)
     {
         if (string.IsNullOrWhiteSpace(json)) return (EventSubFrame.Unknown, null, null);
 
@@ -87,7 +87,7 @@ public static class EventSubFrameParser
         }
     }
 
-    private static (EventSubFrame, TwitchChatMessage?, string?) ParseNotification(JsonElement payload)
+    private static (EventSubFrame, ChatMessage?, string?) ParseNotification(JsonElement payload)
     {
         // Событие не channel.chat.message — значит это подписка, рейд, точка или
         // что-то ещё. Модулю озвучивать нечего.
@@ -114,7 +114,7 @@ public static class EventSubFrameParser
         string text = ReadPlainText(data);
         if (login.Length == 0 || text.Length == 0) return (EventSubFrame.Unknown, null, null);
 
-        return (EventSubFrame.ChatMessage, new TwitchChatMessage(login, text), null);
+        return (EventSubFrame.ChatMessage, new ChatMessage(login, text), null);
     }
 
     /// <summary>

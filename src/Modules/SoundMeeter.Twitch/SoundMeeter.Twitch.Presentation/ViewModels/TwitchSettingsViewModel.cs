@@ -4,7 +4,6 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Core.Contract;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.UseCases;
 
 namespace SoundMeeter.Twitch.Presentation.ViewModels;
 

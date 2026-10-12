@@ -28,7 +28,6 @@ using SoundMeeter.Docking.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
 using SoundMeeter.TrayIcon.UseCases;
 using SoundMeeter.StartUp.UseCases;
-using SoundMeeter.Twitch.Presentation;
 using SoundMeeter.Twitch;
 using SoundMeeter.Midi;
 

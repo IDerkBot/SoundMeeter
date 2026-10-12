@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SoundMeeter.Update.Contract.Implementation;
+namespace SoundMeeter.Update.Entities;
 
 /// <summary>
 /// Ответ GET https://api.github.com/repos/{owner}/{repo}/releases/latest и
