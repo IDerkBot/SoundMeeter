@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
 using SoundMeeter.Midi.Presentation.Dto;
@@ -47,7 +48,6 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
         UpdateMidiBindingUseCase updateBinding,
         ClearMidiBindingUseCase clearBinding,
         GetMidiBindingQuery getMidiBinding,
-        IMidiBindingStore bindings,
         IStripProvider stripProvider)
     {
         _midi = midi;
@@ -57,7 +57,6 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
         _updateBinding = updateBinding;
         _clearBinding = clearBinding;
         _getMidiBinding = getMidiBinding;
-        _bindings = bindings;
         _stripProvider = stripProvider;
 
         foreach (var device in _selectDevice.GetAvailableDevices())

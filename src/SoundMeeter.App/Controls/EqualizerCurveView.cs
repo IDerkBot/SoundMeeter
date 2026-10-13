@@ -1,7 +1,7 @@
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.Presentation.ViewModels;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows;

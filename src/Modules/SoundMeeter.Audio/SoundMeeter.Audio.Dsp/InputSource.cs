@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Framework.Contract.Implementation;
 using System.Runtime.InteropServices;
 
 namespace SoundMeeter.Audio.Dsp;

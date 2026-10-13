@@ -1,5 +1,5 @@
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Entities;
 using SoundMeeter.Midi.Entities;
 
 namespace SoundMeeter.Tests.Infrastructure;

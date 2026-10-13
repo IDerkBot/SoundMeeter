@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Infrastructure.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.Twitch.Contract;
@@ -335,7 +336,7 @@ public sealed class TwitchService : ITwitchService, ITwitchState, IDisposable
 
     private void StopChat() => _chat.Stop();
 
-    private void OnChatMessage(TwitchChatMessage message)
+    private void OnChatMessage(ChatMessage message)
     {
         try
         {

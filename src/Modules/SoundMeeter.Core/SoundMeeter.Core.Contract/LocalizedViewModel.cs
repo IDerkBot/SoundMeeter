@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using SoundMeeter.ChangeLanguage.UseCases;
 
-namespace SoundMeeter.Core.Contract;
+namespace SoundMeeter.Framework.Contract;
 
 /// <summary>
 /// База для ViewModel'ов, у которых есть вычисляемые надписи (SM-C07).

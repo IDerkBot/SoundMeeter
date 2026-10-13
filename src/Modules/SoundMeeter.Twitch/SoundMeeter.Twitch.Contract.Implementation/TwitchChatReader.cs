@@ -2,7 +2,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 

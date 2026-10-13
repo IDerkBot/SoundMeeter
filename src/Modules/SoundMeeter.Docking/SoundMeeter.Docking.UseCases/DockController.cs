@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Core.Contract;
 using SoundMeeter.Docking.Contract;
 using SoundMeeter.Docking.Entities;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract;
+using SoundMeeter.Framework.Contract;
 
 namespace SoundMeeter.Docking.UseCases;
 

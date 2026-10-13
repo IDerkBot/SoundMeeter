@@ -2,13 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.AppRouting.Entities;
 using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Logger;
-using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Infrastructure.Contract.Implementation;
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Окно просмотра журнала: текущий файл, уровень детализации, копирование

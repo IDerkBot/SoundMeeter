@@ -1,13 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using System.Collections.ObjectModel;
 using static SoundMeeter.TextToSpeech.Entities.TextToSpeechSettings;
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>Входной стрип в списке выбора цели для голоса.</summary>
 public sealed class TtsTargetItemViewModel

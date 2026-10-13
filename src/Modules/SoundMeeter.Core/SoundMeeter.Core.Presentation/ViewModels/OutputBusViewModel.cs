@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Выходная шина (стрип вывода): громкость, мут, моно, соло, VU-метр.

@@ -1,5 +1,5 @@
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Tests.Infrastructure;
 using System.Text.Json;
 using Xunit;

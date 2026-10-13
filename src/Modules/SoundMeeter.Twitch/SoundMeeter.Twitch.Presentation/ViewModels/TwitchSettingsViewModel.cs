@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 

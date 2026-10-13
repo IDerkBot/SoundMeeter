@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
 using System.Diagnostics;

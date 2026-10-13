@@ -1,4 +1,5 @@
-﻿using SoundMeeter.Core.Entities;
+﻿using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Entities;
 
 namespace SoundMeeter.Audio.Contract;
 

@@ -1,9 +1,11 @@
 using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
+using SoundMeeter.Twitch.Presentation.ViewModels;
 using SoundMeeter.Twitch.UseCases;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Интеграция с Twitch (SM-F01) вынесена в TwitchViewModel
 // (SoundMeeter.Twitch.UseCases). Этот partial оставлен для совместимости:

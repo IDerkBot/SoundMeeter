@@ -59,6 +59,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Update\SoundMeeter.Update.Presentation\SoundMeeter.Update.Presentation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Entities\SoundMeeter.Core.Entities.csproj" />
     <!-- Оркестрация: MixerCoordinator (движок, таймеры, пресет, импорт/экспорт),

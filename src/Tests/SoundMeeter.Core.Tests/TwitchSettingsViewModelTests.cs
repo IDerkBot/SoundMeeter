@@ -1,6 +1,6 @@
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 using Xunit;

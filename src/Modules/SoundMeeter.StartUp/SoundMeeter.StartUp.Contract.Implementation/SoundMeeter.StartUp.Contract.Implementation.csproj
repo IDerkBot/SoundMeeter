@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.StartUp.Contract\SoundMeeter.StartUp.Contract.csproj" />
   </ItemGroup>
 

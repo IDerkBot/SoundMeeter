@@ -1,6 +1,6 @@
 using SoundMeeter.Controls;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;

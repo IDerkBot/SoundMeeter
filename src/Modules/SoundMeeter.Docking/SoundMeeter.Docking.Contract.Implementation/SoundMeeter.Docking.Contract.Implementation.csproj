@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />

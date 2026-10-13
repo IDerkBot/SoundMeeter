@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SoundMeeter.ChangeLanguage.UseCases;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Поведение приложения: значок в трее (SM-D02) и автозапуск вместе с Windows (SM-D01).
 //

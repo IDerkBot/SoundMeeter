@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
 using System.Windows;

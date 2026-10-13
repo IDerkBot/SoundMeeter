@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NAudio.Midi;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Midi.Entities;
 
 namespace SoundMeeter.Midi.Contract.Implementation;

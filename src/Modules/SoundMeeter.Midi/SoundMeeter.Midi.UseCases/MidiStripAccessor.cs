@@ -1,4 +1,5 @@
-﻿using SoundMeeter.Core.Contract;
+﻿using SoundMeeter.Audio.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
 

@@ -1,5 +1,5 @@
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.Twitch.Contract;

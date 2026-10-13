@@ -1,8 +1,8 @@
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Infrastructure.Entities;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Восстановление пресета и сохранение настроек микшера — в MixerCoordinator
 // (SoundMeeter.Core.UseCases). Здесь остались только две двери, в которые

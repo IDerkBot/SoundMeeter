@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 

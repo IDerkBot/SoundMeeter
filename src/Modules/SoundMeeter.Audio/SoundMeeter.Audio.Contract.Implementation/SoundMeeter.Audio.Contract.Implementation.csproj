@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract\SoundMeeter.Infrastructure.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
     <ProjectReference Include="..\SoundMeeter.Audio.Entities\SoundMeeter.Audio.Entities.csproj" />

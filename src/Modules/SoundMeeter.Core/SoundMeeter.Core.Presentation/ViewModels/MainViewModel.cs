@@ -1,16 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Update.UseCases;
 using System.Collections.ObjectModel;
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Пункт переключателя языка в меню настроек (SM-C07). Название языка

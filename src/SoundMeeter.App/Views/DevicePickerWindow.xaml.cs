@@ -1,4 +1,5 @@
 using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.ChangeLanguage.UseCases;
 using System.Collections.Generic;

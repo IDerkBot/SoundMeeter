@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Midi.Contract;
+using SoundMeeter.Midi.Presentation.UseCases;
 using SoundMeeter.Midi.Presentation.ViewModels;
 using SoundMeeter.Midi.UseCases;
 using System.Windows;
@@ -28,7 +30,7 @@ namespace SoundMeeter.Midi.Presentation
                 services.GetRequiredService<BindMidiControlUseCase>(),
                 services.GetRequiredService<UpdateMidiBindingUseCase>(),
                 services.GetRequiredService<ClearMidiBindingUseCase>(),
-                services.GetRequiredService<IMidiBindingStore>(),
+                services.GetRequiredService<GetMidiBindingQuery>(),
                 services.GetRequiredService<IStripProvider>());
 
             // Окно создаётся уже после выбора языка, но не наследует Language от

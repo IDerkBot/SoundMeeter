@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using System.Collections.ObjectModel;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Один параметр эффекта стрипа: подпись, диапазон и значение, которые крутилка

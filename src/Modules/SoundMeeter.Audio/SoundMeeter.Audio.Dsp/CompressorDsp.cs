@@ -1,4 +1,4 @@
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Audio.Entities;
 
 namespace SoundMeeter.Audio.Dsp;
 

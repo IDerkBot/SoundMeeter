@@ -5,11 +5,13 @@ using SoundMeeter.StartUp.UseCases;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Infrastructure.Logger;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Settings;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
+using SoundMeeter.StartUp.Contract.Implementation;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract.Implementation;
+using SoundMeeter.Infrastructure.Entities;
 
 namespace SoundMeeter
 {

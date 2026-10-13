@@ -1,7 +1,7 @@
 using SoundMeeter.Midi.UseCases;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // MIDI-привязки вынесены в модуль SoundMeeter.Midi (сценарии в .UseCases).
 // Этот partial оставлен как фасад: окно привязок берёт модуль у главной VM.

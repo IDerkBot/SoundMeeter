@@ -1,8 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Entities;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Запущенное приложение, играющее звук.

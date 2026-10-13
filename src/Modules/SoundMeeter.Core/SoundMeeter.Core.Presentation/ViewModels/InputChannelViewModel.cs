@@ -2,13 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.AppRouting.Entities;
 using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
 using System.Collections.ObjectModel;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Входной стрип (микрофон/loopback): громкость, мут, моно, соло, VU-метр

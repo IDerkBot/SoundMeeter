@@ -1,5 +1,5 @@
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Docking.Presentation.ViewModels;
 using SoundMeeter.Docking.UseCases;
 using System.Windows;

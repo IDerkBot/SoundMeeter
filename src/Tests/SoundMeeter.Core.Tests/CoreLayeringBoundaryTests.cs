@@ -1,6 +1,6 @@
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using System.Reflection;
 using Xunit;
 

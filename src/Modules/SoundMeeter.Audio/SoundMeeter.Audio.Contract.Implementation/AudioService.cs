@@ -2,10 +2,11 @@ using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract;
 using System.Diagnostics;
 
 namespace SoundMeeter.Audio.Contract.Implementation;

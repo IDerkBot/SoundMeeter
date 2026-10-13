@@ -1,6 +1,6 @@
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using System.Windows;
 
 namespace SoundMeeter.Views

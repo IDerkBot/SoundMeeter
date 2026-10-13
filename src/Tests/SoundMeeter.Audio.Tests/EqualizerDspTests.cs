@@ -1,6 +1,6 @@
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Entities;
 using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace SoundMeeter.Update.Entities;
 
 /// <summary>Файл, приложенный к релизу.</summary>
-internal sealed class GitHubAssetDto
+public sealed class GitHubAssetDto
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

@@ -30,15 +30,20 @@
     <Project Path="Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
   </Folder>
   <Folder Name="/Modules/Framework/">
+    <Project Path="Modules/SoundMeeter.Framework/SoundMeeter.Framework.Contract.Implementation/SoundMeeter.Framework.Contract.Implementation.csproj" Id="199de07b-9bb1-45db-85c4-1456a1cc9539" />
+    <Project Path="Modules/SoundMeeter.Framework/SoundMeeter.Framework.Contract/SoundMeeter.Framework.Contract.csproj" Id="51477e16-8b46-4f23-833d-b6403baa0ecf" />
+    <Project Path="Modules/SoundMeeter.Framework/SoundMeeter.Framework.Entities/SoundMeeter.Framework.Entities.csproj" Id="990b2fec-1c2c-4179-8b91-0a442e142410" />
+    <Project Path="Modules/SoundMeeter.Framework/SoundMeeter.Framework.Presentation/SoundMeeter.Framework.Presentation.csproj" Id="8cea9c6d-ad67-42c2-a9fd-5d07b72ad8b6" />
     <Project Path="Modules\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
     <Project Path="Modules\SoundMeeter.Framework\SoundMeeter.Framework.Utils\SoundMeeter.Framework.Utils.csproj" />
   </Folder>
   <Folder Name="/Modules/Infrastructure/">
-    <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Clipboard\SoundMeeter.Infrastructure.Clipboard.csproj" />
-    <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Dispatcher\SoundMeeter.Infrastructure.Dispatcher.csproj" />
+    <Project Path="Modules/SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Contract.Implementation/SoundMeeter.Infrastructure.Contract.Implementation.csproj" Id="60a251e6-ec46-45d5-9e85-81764c0029e0" />
+    <Project Path="Modules/SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Contract/SoundMeeter.Infrastructure.Contract.csproj" Id="f3bba867-28bd-4485-8c4f-4f0036f0d43b" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
     <Project Path="Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.UiTimer\SoundMeeter.Infrastructure.UiTimer.csproj" />
+    <Project Path="SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Entities/SoundMeeter.Infrastructure.Entities.csproj" Id="41d41d39-85a2-4848-8eec-675bc62e05bc" />
   </Folder>
   <Folder Name="/Modules/Midi/">
     <Project Path="Modules/SoundMeeter.Midi/SoundMeeter.Midi.Presentation/SoundMeeter.Midi.Presentation.csproj" Id="8d83a737-decc-40bb-8bef-82e87f657071" />

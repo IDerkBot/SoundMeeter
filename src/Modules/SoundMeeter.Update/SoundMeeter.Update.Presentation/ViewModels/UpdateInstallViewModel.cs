@@ -2,11 +2,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.UseCases;
 using SoundMeeter.Update.Entities;
+using SoundMeeter.Framework.Contract.Implementation;
 
 namespace SoundMeeter.Update.Presentation.ViewModels;
 

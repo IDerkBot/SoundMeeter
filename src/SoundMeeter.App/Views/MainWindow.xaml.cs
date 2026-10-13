@@ -1,5 +1,5 @@
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.StartUp.Contract;
 using SoundMeeter.TrayIcon.Contract;
 using SoundMeeter.TrayIcon.Contract.Implementation;

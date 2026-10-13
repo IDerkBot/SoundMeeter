@@ -31,6 +31,9 @@
     означала бы, что сценарии снова начали знать о ViewModel.
   -->
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract.Implementation\SoundMeeter.Infrastructure.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Twitch\SoundMeeter.Twitch.Presentation\SoundMeeter.Twitch.Presentation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Entities\SoundMeeter.Core.Entities.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />

@@ -1,7 +1,7 @@
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.UseCases;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;

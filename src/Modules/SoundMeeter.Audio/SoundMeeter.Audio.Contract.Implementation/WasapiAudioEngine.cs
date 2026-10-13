@@ -5,8 +5,8 @@ using NAudio.Wave.SampleProviders;
 using SoundMeeter.AppRouting.Entities;
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.Midi.Entities;
 using System.Collections.ObjectModel;
 

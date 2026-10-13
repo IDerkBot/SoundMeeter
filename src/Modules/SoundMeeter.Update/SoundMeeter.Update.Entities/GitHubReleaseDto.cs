@@ -7,7 +7,7 @@ namespace SoundMeeter.Update.Entities;
 /// списка /releases. Внутренний DTO: наружу торчат только <see cref="UpdateInfo"/>,
 /// <see cref="UpdateRelease"/> и <see cref="UpdateAsset"/>.
 /// </summary>
-internal sealed class GitHubReleaseDto
+public sealed class GitHubReleaseDto
 {
     [JsonPropertyName("tag_name")]
     public string? TagName { get; set; }

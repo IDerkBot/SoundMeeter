@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Audio.Entities;
 using System.Collections.ObjectModel;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels
+namespace SoundMeeter.Framework.Presentation.ViewModels
 {
     public partial class AudioDeviceViewModel : ObservableObject
     {

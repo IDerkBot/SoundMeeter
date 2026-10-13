@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.StartUp.Contract;
 
 namespace SoundMeeter.StartUp.Contract.Implementation;

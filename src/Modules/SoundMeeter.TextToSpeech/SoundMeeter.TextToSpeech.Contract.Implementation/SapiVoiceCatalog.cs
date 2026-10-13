@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using System.Speech.Synthesis;
 
 namespace SoundMeeter.TextToSpeech.Contract.Implementation;

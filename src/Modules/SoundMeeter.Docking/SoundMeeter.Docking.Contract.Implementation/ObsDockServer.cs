@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Docking.Contract;
 using SoundMeeter.Docking.Entities;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;

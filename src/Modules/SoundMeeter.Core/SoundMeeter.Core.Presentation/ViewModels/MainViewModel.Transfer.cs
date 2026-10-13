@@ -1,7 +1,7 @@
-using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Infrastructure.Contract.Implementation;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Импорт и экспорт всех настроек одним файлом (SM-C09).
 //

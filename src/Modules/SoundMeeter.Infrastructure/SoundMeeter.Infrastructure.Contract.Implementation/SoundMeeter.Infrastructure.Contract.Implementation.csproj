@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Infrastructure.Contract\SoundMeeter.Infrastructure.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;

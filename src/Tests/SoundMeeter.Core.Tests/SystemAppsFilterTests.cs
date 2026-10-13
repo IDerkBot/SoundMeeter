@@ -1,5 +1,5 @@
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.UseCases;
 using System.Text.Json;
 using Xunit;
 

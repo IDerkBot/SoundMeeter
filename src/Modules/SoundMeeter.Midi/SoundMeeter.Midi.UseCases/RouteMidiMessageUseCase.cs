@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
 

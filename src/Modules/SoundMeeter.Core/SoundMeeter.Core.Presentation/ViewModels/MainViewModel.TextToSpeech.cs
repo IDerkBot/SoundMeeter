@@ -1,10 +1,10 @@
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Модуль синтеза речи (SM-E01) вынесен в TtsViewModel
 // (SoundMeeter.TextToSpeech.UseCases). Этот partial оставлен для

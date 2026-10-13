@@ -20,6 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract\SoundMeeter.Infrastructure.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />

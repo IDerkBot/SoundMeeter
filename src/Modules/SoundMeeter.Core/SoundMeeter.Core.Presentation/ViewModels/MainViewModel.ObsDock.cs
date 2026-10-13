@@ -1,7 +1,7 @@
 using SoundMeeter.Docking.UseCases;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 // Док-панель OBS вынесена в модуль SoundMeeter.Docking: оркестрация — в
 // DockController (SoundMeeter.Docking.UseCases), окно настроек — в

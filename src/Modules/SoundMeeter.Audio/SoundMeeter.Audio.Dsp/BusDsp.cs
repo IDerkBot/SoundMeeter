@@ -1,7 +1,6 @@
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Core.Entities;
 
 namespace SoundMeeter.Audio.Dsp;
 

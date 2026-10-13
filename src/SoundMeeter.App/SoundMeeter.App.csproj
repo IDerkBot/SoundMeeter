@@ -34,6 +34,8 @@
     <ProjectReference Include="..\Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Framework\SoundMeeter.Framework.Presentation\SoundMeeter.Framework.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract.Implementation\SoundMeeter.Infrastructure.Contract.Implementation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.Presentation\SoundMeeter.Midi.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi\SoundMeeter.Midi.csproj" />
@@ -60,9 +62,7 @@
     <ProjectReference Include="..\Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.UseCases\SoundMeeter.TrayIcon.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
-    <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Dispatcher\SoundMeeter.Infrastructure.Dispatcher.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.UiTimer\SoundMeeter.Infrastructure.UiTimer.csproj" />
-    <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Clipboard\SoundMeeter.Infrastructure.Clipboard.csproj" />
     <ProjectReference Include="..\StreamerTools.Style\StreamerTools.Style.csproj" />
   </ItemGroup>
 

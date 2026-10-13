@@ -1,6 +1,6 @@
 using SoundMeeter.Audio.Contract.Implementation;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
 using SoundMeeter.Docking.Entities;
 using SoundMeeter.Infrastructure.Settings;
 using System.Text.Json;

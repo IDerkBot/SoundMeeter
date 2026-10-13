@@ -1,8 +1,8 @@
 using SoundMeeter.Audio.Contract.Implementation;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using Xunit;
 
 namespace SoundMeeter.Tests;

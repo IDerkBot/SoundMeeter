@@ -1,15 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Docking.UseCases;
-using SoundMeeter.Infrastructure.Settings;
 using SoundMeeter.Midi.Presentation;
 using SoundMeeter.Docking.Contract.Implementation;
 using SoundMeeter.Docking.Presentation.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using SoundMeeter.Twitch.Presentation.Views;
+using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Infrastructure.Contract.Implementation;
 
 namespace SoundMeeter.Views.Controls
 {

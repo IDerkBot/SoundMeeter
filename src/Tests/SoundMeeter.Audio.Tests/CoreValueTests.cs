@@ -1,6 +1,6 @@
 using SoundMeeter.Audio;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Entities;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Entities;
 using Xunit;
 
 /// <summary>

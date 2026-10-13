@@ -1,10 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.Audio.Dsp;
-using SoundMeeter.Core.Contract;
+using SoundMeeter.Framework.Contract;
 
 
-namespace SoundMeeter.Core.Presentation.ViewModels;
+namespace SoundMeeter.Framework.Presentation.ViewModels;
 
 /// <summary>
 /// Один выбираемый выход для стрипа (чекбокс в попапе OUT/VIRT) плюс

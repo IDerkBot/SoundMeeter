@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Core.Presentation.ViewModels;
-using SoundMeeter.Core.UseCases;
-using SoundMeeter.Infrastructure.Settings;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Presentation.ViewModels;
+using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Infrastructure.Contract.Implementation;
 using System.Windows;
 
 namespace SoundMeeter.Views

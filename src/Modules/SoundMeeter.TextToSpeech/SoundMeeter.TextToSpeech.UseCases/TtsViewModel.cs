@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Core.Contract;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
 
 namespace SoundMeeter.TextToSpeech.UseCases;
 

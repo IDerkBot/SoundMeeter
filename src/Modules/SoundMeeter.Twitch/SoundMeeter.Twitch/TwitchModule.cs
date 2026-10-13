@@ -36,8 +36,9 @@ namespace SoundMeeter.Twitch
             services.AddSingleton<TwitchChatReader>();
             services.AddSingleton<ITwitchChatReader>(sp => sp.GetRequiredService<TwitchChatReader>());
 
-            services.AddSingleton<TwitchService>();
+            services.AddSingleton<ITwitchService, TwitchService>();
             services.AddSingleton<TwitchViewModel>();
+            services.AddSingleton<TwitchSettingsViewModel>();
 
             // Окно настроек получает состояние интеграции, а не сам сервис: окно
             // показывает состояние и не должно получать ещё и право им управлять.
