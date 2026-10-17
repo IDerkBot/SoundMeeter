@@ -2,9 +2,6 @@ using Microsoft.Extensions.Logging;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.Framework.Contract.Implementation;
-using SoundMeeter.TextToSpeech.Contract;
-using SoundMeeter.TextToSpeech.Entities;
-using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 
 namespace SoundMeeter.Twitch.Contract.Implementation;

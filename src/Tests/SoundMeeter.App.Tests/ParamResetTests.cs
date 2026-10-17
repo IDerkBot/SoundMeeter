@@ -5,6 +5,8 @@ using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Views.Controls;
 using System.Windows.Controls;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Audio.Presentation;
 using Xunit;
 
 namespace SoundMeeter.Tests;

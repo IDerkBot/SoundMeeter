@@ -2,6 +2,7 @@ using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Contract.Implementation;
 using SoundMeeter.AppRouting.Entities;
 using System.Reflection;
+using SoundMeeter.Audio.Entities;
 using Xunit;
 
 namespace SoundMeeter.AppRouting.Tests;

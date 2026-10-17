@@ -1,4 +1,5 @@
 using SoundMeeter.Audio.Dsp;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Tests.Infrastructure;
 using Xunit;

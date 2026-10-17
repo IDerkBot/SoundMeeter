@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-
-namespace SoundMeeter.Framework.Presentation.ViewModels;
+namespace SoundMeeter.Audio.Presentation;
 
 /// <summary>
 /// Один выход в списке назначения кнопки FUNC. То же, что строка в попапах

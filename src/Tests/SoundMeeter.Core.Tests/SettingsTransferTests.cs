@@ -1,9 +1,10 @@
 using SoundMeeter.Audio.Contract.Implementation;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
 using SoundMeeter.Docking.Entities;
-using SoundMeeter.Infrastructure.Settings;
 using System.Text.Json;
+using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Infrastructure.Contract.Implementation;
+using SoundMeeter.Infrastructure.Entities;
 using Xunit;
 
 namespace SoundMeeter.Tests;

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Framework.Contract.Implementation;
-using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -26,8 +25,8 @@ namespace SoundMeeter.Update.Contract.Implementation
     /// </summary>
     public class GithubUpdateService : IUpdateService, IDisposable
     {
-        public const string Owner = "IDerkBot";
-        public const string Repo = "SoundMeeter";
+        private const string Owner = "IDerkBot";
+        private const string Repo = "SoundMeeter";
 
         private const string ApiBase = "https://api.github.com/repos/";
 
@@ -265,7 +264,7 @@ namespace SoundMeeter.Update.Contract.Implementation
         /// Выбирает архив для автоустановки: обычный .zip, причём предпочтительно
         /// win-x64/win-x86 сборка. Отбрасываем символьные пакеты и исходники.
         /// </summary>
-        internal static UpdateAsset? SelectAsset(IEnumerable<GitHubAssetDto> assets)
+        private static UpdateAsset? SelectAsset(IEnumerable<GitHubAssetDto> assets)
         {
             UpdateAsset? fallback = null;
 
@@ -383,7 +382,7 @@ namespace SoundMeeter.Update.Contract.Implementation
             Process.Start(new ProcessStartInfo(update.HtmlUrl) { UseShellExecute = true })?.Dispose();
         }
 
-        internal static string FindPayloadRoot(string extractedDirectory)
+        private static string FindPayloadRoot(string extractedDirectory)
         {
             var current = extractedDirectory;
             for (var depth = 0; depth < 3; depth++)
@@ -400,7 +399,7 @@ namespace SoundMeeter.Update.Contract.Implementation
             return current;
         }
 
-        internal static string SafeFileName(string? value)
+        private static string SafeFileName(string? value)
         {
             var invalid = Path.GetInvalidFileNameChars();
             var cleaned = new string((value ?? "update")

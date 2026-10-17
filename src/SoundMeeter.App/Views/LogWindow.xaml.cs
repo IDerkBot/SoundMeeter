@@ -2,10 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using System.Windows;
+using LogViewModel = SoundMeeter.ViewModels.LogViewModel;
 
 namespace SoundMeeter.Views
 {

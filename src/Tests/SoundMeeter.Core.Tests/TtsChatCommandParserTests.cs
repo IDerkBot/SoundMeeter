@@ -1,5 +1,6 @@
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.UseCases;
 using Xunit;
 
 namespace SoundMeeter.Tests;

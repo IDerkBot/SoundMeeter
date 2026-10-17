@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Presentation\SoundMeeter.AppRouting.Presentation.csproj" />
+      <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Presentation\SoundMeeter.Framework.Presentation.csproj" />
+      <ProjectReference Include="..\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
+      <ProjectReference Include="..\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
+      <ProjectReference Include="..\SoundMeeter.Audio.Entities\SoundMeeter.Audio.Entities.csproj" />
+    </ItemGroup>
+
+</Project>

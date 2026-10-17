@@ -3,6 +3,7 @@ using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
+using SoundMeeter.Twitch.Presentation.ViewModels;
 using Xunit;
 
 namespace SoundMeeter.Tests;

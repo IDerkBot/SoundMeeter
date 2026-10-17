@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Infrastructure.Logger;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.StartUp.Contract;
 
-
-namespace SoundMeeter.Framework.UseCases;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Поведение приложения: значок в системном лотке (SM-D02) и автозапуск вместе

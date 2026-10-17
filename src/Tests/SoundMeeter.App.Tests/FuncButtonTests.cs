@@ -4,7 +4,9 @@ using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Views.Controls;
 using System.Windows.Controls.Primitives;
+using SoundMeeter.Audio.Entities;
 using Xunit;
+using FuncTargetViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncTargetViewModel;
 
 namespace SoundMeeter.Tests;
 

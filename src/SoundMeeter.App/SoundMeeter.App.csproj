@@ -31,14 +31,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Presentation\SoundMeeter.Audio.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
-    <ProjectReference Include="..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Framework\SoundMeeter.Framework.Presentation\SoundMeeter.Framework.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract.Implementation\SoundMeeter.Infrastructure.Contract.Implementation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.Presentation\SoundMeeter.Midi.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Midi\SoundMeeter.Midi\SoundMeeter.Midi.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Presentation\SoundMeeter.TextToSpeech.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
     <!-- Композиционный корень регистрирует SAPI-реализации контрактов синтеза,
          каталога голосов и источника реплик. -->

@@ -1,7 +1,6 @@
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Windows;
 using System.Windows.Controls;
+using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Views.Controls
 {

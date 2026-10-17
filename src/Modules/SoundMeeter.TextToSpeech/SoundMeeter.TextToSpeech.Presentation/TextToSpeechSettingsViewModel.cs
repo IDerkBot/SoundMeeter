@@ -1,73 +1,13 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Contract;
+using SoundMeeter.Core.Contract;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
-using System.Collections.ObjectModel;
-using static SoundMeeter.TextToSpeech.Entities.TextToSpeechSettings;
+using SoundMeeter.TextToSpeech.UseCases;
 
-namespace SoundMeeter.Framework.Presentation.ViewModels;
-
-/// <summary>Входной стрип в списке выбора цели для голоса.</summary>
-public sealed class TtsTargetItemViewModel
-{
-    /// <summary>
-    /// Пункт «отдельный канал TTS». Его Id — маркер, а не настоящий Id стрипа;
-    /// настоящий появляется после создания (см. TtsViewModel.ApplyTtsSettings).
-    /// </summary>
-    public const string GeneratedId = TtsStripNames.GeneratedSentinel;
-
-    public TtsTargetItemViewModel(string id, string title, string deviceId, bool isAvailable, bool isGenerated)
-    {
-        Id = id;
-        Title = title;
-        DeviceId = deviceId;
-        IsAvailable = isAvailable;
-        IsGenerated = isGenerated;
-    }
-
-    /// <summary>Id стрипа либо <see cref="GeneratedId"/>.</summary>
-    public string Id { get; }
-
-    /// <summary>Имя канала: своё, если задано, иначе имя устройства.</summary>
-    public string Title { get; }
-
-    /// <summary>DeviceId устройства стрипа (пусто у генерируемого).</summary>
-    public string DeviceId { get; }
-
-    /// <summary>Устройство на месте.</summary>
-    public bool IsAvailable { get; }
-
-    /// <summary>Канал без устройства, наполняемый модулем синтеза.</summary>
-    public bool IsGenerated { get; }
-}
-
-/// <summary>Голос, выбранный пользователю чата: имя, код и «используется сейчас».</summary>
-public sealed partial class TtsUserVoiceItemViewModel : ObservableObject
-{
-    public TtsUserVoiceItemViewModel(TtsUserVoice model)
-    {
-        Model = model;
-    }
-
-    public TtsUserVoice Model { get; }
-
-    /// <summary>Логин без «@».</summary>
-    public string User => Model.User;
-
-    /// <summary>Имя голоса SAPI.</summary>
-    public string Voice => Model.Voice;
-
-    /// <summary>Подпись строки списка.</summary>
-    public string DisplayName => $"{Model.User} → {Model.Voice}";
-
-    [RelayCommand]
-    private void Remove() => RemoveRequested?.Invoke(this);
-
-    /// <summary>Удаление обрабатывает окно: список — его, а модель живёт в настройках.</summary>
-    public event Action<TtsUserVoiceItemViewModel>? RemoveRequested;
-}
+namespace SoundMeeter.TextToSpeech.Presentation;
 
 /// <summary>
 /// Окно настроек модуля синтеза речи (SM-E01): включение, целевой канал, голос
@@ -377,20 +317,20 @@ public sealed partial class TextToSpeechSettingsViewModel : LocalizedViewModel
         settings.TargetInputId = SelectedTarget?.Id ?? "";
         settings.TargetInputDeviceId = SelectedTarget?.DeviceId ?? "";
         settings.DefaultVoice = SelectedVoice?.Name ?? "";
-        settings.Rate = Math.Clamp(Rate, Limits.RateMin, Limits.RateMax);
-        settings.Volume = Math.Clamp(Volume, Limits.VolumeMin, Limits.VolumeMax);
+        settings.Rate = Math.Clamp((int)Rate, TextToSpeechSettings.Limits.RateMin, TextToSpeechSettings.Limits.RateMax);
+        settings.Volume = Math.Clamp((int)Volume, TextToSpeechSettings.Limits.VolumeMin, TextToSpeechSettings.Limits.VolumeMax);
         settings.SpeakCommand = SpeakCommandText.Trim();
         settings.VoiceCommand = VoiceCommandText.Trim();
         settings.AllowVoiceChange = AllowVoiceChange;
-        settings.MaxQueueLength = Math.Clamp(MaxQueueLength, Limits.QueueMin, Limits.QueueMax);
-        settings.MaxMessagesPerMinute = Math.Clamp(MaxMessagesPerMinute,
-            Limits.MessagesPerMinuteMin, Limits.MessagesPerMinuteMax);
-        settings.MaxMessageChars = Math.Clamp(MaxMessageChars, Limits.MessageCharsMin, Limits.MessageCharsMax);
+        settings.MaxQueueLength = Math.Clamp((int)MaxQueueLength, TextToSpeechSettings.Limits.QueueMin, TextToSpeechSettings.Limits.QueueMax);
+        settings.MaxMessagesPerMinute = Math.Clamp((int)MaxMessagesPerMinute,
+            TextToSpeechSettings.Limits.MessagesPerMinuteMin, TextToSpeechSettings.Limits.MessagesPerMinuteMax);
+        settings.MaxMessageChars = Math.Clamp((int)MaxMessageChars, TextToSpeechSettings.Limits.MessageCharsMin, TextToSpeechSettings.Limits.MessageCharsMax);
         settings.UserVoices = UserVoices.Select(item => item.Model.Clone()).ToList();
-        settings.IgnoredUsers = IgnoredUsersText
-            .Split([',', ';', ' ', '\t', '\r', '\n'],
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(TtsChatCommandParser.NormalizeUser)
+        settings.IgnoredUsers = Enumerable
+            .Select<string, string>(IgnoredUsersText
+                .Split([',', ';', ' ', '\t', '\r', '\n'],
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), TtsChatCommandParser.NormalizeUser)
             .Where(login => login.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();

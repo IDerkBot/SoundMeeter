@@ -3,6 +3,8 @@ using SoundMeeter.Audio.Entities;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Infrastructure.Contract.Implementation;
+using SoundMeeter.Infrastructure.Entities;
 using Xunit;
 
 namespace SoundMeeter.Tests;

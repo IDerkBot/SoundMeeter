@@ -1,12 +1,14 @@
 <Solution>
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/AppRouting/">
+    <Project Path="Modules/SoundMeeter.AppRouting/SoundMeeter.AppRouting.Presentation/SoundMeeter.AppRouting.Presentation.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
   </Folder>
   <Folder Name="/Modules/Audio/">
     <Project Path="Modules/SoundMeeter.Audio/SoundMeeter.Audio.Entities/SoundMeeter.Audio.Entities.csproj" Id="766a9255-0842-46b3-9671-bf447646f30b" />
+    <Project Path="Modules/SoundMeeter.Audio/SoundMeeter.Audio.Presentation/SoundMeeter.Audio.Presentation.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Audio\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />
@@ -20,7 +22,6 @@
     <Project Path="Modules/SoundMeeter.Core/SoundMeeter.Core.Entities/SoundMeeter.Core.Entities.csproj" Id="ae24243e-b065-47a5-a7aa-877fae6e7c55" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
-    <Project Path="Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
   </Folder>
   <Folder Name="/Modules/Docking/">
     <Project Path="Modules/SoundMeeter.Docking/SoundMeeter.Docking.Presentation/SoundMeeter.Docking.Presentation.csproj" Id="690c2411-c243-4ea9-a408-2abd12a3522c" />
@@ -60,6 +61,7 @@
   </Folder>
   <Folder Name="/Modules/TextToSpeech/">
     <Project Path="Modules/SoundMeeter.TextToSpeech/SoundMeeter.TextToSpeech.Entities/SoundMeeter.TextToSpeech.Entities.csproj" Id="13c90d25-5953-45b5-a6f8-a7557ccdc800" />
+    <Project Path="Modules/SoundMeeter.TextToSpeech/SoundMeeter.TextToSpeech.Presentation/SoundMeeter.TextToSpeech.Presentation.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract.Implementation\SoundMeeter.TextToSpeech.Contract.Implementation.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <Project Path="Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using SoundMeeter.Core.Contract;
 using SoundMeeter.Framework.Contract;
 
 namespace SoundMeeter.Docking.Presentation.ViewModels

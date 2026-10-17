@@ -133,7 +133,7 @@ public class TwitchServiceTests
         var received = new List<TtsChatMessage>();
         fixture.Service.MessageReceived += received.Add;
 
-        fixture.Chat.Raise(new TwitchChatMessage("viewer", "!tts привет"));
+        fixture.Chat.Raise(new ChatMessage("viewer", "!tts привет"));
 
         // Мост передаёт реплику ровно такой, какой её прислал чат. Разбор команд — дело
         // модуля: если разбирать здесь, логика разъехалась бы на две копии.
@@ -148,8 +148,8 @@ public class TwitchServiceTests
         using var fixture = new Fixture(authorized: true);
         fixture.Service.MessageReceived += _ => throw new InvalidOperationException("модуль упал");
 
-        fixture.Chat.Raise(new TwitchChatMessage("viewer", "!tts раз"));
-        fixture.Chat.Raise(new TwitchChatMessage("viewer", "!tts два"));
+        fixture.Chat.Raise(new ChatMessage("viewer", "!tts раз"));
+        fixture.Chat.Raise(new ChatMessage("viewer", "!tts два"));
 
         // Один сбойный обработчик (а он один — модуль озвучки) не должен ронять чтение
         // чата: иначе он просто перестал бы работать без объяснений.

@@ -9,24 +9,17 @@ namespace SoundMeeter.Update.Entities;
 /// «1.2.3-beta.1», «1.2.3+abc1234» (суффикс от SourceLink отбрасывается).
 /// Сравнение нужно, чтобы отличить релиз новее установленного от более старого.
 /// </summary>
-public sealed class AppVersion : IComparable<AppVersion>, IEquatable<AppVersion>
+public sealed class AppVersion(int major, int minor, int patch, string prerelease = "")
+    : IComparable<AppVersion>, IEquatable<AppVersion>
 {
-    public int Major { get; }
-    public int Minor { get; }
-    public int Patch { get; }
+    public int Major { get; } = major;
+    public int Minor { get; } = minor;
+    public int Patch { get; } = patch;
 
     /// <summary>Пре-релизный суффикс без ведущего дефиса. Пусто у обычного релиза.</summary>
-    public string Prerelease { get; }
+    public string Prerelease { get; } = prerelease;
 
     public bool IsPrerelease => !string.IsNullOrEmpty(Prerelease);
-
-    public AppVersion(int major, int minor, int patch, string prerelease = "")
-    {
-        Major = major;
-        Minor = minor;
-        Patch = patch;
-        Prerelease = prerelease ?? "";
-    }
 
     /// <summary>
     /// Версия запущенной сборки. Берётся из AssemblyInformationalVersion
@@ -103,7 +96,7 @@ public sealed class AppVersion : IComparable<AppVersion>, IEquatable<AppVersion>
         IsPrerelease ? $"{Major}.{Minor}.{Patch}-{Prerelease}" : $"{Major}.{Minor}.{Patch}";
 
     public static bool operator ==(AppVersion? left, AppVersion? right) =>
-        left is null ? right is null : left.Equals(right);
+        left?.Equals(right) ?? right is null;
 
     public static bool operator !=(AppVersion? left, AppVersion? right) => !(left == right);
 

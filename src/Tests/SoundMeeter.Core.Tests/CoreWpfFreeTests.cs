@@ -2,6 +2,7 @@ using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
 using System.Reflection;
 using Xunit;
+using MainViewModel = SoundMeeter.Core.Presentation.ViewModels.MainViewModel;
 
 /// <summary>
 /// Ядро обязано оставаться переносимым в не-WPF хост (SM-A10).

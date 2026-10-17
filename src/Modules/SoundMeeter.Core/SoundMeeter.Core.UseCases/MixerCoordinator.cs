@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Docking.UseCases;

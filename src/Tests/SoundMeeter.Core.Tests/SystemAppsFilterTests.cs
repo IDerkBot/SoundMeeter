@@ -1,6 +1,7 @@
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Framework.UseCases;
 using System.Text.Json;
+using SoundMeeter.AppRouting.Entities;
 using Xunit;
 
 namespace SoundMeeter.Tests;

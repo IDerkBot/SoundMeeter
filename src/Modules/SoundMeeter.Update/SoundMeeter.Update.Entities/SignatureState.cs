@@ -1,9 +1,9 @@
-namespace SoundMeeter.Update.Contract.Implementation;
+namespace SoundMeeter.Update.Entities;
 
 /// <summary>
 /// Результат сверки подписи Authenticode файла.
 /// </summary>
-internal enum SignatureState
+public enum SignatureState
 {
     /// <summary>Подписи нет (обычное состояние сборок без сертификата).</summary>
     Unsigned,

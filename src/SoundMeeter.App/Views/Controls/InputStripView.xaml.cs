@@ -1,11 +1,10 @@
 using SoundMeeter.Controls;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using SoundMeeter.Audio.Presentation;
 
 namespace SoundMeeter.Views.Controls
 {
@@ -14,7 +13,7 @@ namespace SoundMeeter.Views.Controls
     /// маршрутизации (OUT/VIRT/MONO/SOLO/MUTE/DEN/FUNC1/FUNC2) и приложения канала.
     /// DataContext — InputChannelViewModel, RemoveCommand приходит от MixerView.
     /// </summary>
-    public partial class InputStripView : UserControl
+    public partial class InputStripView
     {
         public InputStripView()
         {

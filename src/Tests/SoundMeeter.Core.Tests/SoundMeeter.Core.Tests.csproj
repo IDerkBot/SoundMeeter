@@ -20,7 +20,6 @@
     <ProjectReference Include="..\..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
     <!-- VM модальных окон: синтез речи, Twitch, журнал. -->
-    <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.Presentation\SoundMeeter.Core.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
     <!-- Граничные проверки модуля AppRouting смотрят на все три его сборки:
          контракт, правила разбора имён и COM-реализацию. -->

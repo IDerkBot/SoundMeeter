@@ -9,7 +9,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SoundMeeter.Audio.Entities;
 using Xunit;
+using EqBandViewModel = SoundMeeter.Core.Presentation.ViewModels.EqBandViewModel;
 
 namespace SoundMeeter.Tests;
 

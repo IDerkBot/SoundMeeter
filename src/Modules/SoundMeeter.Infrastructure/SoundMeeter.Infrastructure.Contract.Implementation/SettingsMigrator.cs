@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using SoundMeeter.AppRouting.Entities;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.Midi.Entities;
 using SoundMeeter.TextToSpeech.Entities;
@@ -15,7 +16,7 @@ namespace SoundMeeter.Infrastructure.Contract.Implementation;
 /// Правило простое: файл всегда несёт номер версии, а переход между соседними
 /// версиями — отдельная маленькая функция. Добавить следующее изменение формата
 /// значит дописать один шаг <c>n → n+1</c>, а не разбирать файл вручную в
-/// <see cref="Services.SettingsService"/>: иначе каждое новое поле обрастает
+/// <see cref="SettingsService"/>: иначе каждое новое поле обрастает
 /// собственной точечной проверкой, и через год их будет пять в разных местах.
 ///
 /// Версия 0 — это формат до введения версионирования, то есть все settings.json,

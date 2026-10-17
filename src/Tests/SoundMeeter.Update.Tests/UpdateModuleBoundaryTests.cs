@@ -2,6 +2,7 @@ using SoundMeeter.Update.Contract.Implementation;
 using SoundMeeter.Update.Entities;
 using SoundMeeter.Update.UseCases;
 using System.Reflection;
+using SoundMeeter.Update.Presentation.ViewModels;
 using Xunit;
 
 namespace SoundMeeter.Update.Tests;

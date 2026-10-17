@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
-using SoundMeeter.Infrastructure.Logger;
-using System.Text;
+using SoundMeeter.Framework.Contract.Implementation;
 using Xunit;
 
 namespace SoundMeeter.Audio.Tests;

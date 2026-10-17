@@ -5,6 +5,7 @@ using SoundMeeter.Framework.Contract;
 using SoundMeeter.Docking.Entities;
 using SoundMeeter.Docking.UseCases;
 using System.Collections.ObjectModel;
+using SoundMeeter.Core.Contract;
 
 namespace SoundMeeter.Docking.Presentation.ViewModels
 {

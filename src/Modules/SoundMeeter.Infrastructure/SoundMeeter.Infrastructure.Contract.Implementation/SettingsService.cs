@@ -8,6 +8,7 @@ using System.Security;
 using System.Text.Json;
 using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Framework.Contract.Implementation;
 
 namespace SoundMeeter.Infrastructure.Contract.Implementation;
 

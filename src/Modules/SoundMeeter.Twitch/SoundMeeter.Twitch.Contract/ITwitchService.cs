@@ -1,8 +1,4 @@
-﻿using SoundMeeter.TextToSpeech.Entities;
-using SoundMeeter.Twitch.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SoundMeeter.Twitch.Entities;
 
 namespace SoundMeeter.Twitch.Contract
 {

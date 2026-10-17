@@ -2,15 +2,13 @@ using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
 using Xunit;
-using SoundMeeter.Infrastructure.Settings;
 using SoundMeeter.Twitch.UseCases;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Update.Contract;
-using SoundMeeter.Update.UseCases;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Update.Contract.Implementation;
+using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.App.Tests;
 

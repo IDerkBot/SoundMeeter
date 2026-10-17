@@ -1,7 +1,6 @@
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Windows;
+using SoundMeeter.TextToSpeech.Presentation;
 
 namespace SoundMeeter.Views
 {

@@ -1,6 +1,7 @@
 using SoundMeeter.ChangeLanguage.UseCases;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using SoundMeeter.Update.Entities;
 
 namespace SoundMeeter.Update.Contract.Implementation;
 

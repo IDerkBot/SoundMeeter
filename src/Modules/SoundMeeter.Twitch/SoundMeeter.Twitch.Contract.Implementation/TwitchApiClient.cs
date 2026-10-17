@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Framework.Contract.Implementation;
-using SoundMeeter.Twitch.Contract;
 
 namespace SoundMeeter.Twitch.Contract.Implementation;
 

@@ -1,11 +1,17 @@
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Infrastructure.Contract;
+using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
+using SoundMeeter.ViewModels;
 
 namespace SoundMeeter.Tests.Infrastructure;
 

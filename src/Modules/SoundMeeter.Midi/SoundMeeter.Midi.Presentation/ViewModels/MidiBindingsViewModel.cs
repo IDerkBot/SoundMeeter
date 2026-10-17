@@ -9,6 +9,7 @@ using SoundMeeter.Midi.Presentation.Helpers;
 using SoundMeeter.Midi.Presentation.UseCases;
 using SoundMeeter.Midi.UseCases;
 using System.Collections.ObjectModel;
+using SoundMeeter.Core.Contract;
 
 namespace SoundMeeter.Midi.Presentation.ViewModels;
 

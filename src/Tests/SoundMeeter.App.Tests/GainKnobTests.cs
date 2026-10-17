@@ -1,3 +1,4 @@
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.Controls;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Tests.Infrastructure;

@@ -1,22 +1,19 @@
-using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Contract.Implementation;
 using SoundMeeter.Audio.Contract.Implementation;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Docking.Contract;
 using SoundMeeter.Docking.UseCases;
 using SoundMeeter.Framework.Base.Modules;
-using SoundMeeter.Midi.UseCases;
 using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Update.Contract;
-using SoundMeeter.Update.UseCases;
 using SoundMeeter.Views;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Update.Contract.Implementation;
@@ -30,6 +27,8 @@ using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Framework.Presentation;
 using SoundMeeter.Infrastructure.Contract;
+using SoundMeeter.Update.Presentation.ViewModels;
+using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter;
 

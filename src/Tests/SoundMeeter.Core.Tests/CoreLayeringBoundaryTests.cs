@@ -2,7 +2,17 @@ using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
 using System.Reflection;
+using SoundMeeter.Audio.Contract;
+using SoundMeeter.Core.UseCases;
 using Xunit;
+using AppViewModel = SoundMeeter.Core.Presentation.ViewModels.AppViewModel;
+using AudioDeviceViewModel = SoundMeeter.Core.Presentation.ViewModels.AudioDeviceViewModel;
+using EqBandViewModel = SoundMeeter.Core.Presentation.ViewModels.EqBandViewModel;
+using EqualizerViewModel = SoundMeeter.Core.Presentation.ViewModels.EqualizerViewModel;
+using FuncButtonViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncButtonViewModel;
+using FuncTargetViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncTargetViewModel;
+using LanguageOptionViewModel = SoundMeeter.Core.Presentation.ViewModels.LanguageOptionViewModel;
+using MainViewModel = SoundMeeter.Core.Presentation.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Tests;
 

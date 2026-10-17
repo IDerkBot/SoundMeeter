@@ -3,10 +3,7 @@ using SoundMeeter.Framework.Base.Modules;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Presentation.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace SoundMeeter.Twitch
 {

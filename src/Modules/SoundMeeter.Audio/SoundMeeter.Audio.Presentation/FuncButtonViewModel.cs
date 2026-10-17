@@ -1,13 +1,11 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SoundMeeter.AppRouting.Entities;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Contract;
-using System.Collections.ObjectModel;
+using SoundMeeter.Core.Contract;
 
-
-namespace SoundMeeter.Framework.Presentation.ViewModels;
+namespace SoundMeeter.Audio.Presentation;
 
 /// <summary>
 /// Пользовательская кнопка FUNC на входном стрипе: назначенный набор выходов
@@ -25,7 +23,7 @@ namespace SoundMeeter.Framework.Presentation.ViewModels;
 /// иначе снятая галка с единственного выхода молча убрала бы звук со стрипа, а
 /// кнопка выглядела бы сломанной.
 ///
-/// Два режима применения (<see cref="IsExclusive"/>): «только свои» — кнопка
+/// Два режима применения (<see cref="Core.Presentation.ViewModels.FuncButtonViewModel.IsExclusive"/>): «только свои» — кнопка
 /// приводит роутинг стрипа ровно к своему списку (сценарий «в колонки» /
 /// «в стрим» одним щелчком), и «дописать» — добавляет свои выходы, чужие не
 /// трогая.
@@ -153,7 +151,7 @@ public partial class FuncButtonViewModel : LocalizedViewModel
         _onAssignmentChanged = onAssignmentChanged;
         _onLabelChanged = onLabelChanged;
 
-        _label = model.Label ?? "";
+        _label = model.Label;
         _isExclusive = model.Exclusive;
 
         foreach (var bus in buses)

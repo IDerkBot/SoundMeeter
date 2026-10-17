@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "SoundMeeter/Review_10_10_26.md",
+                "file": "SoundMeeter/Tasks.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Review_10_10_26"
+              "title": "Tasks"
             }
           }
         ]
@@ -190,6 +190,7 @@
   },
   "active": "31180e862d28e054",
   "lastOpenFiles": [
+    "SoundMeeter/Review_10_10_26.md",
     "SoundMeeter/Tests.md",
     "SoundMeeter/Tasks.md",
     "SoundMeeter/Versions.md",

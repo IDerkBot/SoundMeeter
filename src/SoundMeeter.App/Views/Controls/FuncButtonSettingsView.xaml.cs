@@ -1,7 +1,5 @@
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Windows;
-using System.Windows.Controls;
+using SoundMeeter.Audio.Presentation;
 
 namespace SoundMeeter.Views.Controls
 {
@@ -14,7 +12,7 @@ namespace SoundMeeter.Views.Controls
     /// когда попап переоткрывается с другим стрипом — иначе старый
     /// FuncButtonViewModel продолжал бы держать ссылку на закрытое окно.
     /// </summary>
-    public partial class FuncButtonSettingsView : UserControl
+    public partial class FuncButtonSettingsView
     {
         public FuncButtonSettingsView()
         {

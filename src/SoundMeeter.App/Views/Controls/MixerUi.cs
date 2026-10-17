@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using SoundMeeter.AppRouting.Presentation.ViewModels;
+using SoundMeeter.Audio.Presentation;
+using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Views.Controls
 {

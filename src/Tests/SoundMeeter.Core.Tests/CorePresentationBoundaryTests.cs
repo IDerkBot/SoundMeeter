@@ -1,6 +1,8 @@
 using SoundMeeter.Framework.Presentation.ViewModels;
 using System.Reflection;
+using SoundMeeter.Twitch.Presentation.ViewModels;
 using Xunit;
+using TextToSpeechSettingsViewModel = SoundMeeter.Core.Presentation.ViewModels.TextToSpeechSettingsViewModel;
 
 namespace SoundMeeter.Tests;
 

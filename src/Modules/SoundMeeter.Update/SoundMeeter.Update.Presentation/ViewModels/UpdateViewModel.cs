@@ -2,12 +2,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.Core.Contract;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
 
-namespace SoundMeeter.Update.UseCases;
+namespace SoundMeeter.Update.Presentation.ViewModels;
 
 /// <summary>
 /// VM модуля обновлений: тихая проверка после старта и ручная по кнопке.

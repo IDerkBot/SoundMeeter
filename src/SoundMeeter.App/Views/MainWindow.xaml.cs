@@ -1,11 +1,10 @@
 using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.StartUp.Contract;
 using SoundMeeter.TrayIcon.Contract;
 using SoundMeeter.TrayIcon.Contract.Implementation;
-using SoundMeeter.TrayIcon.UseCases;
 using System.ComponentModel;
 using System.Windows;
+using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Views
 {

@@ -8,7 +8,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+using SoundMeeter.Core.Presentation.ViewModels;
 using Xunit;
+using TextToSpeechSettingsViewModel = SoundMeeter.Core.Presentation.ViewModels.TextToSpeechSettingsViewModel;
 
 namespace SoundMeeter.Tests;
 

@@ -4,7 +4,6 @@ using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Update.Entities;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 
 namespace SoundMeeter.Update.Contract.Implementation
@@ -99,7 +98,7 @@ namespace SoundMeeter.Update.Contract.Implementation
                 // наличие не делает архив неполным. А вот чужая dll рядом означает
                 // ровно обратное: сборка разъехалась, и запускать нечего.
                 var assemblies = Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories)
-                    .Where(file => IsAssemblyLeftover(Path.GetFileName(file) ?? ""))
+                    .Where(file => IsAssemblyLeftover(Path.GetFileName(file)))
                     .ToList();
 
                 if (assemblies.Count > 0 || exeSize < SingleFileMinimumSize)
@@ -120,7 +119,7 @@ namespace SoundMeeter.Update.Contract.Implementation
             VerifySignature(mainExe, update, notes);
 
             var payloadFiles = Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories).ToList();
-            var newTotalBytes = payloadFiles.Sum(f => SafeLength(f));
+            var newTotalBytes = payloadFiles.Sum(SafeLength);
             notes.Add(Loc.Get("Sm.Update.Plan.FilesTotal", payloadFiles.Count, FormatBytes(newTotalBytes)));
 
             var stale = CollectFilesToDelete(payloadDirectory, installDirectory);
@@ -129,7 +128,8 @@ namespace SoundMeeter.Update.Contract.Implementation
                 : Loc.Get("Sm.Update.Plan.StaleCount", stale.Count));
 
             Logger.LogInformation("План обновления {Tag}: {Notes}", update.TagName, string.Join("; ", notes));
-            Logger.LogInformation("Каталог установки: {Install}, запускаемый файл: {Exe}", installDirectory, executablePath);
+            Logger.LogInformation("Каталог установки: {Install}, запускаемый файл: {Exe}", installDirectory,
+                executablePath);
             foreach (var path in stale)
                 Logger.LogWarning("Будет удалён устаревший файл: {Path}", path);
 
@@ -205,7 +205,7 @@ namespace SoundMeeter.Update.Contract.Implementation
 
             var payload = new HashSet<string>(
                 Directory.EnumerateFiles(payloadDirectory, "*", SearchOption.AllDirectories)
-                    .Select(file => Path.GetFileName(file) ?? ""),
+                    .Select(file => Path.GetFileName(file)),
                 StringComparer.OrdinalIgnoreCase);
 
             foreach (var file in Directory.EnumerateFiles(installDirectory, "*", SearchOption.AllDirectories))
@@ -231,19 +231,25 @@ namespace SoundMeeter.Update.Contract.Implementation
 
         private static long SafeLength(string file)
         {
-            try { return new FileInfo(file).Length; }
-            catch { return 0; }
+            try
+            {
+                return new FileInfo(file).Length;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
-        internal static string FormatBytes(long bytes)
+        private static string FormatBytes(long bytes)
         {
             string[] units =
-            {
+            [
                 Loc.Get("Sm.Unit.Bytes"),
                 Loc.Get("Sm.Unit.Kilobytes"),
                 Loc.Get("Sm.Unit.Megabytes"),
-                Loc.Get("Sm.Unit.Gigabytes"),
-            };
+                Loc.Get("Sm.Unit.Gigabytes")
+            ];
             double value = bytes;
             var unit = 0;
             while (value >= 1024 && unit < units.Length - 1)
@@ -251,6 +257,7 @@ namespace SoundMeeter.Update.Contract.Implementation
                 value /= 1024;
                 unit++;
             }
+
             return $"{value.ToString(unit == 0 ? "0" : "0.0", CultureInfo.InvariantCulture)} {units[unit]}";
         }
 
@@ -459,6 +466,7 @@ try {
                     sb.Append("\n").Append(Loc.Get("Sm.Update.Plan.DeletionMore", files.Count - shown));
                     break;
                 }
+
                 sb.Append("\n  • ").Append(file);
                 shown++;
             }

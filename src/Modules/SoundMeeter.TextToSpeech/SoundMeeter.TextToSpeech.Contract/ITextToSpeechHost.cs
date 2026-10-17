@@ -1,5 +1,4 @@
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Framework.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 
 namespace SoundMeeter.TextToSpeech.Contract;
