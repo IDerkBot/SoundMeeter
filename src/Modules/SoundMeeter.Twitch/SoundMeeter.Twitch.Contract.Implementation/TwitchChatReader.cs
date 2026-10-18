@@ -72,6 +72,7 @@ public sealed class TwitchChatReader : ITwitchChatReader
     private static readonly TimeSpan ReconnectDelay = TimeSpan.FromSeconds(5);
 
     private readonly Func<string> _webSocketUrl;
+    private readonly ITwitchApi _api;
     private readonly ILogger _logger = AppLog.For<TwitchChatReader>();
 
     private CancellationTokenSource? _lifetime;
@@ -99,14 +100,16 @@ public sealed class TwitchChatReader : ITwitchChatReader
     /// <summary>Соединение поднялось или упало. true — читаем чат.</summary>
     public event Action<bool>? ConnectionChanged;
 
-    public TwitchChatReader() : this(() => DefaultWebSocketUrl) { }
+    public TwitchChatReader() : this(() => DefaultWebSocketUrl, null!) { }
 
     /// <summary>
-    /// Адрес сессии задаётся снаружи (внутренний конструктор): так проверка может
-    /// подсунуть свой сервер и не ходить в Twitch.
+    /// Конструктор с параметрами для DI-регистрации.
     /// </summary>
-    internal TwitchChatReader(Func<string> webSocketUrl) =>
+    public TwitchChatReader(Func<string> webSocketUrl, ITwitchApi api)
+    {
         _webSocketUrl = webSocketUrl ?? throw new ArgumentNullException(nameof(webSocketUrl));
+        _api = api ?? throw new ArgumentNullException(nameof(api));
+    }
 
     /// <summary>
     /// Начать читать чат канала от имени аккаунта.
@@ -253,8 +256,14 @@ public sealed class TwitchChatReader : ITwitchChatReader
         // новый адрес наследует подписки старой сессии, и повтор упёрся бы в лимит.
         if (pendingUrl is null)
         {
-            await SubscribeAsync(socket, session, broadcasterUserId, readerUserId, handshake.Token)
-                .ConfigureAwait(false);
+            var subscribed = await _api.SubscribeToChatAsync(
+                session, broadcasterUserId, readerUserId, handshake.Token).ConfigureAwait(false);
+            if (!subscribed)
+            {
+                LastError = "HTTP API отказало в создании подписки";
+                return null;
+            }
+            _logger.LogInformation("Twitch: подписка на сообщения чата создана через HTTP API");
         }
 
         SetConnected(true);
@@ -305,44 +314,6 @@ public sealed class TwitchChatReader : ITwitchChatReader
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Создать подписку на сообщения чата в открытой сессии.
-    ///
-    /// Подписка уходит прямо в сокет: у EventSub WebSocket доставка именно такая,
-    /// отдельного HTTP-запроса на создание нет.
-    /// </summary>
-    private async Task SubscribeAsync(ClientWebSocket socket, string sessionId,
-        string broadcasterUserId, string readerUserId, CancellationToken token)
-    {
-        var payload = new Dictionary<string, object>
-        {
-            ["type"] = "channel.chat.message",
-            ["version"] = "1",
-            ["condition"] = new Dictionary<string, string>
-            {
-                ["broadcaster_user_id"] = broadcasterUserId,
-                ["user_id"] = readerUserId,
-            },
-            ["transport"] = new Dictionary<string, string>
-            {
-                ["method"] = "websocket",
-                ["session_id"] = sessionId,
-            },
-        };
-
-        byte[] body = JsonSerializer.SerializeToUtf8Bytes(payload);
-
-        // Сервер десять секунд ждёт подписку и молча закрывает соединение без неё.
-        // Таймер нужен, чтобы приложение не висело, если сокет перестанет отвечать.
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(token);
-        timeout.CancelAfter(HandshakeTimeout);
-
-        await socket.SendAsync(body, WebSocketMessageType.Text, endOfMessage: true, timeout.Token)
-            .ConfigureAwait(false);
-
-        _logger.LogInformation("Twitch: подписка на сообщения чата создана");
     }
 
     /// <summary>Прочитать приветствие и достать из него идентификатор сессии.</summary>

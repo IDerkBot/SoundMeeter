@@ -820,10 +820,10 @@
     <value>SoundMeeter: the dock panel is broken (no embedded resource {0}).</value>
   </data>
   <data name="Sm.Update.Status.Checking" xml:space="preserve">
-    <value>SoundMeeter {0}: checking for updates…</value>
+    <value>checking for updates…</value>
   </data>
   <data name="Sm.Update.Status.UpToDate" xml:space="preserve">
-    <value>SoundMeeter {0}: no updates</value>
+    <value>no updates</value>
   </data>
   <data name="Sm.Update.Status.CheckFailed" xml:space="preserve">
     <value>Update check failed: {0}</value>
@@ -1065,7 +1065,7 @@
   <data name="Sm.Update.Plan.NoAssembly" xml:space="preserve">
     <value>The release archive {0} has no {1} — the update is incomplete.</value>
   </data>
-<data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
+  <data name="Sm.Update.Plan.AssemblyTooSmall" xml:space="preserve">
     <value>{0} in the release archive {1} is suspiciously small ({2} bytes) - the update was rejected.</value>
   </data>
   <data name="Sm.Update.Plan.SingleFile" xml:space="preserve">
@@ -1159,46 +1159,46 @@
     <value>GB</value>
   </data>
   <data name="Sm.Tray.Menu" xml:space="preserve">
-   <value>Application</value>
+    <value>Application</value>
   </data>
   <data name="Sm.Tray.Enabled" xml:space="preserve">
-   <value>Minimize to tray</value>
+    <value>Minimize to tray</value>
   </data>
   <data name="Sm.Tray.EnabledTip" xml:space="preserve">
-   <value>Show an icon in the notification area. With it on, closing the window hides it instead of quitting — exit from the tray menu.</value>
+    <value>Show an icon in the notification area. With it on, closing the window hides it instead of quitting — exit from the tray menu.</value>
   </data>
   <data name="Sm.Tray.Startup" xml:space="preserve">
-   <value>Start with Windows</value>
+    <value>Start with Windows</value>
   </data>
   <data name="Sm.Tray.StartupTip" xml:space="preserve">
-   <value>Launch SoundMeeter when you log in. Registers a scheduled task that runs with administrator rights (SoundMeeter needs them for AppRouting), so no UAC prompt appears at logon; turning it off removes that task.</value>
+    <value>Launch SoundMeeter when you log in. Registers a scheduled task that runs with administrator rights (SoundMeeter needs them for AppRouting), so no UAC prompt appears at logon; turning it off removes that task.</value>
   </data>
   <data name="Sm.Tray.On" xml:space="preserve">
-   <value>on</value>
+    <value>on</value>
   </data>
   <data name="Sm.Tray.Off" xml:space="preserve">
-   <value>off</value>
+    <value>off</value>
   </data>
   <data name="Sm.Tray.Enable" xml:space="preserve">
-   <value>enable</value>
+    <value>enable</value>
   </data>
   <data name="Sm.Tray.Disable" xml:space="preserve">
-   <value>disable</value>
+    <value>disable</value>
   </data>
   <data name="Sm.Tray.StartupFailedTitle" xml:space="preserve">
-   <value>Startup entry</value>
+    <value>Startup entry</value>
   </data>
   <data name="Sm.Tray.StartupFailedMessage" xml:space="preserve">
-   <value>Could not turn startup {0}. The switch stayed as it is in the system.</value>
+    <value>Could not turn startup {0}. The switch stayed as it is in the system.</value>
   </data>
   <data name="Sm.Tray.Open" xml:space="preserve">
-   <value>Open SoundMeeter</value>
+    <value>Open SoundMeeter</value>
   </data>
   <data name="Sm.Tray.RunToggle" xml:space="preserve">
-   <value>Start / stop engine</value>
+    <value>Start / stop engine</value>
   </data>
   <data name="Sm.Tray.Exit" xml:space="preserve">
-   <value>Exit</value>
+    <value>Exit</value>
   </data>
   <data name="Sm.Toolbar.TextToSpeech" xml:space="preserve">
     <value>Text to speech</value>
@@ -1469,9 +1469,14 @@
   </data>
   <data name="Sm.Twitch.Status.ChatDisconnected" xml:space="preserve">
     <value>Chat not connected</value>
-  </data>  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
+  </data>
+  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
     <value>Twitch</value>
   </data>
   <data name="Sm.Toolbar.TwitchTip" xml:space="preserve">
     <value>Twitch: sign in, read chat, show whether the stream is live</value>
-  </data></root>
+  </data>
+  <data name="Sm.Update.Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+</root>

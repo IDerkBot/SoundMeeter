@@ -22,4 +22,14 @@ public interface ITwitchApi
     /// Нужен потому, что подписка на чат адресуется идентификатором, а не логином.
     /// </summary>
     Task<string?> ResolveChannelUserIdAsync(string channelLogin, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Создать подписку на сообщения чата через HTTP API EventSub.
+    ///
+    /// <paramref name="sessionId"/> — идентификатор сессии WebSocket, полученный
+    /// из приветствия EventSub. Транспорт подписки — websocket, и именно session_id
+    /// связывает подписку с открытым сокетом: без него события не придут.
+    /// </summary>
+    Task<bool> SubscribeToChatAsync(string sessionId, string broadcasterUserId, string moderatorUserId,
+        CancellationToken cancellationToken = default);
 }

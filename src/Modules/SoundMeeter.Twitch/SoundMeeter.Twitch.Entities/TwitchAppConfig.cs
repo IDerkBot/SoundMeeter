@@ -30,7 +30,7 @@ public static class TwitchAppConfig
     /// Пока строка пустая, модуль честно говорит в окне «не настроено» и в сеть не
     /// ходит: так пользователь увидит причину, а не ошибку 401 от Twitch.
     /// </summary>
-    public const string ClientId = "";
+    public const string ClientId = "fq0m3yeycvz5fbbst95scp6612xoln";
 
     /// <summary>
     /// Приложение собрано с client ID. Пока строка пустая, вход невозможен, и об

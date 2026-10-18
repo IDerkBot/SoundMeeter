@@ -38,7 +38,7 @@ public sealed class TwitchAuthService : ITwitchAuth
     private const string RevokeUrl = "https://id.twitch.tv/oauth2/revoke";
 
     /// <summary>Области прав. Ровно те, что нужны, и ни одной сверху.</summary>
-    private const string Scopes = "user:read:chat channel:read:chat";
+    private const string Scopes = "user:read:chat";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

@@ -1,0 +1,39 @@
+﻿<UserControl
+    x:Class="SoundMeeter.Update.Presentation.Views.UpdateStatusView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SoundMeeter.Update.Presentation.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:SoundMeeter.Update.Presentation.ViewModels"
+    Margin="6"
+    HorizontalAlignment="Right"
+    VerticalAlignment="Center"
+    d:DataContext="{d:DesignInstance vm:UpdateViewModel}"
+    d:DesignHeight="34"
+    d:DesignWidth="200"
+    mc:Ignorable="d">
+    <Grid VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            FontSize="14"
+            FontStretch="UltraExpanded"
+            FontWeight="400"
+            Foreground="#CACACA"
+            Text="{Binding Version}"
+            TextAlignment="Right" />
+        <TextBlock
+            Grid.Row="1"
+            VerticalAlignment="Center"
+            FontSize="12"
+            FontWeight="200"
+            Foreground="#7E7E7E"
+            Text="{Binding UpdateStatus}"
+            TextAlignment="Right" />
+    </Grid>
+</UserControl>

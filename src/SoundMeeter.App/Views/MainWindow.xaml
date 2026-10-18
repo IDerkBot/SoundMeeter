@@ -11,5 +11,5 @@
     Background="#1E1E1E"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <local:MainView />
+    <local:MainView DataContext="{Binding}" />
 </Window>

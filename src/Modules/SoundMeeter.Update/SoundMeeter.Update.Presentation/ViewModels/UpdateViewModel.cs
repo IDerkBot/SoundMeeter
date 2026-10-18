@@ -7,6 +7,7 @@ using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.Presentation.Events;
 
 namespace SoundMeeter.Update.Presentation.ViewModels;
 
@@ -26,6 +27,8 @@ public partial class UpdateViewModel : LocalizedViewModel
         _dispatcherService = dispatcherService;
     }
 
+    public event EventHandler<UpdateInstallRequestedEventArgs>? InstallRequested;
+
     /// <summary>Сервис обновлений (окно установки берёт план и отчёт).</summary>
     public IUpdateService UpdateService => _updateService;
 
@@ -39,6 +42,9 @@ public partial class UpdateViewModel : LocalizedViewModel
     private string _updateBanner = "";
 
     [ObservableProperty]
+    private string _version = "";
+
+    [ObservableProperty]
     private string _updateStatus = "";
 
     /// <summary>
@@ -48,6 +54,7 @@ public partial class UpdateViewModel : LocalizedViewModel
     {
         try
         {
+            Version = Loc.Get("Sm.Update.Version", _updateService.CurrentVersion);
             UpdateStatus = Loc.Get("Sm.Update.Status.Checking", _updateService.CurrentVersion);
             var result = await _updateService.CheckAsync();
             await _dispatcherService.InvokeAsync(() => ApplyCheckResult(result));
@@ -70,6 +77,15 @@ public partial class UpdateViewModel : LocalizedViewModel
     /// <summary>Скрыть баннер до следующей проверки.</summary>
     [RelayCommand]
     private void DismissUpdate() => IsUpdateAvailable = false;
+
+    [RelayCommand]
+    private void RequestInstall()
+    {
+        if (PendingUpdate is { } update)
+        {
+            InstallRequested?.Invoke(this, new UpdateInstallRequestedEventArgs(update));
+        }
+    }
 
     private void ApplyCheckResult(UpdateCheckResult result)
     {

@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SoundMeeter.AppRouting.Contract;
@@ -25,7 +24,9 @@ using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
 using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.Presentation.Events;
 using SoundMeeter.Update.Presentation.ViewModels;
+using System.Collections.ObjectModel;
 
 namespace SoundMeeter.ViewModels;
 
@@ -56,6 +57,8 @@ public partial class MainViewModel : LocalizedViewModel, ITextToSpeechHost, ITwi
     
     private readonly ObservableCollection<AudioDeviceViewModel> _allAudioDevices = new();
     private readonly SemaphoreSlim _appRoutingGate = new(1, 1);
+
+    public event EventHandler<UpdateInstallRequestedEventArgs>? InstallRequested;
 
     [ObservableProperty]
     private ObservableCollection<InputChannelViewModel> _inputs = new();
@@ -97,6 +100,12 @@ public partial class MainViewModel : LocalizedViewModel, ITextToSpeechHost, ITwi
 
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
         _audioService.AppsChanged += async (s, e) => await RefreshAppsAsync();
+
+        _updateVm.InstallRequested += (s, e) =>
+        {
+            // Передать событие в UI-слой основного приложения
+            InstallRequested?.Invoke(this, e);
+        };
 
         // Подписка на уведомления от UpdateViewModel: свойства-обёртки (UpdateStatus,
         // UpdateBanner, IsUpdateAvailable) должны уведомлять WPF привязки об изменениях.
@@ -294,37 +303,6 @@ public partial class MainViewModel : LocalizedViewModel, ITextToSpeechHost, ITwi
     public UpdateViewModel Update => _updateVm;
     public UpdateInfo? PendingUpdate => _updateVm.PendingUpdate;
 
-    public bool IsUpdateAvailable
-    {
-        get => _updateVm.IsUpdateAvailable;
-        set
-        {
-            if (_updateVm.IsUpdateAvailable != value)
-                _updateVm.IsUpdateAvailable = value;
-        }
-    }
-
-    public string UpdateBanner
-    {
-        get => _updateVm.UpdateBanner;
-        set
-        {
-            if (_updateVm.UpdateBanner != value)
-                _updateVm.UpdateBanner = value;
-        }
-    }
-
-    public string UpdateStatus
-    {
-        get => _updateVm.UpdateStatus;
-        set
-        {
-            if (_updateVm.UpdateStatus != value)
-                _updateVm.UpdateStatus = value;
-        }
-    }
-
     public Task CheckUpdatesOnStartupAsync() => _updateVm.CheckUpdatesOnStartupAsync();
     public Task CheckUpdatesAsync() => _updateVm.CheckUpdatesAsync();
-    public void DismissUpdate() => _updateVm.DismissUpdateCommand.Execute(null);
 }

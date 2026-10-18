@@ -820,10 +820,10 @@
     <value>SoundMeeter: панель дока повреждена (в сборке нет встроенного ресурса {0}).</value>
   </data>
   <data name="Sm.Update.Status.Checking" xml:space="preserve">
-    <value>SoundMeeter {0}: проверка обновлений…</value>
+    <value>проверка обновлений…</value>
   </data>
   <data name="Sm.Update.Status.UpToDate" xml:space="preserve">
-    <value>SoundMeeter {0}: обновлений нет</value>
+    <value>обновлений нет</value>
   </data>
   <data name="Sm.Update.Status.CheckFailed" xml:space="preserve">
     <value>Проверка обновлений не удалась: {0}</value>
@@ -1159,46 +1159,46 @@
     <value>ГБ</value>
   </data>
   <data name="Sm.Tray.Menu" xml:space="preserve">
-   <value>Приложение</value>
+    <value>Приложение</value>
   </data>
   <data name="Sm.Tray.Enabled" xml:space="preserve">
-   <value>Сворачивать в трей</value>
+    <value>Сворачивать в трей</value>
   </data>
   <data name="Sm.Tray.EnabledTip" xml:space="preserve">
-   <value>Значок в области уведомлений. Когда включено, закрытие окна прячет его, а не закрывает программу — выход через меню значка.</value>
+    <value>Значок в области уведомлений. Когда включено, закрытие окна прячет его, а не закрывает программу — выход через меню значка.</value>
   </data>
   <data name="Sm.Tray.Startup" xml:space="preserve">
-   <value>Запускать вместе с Windows</value>
+    <value>Запускать вместе с Windows</value>
   </data>
   <data name="Sm.Tray.StartupTip" xml:space="preserve">
-   <value>Запускать SoundMeeter при входе в Windows. Создаёт задачу планировщика, которая запускается с правами администратора (микшеру они нужны для AppRouting), поэтому при входе не появляется запрос UAC; выключение удаляет задачу.</value>
+    <value>Запускать SoundMeeter при входе в Windows. Создаёт задачу планировщика, которая запускается с правами администратора (микшеру они нужны для AppRouting), поэтому при входе не появляется запрос UAC; выключение удаляет задачу.</value>
   </data>
   <data name="Sm.Tray.On" xml:space="preserve">
-   <value>включить</value>
+    <value>включить</value>
   </data>
   <data name="Sm.Tray.Off" xml:space="preserve">
-   <value>выключить</value>
+    <value>выключить</value>
   </data>
   <data name="Sm.Tray.Enable" xml:space="preserve">
-   <value>включение</value>
+    <value>включение</value>
   </data>
   <data name="Sm.Tray.Disable" xml:space="preserve">
-   <value>выключение</value>
+    <value>выключение</value>
   </data>
   <data name="Sm.Tray.StartupFailedTitle" xml:space="preserve">
-   <value>Автозапуск</value>
+    <value>Автозапуск</value>
   </data>
   <data name="Sm.Tray.StartupFailedMessage" xml:space="preserve">
-   <value>Не удалось {0} автозапуск. Переключатель оставлен в состоянии, которое записано в системе.</value>
+    <value>Не удалось {0} автозапуск. Переключатель оставлен в состоянии, которое записано в системе.</value>
   </data>
   <data name="Sm.Tray.Open" xml:space="preserve">
-   <value>Открыть SoundMeeter</value>
+    <value>Открыть SoundMeeter</value>
   </data>
   <data name="Sm.Tray.RunToggle" xml:space="preserve">
-   <value>Пуск / стоп движка</value>
+    <value>Пуск / стоп движка</value>
   </data>
   <data name="Sm.Tray.Exit" xml:space="preserve">
-   <value>Выход</value>
+    <value>Выход</value>
   </data>
   <data name="Sm.Toolbar.TextToSpeech" xml:space="preserve">
     <value>Озвучка текста</value>
@@ -1469,9 +1469,14 @@
   </data>
   <data name="Sm.Twitch.Status.ChatDisconnected" xml:space="preserve">
     <value>Чат не подключён</value>
-  </data>  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
+  </data>
+  <data name="Sm.Toolbar.Twitch" xml:space="preserve">
     <value>Twitch</value>
   </data>
   <data name="Sm.Toolbar.TwitchTip" xml:space="preserve">
     <value>Twitch: вход, чтение чата, статус трансляции</value>
-  </data></root>
+  </data>
+  <data name="Sm.Update.Version" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+</root>

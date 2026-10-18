@@ -10,7 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.2.0</Version>
+    <Version>0.1.0</Version>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
 

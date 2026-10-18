@@ -31,7 +31,10 @@ namespace SoundMeeter.Twitch
             services.AddSingleton<TwitchApiClient>();
             services.AddSingleton<ITwitchApi>(sp => sp.GetRequiredService<TwitchApiClient>());
 
-            services.AddSingleton<TwitchChatReader>();
+            services.AddSingleton<TwitchChatReader>(sp =>
+                new TwitchChatReader(
+                    () => "wss://eventsub.wss.twitch.tv/ws",
+                    sp.GetRequiredService<ITwitchApi>()));
             services.AddSingleton<ITwitchChatReader>(sp => sp.GetRequiredService<TwitchChatReader>());
 
             services.AddSingleton<TwitchService>();

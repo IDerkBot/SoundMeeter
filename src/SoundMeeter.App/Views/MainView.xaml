@@ -5,6 +5,9 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:SoundMeeter.Update.Presentation.Views;assembly=SoundMeeter.Update.Presentation"
+    xmlns:vm="clr-namespace:SoundMeeter.ViewModels"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}"
     d:DesignHeight="700"
     d:DesignWidth="1280"
     mc:Ignorable="d">
@@ -27,7 +30,10 @@
         <!--  Панель инструментов; баннер обновления накладывается справа  -->
         <Grid Grid.Row="0">
             <controls:MixerToolbarView />
-            <controls:UpdateBannerView />
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <views:UpdateBannerView DataContext="{Binding Update}" />
+                <views:UpdateStatusView DataContext="{Binding Update}" />
+            </StackPanel>
         </Grid>
 
         <!--  Советы: нет виртуального кабеля  -->

@@ -59,6 +59,8 @@ public sealed class CompositeTtsMessageSource : ITtsMessageSource
                 _logger.LogWarning(ex, "Источник «{Source}» не поднялся: {Message}", source.Name, ex.Message);
             }
         }
+
+        Attach();
     }
 
     public void Stop()
@@ -74,6 +76,7 @@ public sealed class CompositeTtsMessageSource : ITtsMessageSource
                 _logger.LogWarning(ex, "Источник «{Source}» не остановился: {Message}", source.Name, ex.Message);
             }
         }
+        Detach();
     }
 
     /// <summary>

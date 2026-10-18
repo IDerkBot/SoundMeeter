@@ -85,14 +85,17 @@ public sealed class TwitchApiClient : ITwitchApi
     }
 
     /// <summary>
-    /// Создать подписку на сообщения чата.
+    /// Создать подписку на сообщения чата через HTTP API EventSub.
     ///
     /// <paramref name="broadcasterUserId"/> — канал, чат которого читаем,
     /// <paramref name="moderatorUserId"/> — аккаунт, от имени которого читаем
     /// (тот, под которым вошли). Это разные идентификаторы, и их путаница означала
     /// бы подписку не туда.
+    ///
+    /// <paramref name="sessionId"/> — идентификатор WebSocket-сессии из приветствия
+    /// EventSub. Без него сервер не знает, в какой сокет слать события.
     /// </summary>
-    public async Task<bool> SubscribeToChatAsync(string broadcasterUserId, string moderatorUserId,
+    public async Task<bool> SubscribeToChatAsync(string sessionId, string broadcasterUserId, string moderatorUserId,
         CancellationToken cancellationToken = default)
     {
         var payload = new Dictionary<string, object>
@@ -104,9 +107,11 @@ public sealed class TwitchApiClient : ITwitchApi
                 ["broadcaster_user_id"] = broadcasterUserId,
                 ["user_id"] = moderatorUserId,
             },
-            // Способ доставки указывается в WebSocket-сессии, а не здесь: EventSub
-            // требует указать transport, и для websocket в нём только method.
-            ["transport"] = new Dictionary<string, string> { ["method"] = "websocket" },
+            ["transport"] = new Dictionary<string, string>
+            {
+                ["method"] = "websocket",
+                ["session_id"] = sessionId,
+            },
         };
 
         return await PostAsync("eventsub/subscriptions", payload, cancellationToken).ConfigureAwait(false);
