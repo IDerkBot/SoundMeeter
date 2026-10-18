@@ -49,6 +49,7 @@ public class MidiModule : IModule
         services.AddSingleton<BindMidiControlUseCase>();
         services.AddSingleton<UpdateMidiBindingUseCase>();
         services.AddSingleton<ClearMidiBindingUseCase>();
+        services.AddSingleton<GetMidiBindingQuery>();
 
         // Подписка на MIDI-порт живёт здесь же и создаётся вместе с
         // MainViewModel — иначе порт открывался бы, а сообщения бы никто не слушал.

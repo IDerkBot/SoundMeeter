@@ -98,6 +98,18 @@ public partial class MainViewModel : LocalizedViewModel, ITextToSpeechHost, ITwi
         _audioService.AudioDevicesChanged += async (s, e) => await RefreshDevicesAsync();
         _audioService.AppsChanged += async (s, e) => await RefreshAppsAsync();
 
+        // Подписка на уведомления от UpdateViewModel: свойства-обёртки (UpdateStatus,
+        // UpdateBanner, IsUpdateAvailable) должны уведомлять WPF привязки об изменениях.
+        _updateVm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName is nameof(UpdateViewModel.UpdateStatus) or
+                                      nameof(UpdateViewModel.UpdateBanner) or
+                                      nameof(UpdateViewModel.IsUpdateAvailable))
+            {
+                OnPropertyChanged(e.PropertyName);
+            }
+        };
+
         _ = InitializeAsync();
         BuildLanguages();
     }

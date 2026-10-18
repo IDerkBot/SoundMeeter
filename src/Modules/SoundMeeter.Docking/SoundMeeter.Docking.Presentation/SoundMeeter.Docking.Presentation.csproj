@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Presentation\SoundMeeter.Framework.Presentation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Docking.Contract\SoundMeeter.Docking.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
     <ProjectReference Include="..\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
