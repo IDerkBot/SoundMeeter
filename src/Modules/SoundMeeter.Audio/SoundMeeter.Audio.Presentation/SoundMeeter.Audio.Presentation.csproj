@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Presentation\SoundMeeter.AppRouting.Presentation.csproj" />
+      <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
       <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Presentation\SoundMeeter.Framework.Presentation.csproj" />
       <ProjectReference Include="..\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
       <ProjectReference Include="..\SoundMeeter.Audio.Dsp\SoundMeeter.Audio.Dsp.csproj" />

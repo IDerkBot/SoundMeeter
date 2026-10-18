@@ -3,12 +3,15 @@ using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Midi.Presentation;
 using SoundMeeter.Docking.Presentation.ViewModels;
+using SoundMeeter.Docking.Presentation.Views;
 using System.Windows;
 using System.Windows.Controls;
 using SoundMeeter.Twitch.Presentation.Views;
 using SoundMeeter.Twitch.Presentation.ViewModels;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Presentation;
+using SoundMeeter.TextToSpeech.Presentation.Views;
+using SoundMeeter.Logger.Presentation.Views;
 using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Views.Controls
@@ -171,7 +174,7 @@ namespace SoundMeeter.Views.Controls
                 existing.Close();
             }
 
-            new LogWindow { Owner = owner }.Show();
+            new LogWindow(App.ServiceProvider) { Owner = owner }.Show();
         }
 
         /// <summary>

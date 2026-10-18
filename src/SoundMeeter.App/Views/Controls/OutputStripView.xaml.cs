@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SoundMeeter.Audio.Presentation;
 using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Audio.Presentation.Views;
 using SoundMeeter.Framework.Presentation.Controls;
 
 namespace SoundMeeter.Views.Controls

@@ -60,6 +60,7 @@
     <!-- Composition Root регистрирует реализацию контракта обновления. -->
     <ProjectReference Include="..\Modules\SoundMeeter.Update\SoundMeeter.Update.Contract.Implementation\SoundMeeter.Update.Contract.Implementation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.Update\SoundMeeter.Update.Presentation\SoundMeeter.Update.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\SoundMeeter.Logger\SoundMeeter.Logger.Presentation\SoundMeeter.Logger.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.UseCases\SoundMeeter.TrayIcon.UseCases.csproj" />
     <ProjectReference Include="..\StreamerTools.Style\StreamerTools.Style.csproj" />

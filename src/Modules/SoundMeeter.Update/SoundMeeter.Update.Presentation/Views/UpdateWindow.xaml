@@ -1,5 +1,5 @@
 <Window
-    x:Class="SoundMeeter.Views.UpdateWindow"
+    x:Class="SoundMeeter.Update.Presentation.Views.UpdateWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"

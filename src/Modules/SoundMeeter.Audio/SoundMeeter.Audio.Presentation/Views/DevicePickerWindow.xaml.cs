@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SoundMeeter.Views
+namespace SoundMeeter.Audio.Presentation.Views
 {
     /// <summary>
     /// Окно выбора аудиоустройства для стрипа (входной источник или выходная шина).

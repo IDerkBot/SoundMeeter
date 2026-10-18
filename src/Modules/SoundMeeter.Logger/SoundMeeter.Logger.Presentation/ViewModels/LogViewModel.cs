@@ -10,7 +10,7 @@ using SoundMeeter.Framework.Contract.Implementation;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 
-namespace SoundMeeter.ViewModels;
+namespace SoundMeeter.Logger.Presentation;
 
 /// <summary>
 /// Окно просмотра журнала: текущий файл, уровень детализации, копирование

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SoundMeeter.ChangeLanguage.UseCases;
 using SoundMeeter.Update.Contract;
 using SoundMeeter.Update.Entities;
+using SoundMeeter.Update.Presentation.Views;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;

@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
       <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
       <ProjectReference Include="..\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
       <ProjectReference Include="..\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />

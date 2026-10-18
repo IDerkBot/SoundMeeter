@@ -1,12 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.Audio.Contract;
 using SoundMeeter.Framework.Contract;
 using SoundMeeter.Infrastructure.Contract.Implementation;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-using LogViewModel = SoundMeeter.ViewModels.LogViewModel;
 
-namespace SoundMeeter.Views
+namespace SoundMeeter.Logger.Presentation.Views
 {
     /// <summary>
     /// Окно просмотра журнала: детализация, список файлов и «Скопировать
@@ -14,14 +13,14 @@ namespace SoundMeeter.Views
     /// </summary>
     public partial class LogWindow : Window
     {
-        public LogWindow()
+        public LogWindow(IServiceProvider serviceProvider)
         {
             InitializeComponent();
             Language = LocResources.XmlLanguage;
 
-            var engine = App.ServiceProvider.GetRequiredService<IAudioEngine>();
-            var settings = App.ServiceProvider.GetRequiredService<SettingsService>();
-            var clipboard = App.ServiceProvider.GetRequiredService<IClipboardService>();
+            var engine = serviceProvider.GetRequiredService<IAudioEngine>();
+            var settings = serviceProvider.GetRequiredService<SettingsService>();
+            var clipboard = serviceProvider.GetRequiredService<IClipboardService>();
             ViewModel = new LogViewModel(engine, settings, clipboard);
             DataContext = ViewModel;
         }

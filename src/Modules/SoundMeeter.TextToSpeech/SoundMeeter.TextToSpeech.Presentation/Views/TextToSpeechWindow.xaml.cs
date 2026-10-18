@@ -2,7 +2,7 @@ using SoundMeeter.ChangeLanguage.Presentation;
 using System.Windows;
 using SoundMeeter.TextToSpeech.Presentation;
 
-namespace SoundMeeter.Views
+namespace SoundMeeter.TextToSpeech.Presentation.Views
 {
     /// <summary>
     /// Окно настроек модуля синтеза речи (SM-E01): куда отдавать голос, каким

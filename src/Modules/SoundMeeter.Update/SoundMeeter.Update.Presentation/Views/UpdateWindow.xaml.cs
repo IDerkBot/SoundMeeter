@@ -5,7 +5,7 @@ using SoundMeeter.Update.Entities;
 using SoundMeeter.Update.Presentation.ViewModels;
 using System.Windows;
 
-namespace SoundMeeter.Views
+namespace SoundMeeter.Update.Presentation.Views
 {
     /// <summary>
     /// Диалог обновления: версии, changelog, прогресс загрузки и запуск установки.

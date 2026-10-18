@@ -4,7 +4,7 @@ using SoundMeeter.Docking.Presentation.ViewModels;
 using SoundMeeter.Docking.UseCases;
 using System.Windows;
 
-namespace SoundMeeter.Views
+namespace SoundMeeter.Docking.Presentation.Views
 {
     /// <summary>
     /// Окно настроек док-панели OBS: сервер, порт, список каналов дока и
