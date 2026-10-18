@@ -1,9 +1,8 @@
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Разбор кадров EventSub WebSocket (SM-F01).

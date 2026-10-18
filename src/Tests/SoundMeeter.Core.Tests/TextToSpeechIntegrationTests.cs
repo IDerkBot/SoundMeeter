@@ -1,13 +1,11 @@
 using System.Diagnostics;
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Entities;
-
-using Xunit;
-using SoundMeeter.TextToSpeech.Contract.Implementation;
 using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.TextToSpeech.Contract.Implementation;
+using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Сквозная проверка модуля синтеза речи (SM-E01) на настоящем синтезаторе Windows.

@@ -1,13 +1,12 @@
+using System.Reflection;
+using SoundMeeter.Core.UseCases;
 using SoundMeeter.Docking.Contract.Implementation;
 using SoundMeeter.Docking.Entities;
 using SoundMeeter.Docking.UseCases;
-using System.Reflection;
+using SoundMeeter.ViewModels;
 using Xunit;
 
-using SoundMeeter.Framework.Presentation.ViewModels;
-using MainViewModel = SoundMeeter.Core.Presentation.ViewModels.MainViewModel;
-
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Границы модуля док-панели OBS.
@@ -58,7 +57,7 @@ public class DockingModuleBoundaryTests
     {
         // Ядро собирает модуль дока и должно видеть только оркестрацию. Проверяется
         // представление: именно главная VM открывает окно настроек дока.
-        var core = typeof(MainViewModel).Assembly;
+        var core = typeof(MixerCoordinator).Assembly;
 
         Assert.Empty(WithPrefix(core, "SoundMeeter.Docking.Presentation"));
         Assert.Contains("SoundMeeter.Docking.UseCases", ReferencesOf(core));

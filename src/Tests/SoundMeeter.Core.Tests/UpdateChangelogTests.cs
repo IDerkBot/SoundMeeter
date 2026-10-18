@@ -1,7 +1,7 @@
 using SoundMeeter.Update.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Сборка описания цепочки релизов (SM-E03).

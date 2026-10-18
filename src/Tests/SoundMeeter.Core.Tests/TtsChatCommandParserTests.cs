@@ -1,9 +1,8 @@
-using SoundMeeter.TextToSpeech.Contract;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.TextToSpeech.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Разбор реплик чата в команды модуля синтеза речи (SM-E01).

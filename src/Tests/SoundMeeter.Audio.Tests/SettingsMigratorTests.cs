@@ -1,12 +1,10 @@
-using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Tests.Infrastructure;
 using System.Text.Json;
+using SoundMeeter.Audio.Entities;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Миграции схемы настроек. Файл settings.json принадлежит пользователю и

@@ -1,6 +1,6 @@
 using SoundMeeter.Audio.Dsp;
 
-namespace SoundMeeter.Tests.Infrastructure;
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Прогон сигнала через <see cref="StripDsp"/> так же, как это делает

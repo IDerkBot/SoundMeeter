@@ -1,10 +1,8 @@
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Денойзер на RNNoise. Тесты бьют по двум дефектам, которые слышны как треск,

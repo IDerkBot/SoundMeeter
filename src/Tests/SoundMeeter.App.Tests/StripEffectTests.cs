@@ -1,14 +1,12 @@
-using SoundMeeter.Audio.Contract;
-using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.Presentation.Controls;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
+using SoundMeeter.App.Tests.Infrastructure;
 using SoundMeeter.Tests.Infrastructure;
+using SoundMeeter.Audio.Entities;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Framework.Presentation.Controls;
 using SoundMeeter.Views.Controls;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Эффекты стрипа (SM-B05): четыре эффекта, их крутилки, включение в модель и

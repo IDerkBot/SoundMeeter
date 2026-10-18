@@ -1,20 +1,16 @@
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.Views.Controls;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SoundMeeter.App.Tests.Infrastructure;
+using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Audio.Presentation;
 using SoundMeeter.Audio.Presentation.ViewModels;
-using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.ViewModels;
+using SoundMeeter.Views.Controls;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Пустой микшер — штатное состояние после первого запуска: каналов нет, и

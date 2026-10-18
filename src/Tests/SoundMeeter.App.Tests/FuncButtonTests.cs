@@ -1,14 +1,12 @@
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.Views.Controls;
 using System.Windows.Controls.Primitives;
+using SoundMeeter.App.Tests.Infrastructure;
+using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Audio.Entities;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Views.Controls;
 using Xunit;
-using FuncTargetViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncTargetViewModel;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Кнопки FUNC: назначение выходов, переключение, возврат базового роутинга

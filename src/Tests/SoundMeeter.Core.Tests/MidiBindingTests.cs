@@ -1,17 +1,14 @@
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Contract.Implementation;
 using SoundMeeter.Midi.Entities;
 using SoundMeeter.Midi.UseCases;
-using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// MIDI-привязки: каталог, доступ к стрипам и сценарии модуля.
@@ -52,8 +49,8 @@ public class MidiBindingTests
         var func1 = MidiParameters.ForInput().Single(d => d.Key == MidiParameters.Func1Key);
         var func2 = MidiParameters.ForInput().Single(d => d.Key == MidiParameters.Func2Key);
 
-        Assert.Equal("Func 1", func1.LabelKey);
-        Assert.Equal("Func 2", func2.LabelKey);
+        Assert.Equal("Sm.Midi.Param.Func1", func1.LabelKey);
+        Assert.Equal("Sm.Midi.Param.Func2", func2.LabelKey);
     }
 
     [Fact]

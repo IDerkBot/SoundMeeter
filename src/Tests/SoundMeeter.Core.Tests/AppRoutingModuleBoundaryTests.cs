@@ -1,11 +1,10 @@
+using System.Reflection;
 using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Contract.Implementation;
-using SoundMeeter.AppRouting.Entities;
-using System.Reflection;
 using SoundMeeter.Audio.Entities;
 using Xunit;
 
-namespace SoundMeeter.AppRouting.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Границы модуля перенаправления звука (SM-B02).
@@ -38,11 +37,12 @@ public class AppRoutingModuleBoundaryTests
     [Fact]
     public void TheContractIsAPureInterface()
     {
-        // Контракт — то, о чём договариваются слои. Ни одной зависимости, кроме
-        // самой BCL: иначе «интерфейс» тянул бы за собой то, от чего его
-        // должны были оградить.
+        // Контракт — то, о чём договариваются слои. Допускаются только зависимости
+        // от BCL и собственных Entities (DTO): иначе «интерфейс» тянул бы за собой
+        // то, от чего его должны были оградить.
         var references = ReferencesOf(typeof(IAppRouter).Assembly)
             .Where(n => !n.StartsWith("System.", StringComparison.Ordinal))
+            .Where(n => n != "SoundMeeter.AppRouting.Entities")
             .ToArray();
 
         Assert.Empty(references);

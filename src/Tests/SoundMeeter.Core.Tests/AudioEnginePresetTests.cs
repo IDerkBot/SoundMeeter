@@ -1,13 +1,11 @@
 using SoundMeeter.Audio.Contract.Implementation;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
+using SoundMeeter.Audio.Presentation.ViewModels;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Применение пресета к настоящему движку: мёртвые Id шин и глубокое копирование

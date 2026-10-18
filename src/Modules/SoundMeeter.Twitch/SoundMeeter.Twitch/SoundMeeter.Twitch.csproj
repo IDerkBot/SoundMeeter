@@ -12,6 +12,7 @@
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Presentation\SoundMeeter.Twitch.Presentation.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
   </ItemGroup>
 
 </Project>

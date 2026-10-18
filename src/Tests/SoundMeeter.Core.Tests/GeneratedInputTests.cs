@@ -1,7 +1,7 @@
 using SoundMeeter.Audio.Contract.Implementation;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Генерируемые входные стрипы (SM-E01) — канал, в который пишет код приложения.

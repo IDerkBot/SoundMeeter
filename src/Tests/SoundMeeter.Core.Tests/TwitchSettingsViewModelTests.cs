@@ -1,12 +1,11 @@
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Entities;
 using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Twitch.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Окно подключения к Twitch (SM-F01): вход, канал, статус трансляции.

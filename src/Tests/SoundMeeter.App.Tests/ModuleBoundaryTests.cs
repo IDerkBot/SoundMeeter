@@ -2,6 +2,8 @@ using System.IO;
 using System.Reflection;
 using Xunit;
 
+namespace SoundMeeter.App.Tests;
+
 /// <summary>
 /// Границы сборок модульного монолита. Проверяем то, что компилятор не проверяет и
 /// что ломается тихо: если модуль начнёт ссылаться на приложение или UI-сборку,
@@ -160,8 +162,8 @@ public class ModuleBoundaryTests
     {
         // Logger лежит в основании графа: если начнёт ссылаться на прикладной
         // модуль, цикл замкнётся и разделение перестанет существовать фактически.
-        Assert.DoesNotContain(CoreAssembly, References("SoundMeeter.Infrastructure.Logger"));
-        Assert.DoesNotContain(AppAssembly, References("SoundMeeter.Infrastructure.Logger"));
+        Assert.DoesNotContain(CoreAssembly, References("SoundMeeter.Logger.Presentation"));
+        Assert.DoesNotContain(AppAssembly, References("SoundMeeter.Logger.Presentation"));
         Assert.DoesNotContain(CoreAssembly, References("SoundMeeter.ChangeLanguage.UseCases"));
         Assert.DoesNotContain(AppAssembly, References("SoundMeeter.ChangeLanguage.UseCases"));
     }
@@ -203,4 +205,3 @@ public class ModuleBoundaryTests
             Assert.DoesNotContain("SoundMeeter.TrayIcon.UseCases", ReferencesIfPresent(module));
     }
 }
-

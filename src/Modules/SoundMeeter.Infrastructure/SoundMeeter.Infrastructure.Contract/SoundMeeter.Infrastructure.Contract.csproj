@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Entities\SoundMeeter.Infrastructure.Entities.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Infrastructure.Entities\SoundMeeter.Infrastructure.Entities.csproj" />
   </ItemGroup>
 
 </Project>

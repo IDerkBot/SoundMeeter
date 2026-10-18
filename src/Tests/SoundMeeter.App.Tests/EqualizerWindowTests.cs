@@ -1,20 +1,18 @@
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.Views;
-using SoundMeeter.Views.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SoundMeeter.App.Tests.Infrastructure;
+using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.Audio.Presentation.Controls;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Audio.Presentation.Views;
 using SoundMeeter.Framework.Presentation.Controls;
+using SoundMeeter.Views.Controls;
 using Xunit;
-using EqBandViewModel = SoundMeeter.Core.Presentation.ViewModels.EqBandViewModel;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Кнопка EQ на стрипе и окно его настроек (SM-B05).

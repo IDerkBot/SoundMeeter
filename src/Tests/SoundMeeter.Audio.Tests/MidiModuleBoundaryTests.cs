@@ -1,6 +1,8 @@
-using SoundMeeter.Midi.UseCases;
 using System.Reflection;
+using SoundMeeter.Midi.UseCases;
 using Xunit;
+
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Границы модуля MIDI (SM-B01).

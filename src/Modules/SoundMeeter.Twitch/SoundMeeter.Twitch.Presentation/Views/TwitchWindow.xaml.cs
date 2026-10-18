@@ -1,5 +1,6 @@
 using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Twitch.UseCases;
 using System.Windows;
 
 namespace SoundMeeter.Twitch.Presentation.Views;

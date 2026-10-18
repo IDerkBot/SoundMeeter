@@ -16,17 +16,17 @@
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />
-    <!-- Реализации контрактов (HTTP, WebSocket, DPAPI) намеренно НЕ подключены.
-         Сценарии работают с интерфейсами, а сборку реализаций знает только
-         Composition Root — он и регистрирует их в контейнере. Если ссылка
-         появится здесь, UseCases перестанет собираться без внешних систем:
-         проверить оркестрацию без сети станет невозможно. -->
+    <ProjectReference Include="..\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
+    <!-- Реализации контрактов подключены намеренно: TwitchViewModel — оркестратор,
+         аналогично TtsViewModel в TextToSpeech.UseCases. Composition Root знает
+         конкретные реализации и регистрирует их. -->
     <!-- Нужен только контракт источника реплик: коннектор к чату реализует
          ITtsMessageSource и ничего не знает про синтез речи. Ссылка на
          TextToSpeech.UseCases была бы лишней — затянула бы сюда и очередь
          озвучки, и VM модуля. -->
     <ProjectReference Include="..\..\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Contract\SoundMeeter.TextToSpeech.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Contract\SoundMeeter.Infrastructure.Contract.csproj" />
   </ItemGroup>
 
   <ItemGroup>

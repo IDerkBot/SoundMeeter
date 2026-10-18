@@ -1,13 +1,13 @@
-using SoundMeeter.Tests.Infrastructure;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Navigation;
+using SoundMeeter.App.Tests.Infrastructure;
 using SoundMeeter.Framework.Presentation.Controls;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Показ описания релиза в окне обновления: разметка должна превратиться в

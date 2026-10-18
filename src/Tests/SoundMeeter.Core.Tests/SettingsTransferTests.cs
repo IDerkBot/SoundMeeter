@@ -1,13 +1,13 @@
-using SoundMeeter.Audio.Contract.Implementation;
-using SoundMeeter.Docking.Entities;
 using System.Text.Json;
 using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Audio.Contract.Implementation;
 using SoundMeeter.Audio.Entities;
+using SoundMeeter.Docking.Entities;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Импорт и экспорт всех настроек (SM-C09).

@@ -1,6 +1,5 @@
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using FuncButtonViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncButtonViewModel;
+using SoundMeeter.Audio.Presentation.ViewModels;
 
 namespace SoundMeeter.Tests.Infrastructure;
 

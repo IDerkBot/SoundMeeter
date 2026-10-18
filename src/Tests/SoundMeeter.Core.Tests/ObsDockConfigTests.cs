@@ -1,9 +1,8 @@
-using SoundMeeter.Docking.Contract.Implementation;
-using SoundMeeter.Docking.UseCases;
 using System.Text;
+using SoundMeeter.Docking.Contract.Implementation;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Правка списка доков OBS в user.ini (SM-F01).

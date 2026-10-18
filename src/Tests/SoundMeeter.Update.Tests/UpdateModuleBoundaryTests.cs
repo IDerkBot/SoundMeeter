@@ -1,6 +1,5 @@
 using SoundMeeter.Update.Contract.Implementation;
 using SoundMeeter.Update.Entities;
-using SoundMeeter.Update.UseCases;
 using System.Reflection;
 using SoundMeeter.Update.Presentation.ViewModels;
 using Xunit;
@@ -83,7 +82,10 @@ public class UpdateModuleBoundaryTests
     [Fact]
     public void UseCasesDoNotDependOnWpf()
     {
-        var offenders = ReferencesOf(typeof(UpdateViewModel).Assembly)
+        // Загружаем сборку UseCases напрямую по имени, так как она не содержит
+        // типов, на которые можно сослаться через typeof.
+        var useCases = Assembly.Load("SoundMeeter.Update.UseCases");
+        var offenders = ReferencesOf(useCases)
             .Intersect(WpfAssemblies)
             .ToArray();
 
@@ -93,7 +95,7 @@ public class UpdateModuleBoundaryTests
     [Fact]
     public void UseCasesDoNotDependOnTheApplicationOrUiModules()
     {
-        var useCases = typeof(UpdateViewModel).Assembly;
+        var useCases = Assembly.Load("SoundMeeter.Update.UseCases");
 
         Assert.DoesNotContain("SoundMeeter", ReferencesOf(useCases));
         Assert.Empty(WithPrefix(useCases, "SoundMeeter.TrayIcon"));

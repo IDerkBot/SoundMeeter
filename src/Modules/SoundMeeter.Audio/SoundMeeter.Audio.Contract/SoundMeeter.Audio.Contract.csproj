@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Entities\SoundMeeter.Infrastructure.Entities.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Entities\SoundMeeter.Infrastructure.Entities.csproj" />
     <ProjectReference Include="..\SoundMeeter.Audio.Entities\SoundMeeter.Audio.Entities.csproj" />
   </ItemGroup>
 </Project>

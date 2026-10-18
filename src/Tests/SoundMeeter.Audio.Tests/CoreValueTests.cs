@@ -1,9 +1,8 @@
-using SoundMeeter.Audio;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
 using Xunit;
+
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Настройки поведения приложения (SM-D01/SM-D02) в файле settings.json.

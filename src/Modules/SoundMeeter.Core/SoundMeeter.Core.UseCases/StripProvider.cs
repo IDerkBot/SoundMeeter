@@ -1,7 +1,6 @@
 using SoundMeeter.Audio.Contract;
-using SoundMeeter.Framework.Contract;
 
-namespace SoundMeeter.Framework.UseCases;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Общий список стрипов для всего, что ими управляет снаружи: MIDI-модуль,

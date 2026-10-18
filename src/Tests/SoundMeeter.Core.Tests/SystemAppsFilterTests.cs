@@ -1,10 +1,9 @@
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Framework.UseCases;
 using System.Text.Json;
 using SoundMeeter.AppRouting.Entities;
+using SoundMeeter.Core.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Фильтр системных приложений живёт файлом рядом с exe (SM-E03).

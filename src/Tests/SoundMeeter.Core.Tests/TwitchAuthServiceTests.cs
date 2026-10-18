@@ -1,11 +1,10 @@
 using System.Net;
 using SoundMeeter.Twitch.Contract;
-using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Twitch.Contract.Implementation;
+using SoundMeeter.Twitch.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Вход в Twitch по схеме device code (SM-F01).

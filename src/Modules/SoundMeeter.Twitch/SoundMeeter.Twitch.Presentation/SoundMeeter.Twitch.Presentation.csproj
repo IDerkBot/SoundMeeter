@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SoundMeeter.Twitch.UseCases\SoundMeeter.Twitch.UseCases.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
+  </ItemGroup>
+
 </Project>

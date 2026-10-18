@@ -1,9 +1,8 @@
-using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Twitch.Contract.Implementation;
+using SoundMeeter.Twitch.Entities;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Хранение пары токенов Twitch (SM-F01).

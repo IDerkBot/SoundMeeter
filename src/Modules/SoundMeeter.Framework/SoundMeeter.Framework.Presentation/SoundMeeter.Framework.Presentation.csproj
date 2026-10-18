@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SoundMeeter.Framework.Contract\SoundMeeter.Framework.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
   </ItemGroup>
 
 </Project>

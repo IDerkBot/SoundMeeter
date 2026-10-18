@@ -1,11 +1,9 @@
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Графический эквалайзер стрипа (SM-B05). Проверяется на сигнале и на кривой

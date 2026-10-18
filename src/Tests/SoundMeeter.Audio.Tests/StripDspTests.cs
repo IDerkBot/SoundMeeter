@@ -1,10 +1,8 @@
 using SoundMeeter.Audio.Dsp;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Обработка стрипа (SM-B05): компрессор, trim, задержка, реверберация.

@@ -1,8 +1,7 @@
 using SoundMeeter.Docking.Contract.Implementation;
-using SoundMeeter.Docking.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Ручная правка INI в user.ini OBS.

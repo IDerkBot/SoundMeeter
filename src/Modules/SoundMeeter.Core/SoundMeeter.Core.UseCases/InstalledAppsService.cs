@@ -1,14 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using SoundMeeter.AppRouting.Contract;
 using SoundMeeter.AppRouting.Entities;
-using SoundMeeter.Framework.Contract;
 using SoundMeeter.Framework.Contract.Implementation;
-using SoundMeeter.Framework.Entities;
-using System.Reflection;
-using System.Text.Json;
 
-namespace SoundMeeter.Framework.UseCases
+namespace SoundMeeter.Core.UseCases
 {
     public class InstalledAppsService : IInstalledAppsService
     {

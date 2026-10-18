@@ -41,7 +41,7 @@
   <Folder Name="/Modules/Infrastructure/">
     <Project Path="Modules/SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Contract.Implementation/SoundMeeter.Infrastructure.Contract.Implementation.csproj" Id="60a251e6-ec46-45d5-9e85-81764c0029e0" />
     <Project Path="Modules/SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Contract/SoundMeeter.Infrastructure.Contract.csproj" Id="f3bba867-28bd-4485-8c4f-4f0036f0d43b" />
-    <Project Path="SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Entities/SoundMeeter.Infrastructure.Entities.csproj" Id="41d41d39-85a2-4848-8eec-675bc62e05bc" />
+    <Project Path="Modules/SoundMeeter.Infrastructure/SoundMeeter.Infrastructure.Entities/SoundMeeter.Infrastructure.Entities.csproj" />
   </Folder>
   <Folder Name="/Modules/Logger/">
     <Project Path="Modules/SoundMeeter.Logger/SoundMeeter.Logger.Presentation/SoundMeeter.Logger.Presentation.csproj" />

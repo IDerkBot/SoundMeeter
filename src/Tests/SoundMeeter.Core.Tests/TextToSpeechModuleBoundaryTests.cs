@@ -1,10 +1,10 @@
-using SoundMeeter.TextToSpeech.UseCases;
-using SoundMeeter.TextToSpeech.Entities;
 using System.Reflection;
-using Xunit;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
+using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.UseCases;
+using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Границы модуля синтеза речи (SM-E01).

@@ -13,7 +13,6 @@ using SoundMeeter.Core.Contract;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Docking.UseCases;
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.Infrastructure.Contract.Implementation;
 using SoundMeeter.Infrastructure.Entities;
@@ -24,7 +23,7 @@ using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Update.Entities;
 using SoundMeeter.Update.Presentation.ViewModels;
 

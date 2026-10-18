@@ -1,18 +1,16 @@
-using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.Views;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-using SoundMeeter.Core.Presentation.ViewModels;
+using SoundMeeter.App.Tests.Infrastructure;
+using SoundMeeter.Tests.Infrastructure;
+using SoundMeeter.ChangeLanguage.UseCases;
+using SoundMeeter.TextToSpeech.Presentation;
+using SoundMeeter.TextToSpeech.Presentation.Views;
 using Xunit;
-using TextToSpeechSettingsViewModel = SoundMeeter.Core.Presentation.ViewModels.TextToSpeechSettingsViewModel;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Окно настроек модуля синтеза речи (SM-E01).

@@ -4,7 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace SoundMeeter.Tests.Infrastructure;
+namespace SoundMeeter.App.Tests.Infrastructure;
 
 /// <summary>
 /// Обход визуального дерева: тесты ищут элементы так же, как их видит

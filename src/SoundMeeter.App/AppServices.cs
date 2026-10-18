@@ -5,7 +5,6 @@ using SoundMeeter.AppRouting.Contract.Implementation;
 using SoundMeeter.Audio.Contract.Implementation;
 using SoundMeeter.Core.UseCases;
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Docking.Contract;
 using SoundMeeter.Docking.UseCases;
 using SoundMeeter.Framework.Base.Modules;

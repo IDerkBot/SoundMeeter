@@ -1,6 +1,8 @@
-using SoundMeeter.Audio.Dsp;
 using System.Reflection;
+using SoundMeeter.Audio.Dsp;
 using Xunit;
+
+namespace SoundMeeter.Audio.Tests;
 
 /// <summary>
 /// Границы ядра обработки звука (SM-A02, SM-A09). Проверяем то, что компилятор не

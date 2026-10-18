@@ -1,14 +1,13 @@
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
-using SoundMeeter.TextToSpeech.Contract;
+using SoundMeeter.Infrastructure.Contract;
+using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.TextToSpeech.Entities;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
-using SoundMeeter.Twitch.UseCases;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Интеграция с Twitch (SM-F01) и её мост в модуль синтеза речи.
@@ -130,7 +129,7 @@ public class TwitchServiceTests
     public void MessagesFromTheChatReachTheSpeechModule()
     {
         using var fixture = new Fixture(authorized: true);
-        var received = new List<TtsChatMessage>();
+        var received = new List<ChatMessage>();
         fixture.Service.MessageReceived += received.Add;
 
         fixture.Chat.Raise(new ChatMessage("viewer", "!tts привет"));
@@ -340,7 +339,7 @@ public class TwitchServiceTests
         var received = new List<TtsChatMessage>();
         source.MessageReceived += received.Add;
 
-        fixture.Chat.Raise(new TwitchChatMessage("viewer", "!ttsvoice Irina"));
+        fixture.Chat.Raise(new ChatMessage("viewer", "!ttsvoice Irina"));
 
         // Проверяется только передача: разбор команд покрыт отдельно и повторять его
         // здесь незачем — именно ради этого мост и тонкий.
@@ -385,7 +384,7 @@ public class TwitchServiceTests
         source.MessageReceived += received.Add;
 
         source.Dispose();
-        fixture.Chat.Raise(new TwitchChatMessage("viewer", "!tts после выгрузки"));
+        fixture.Chat.Raise(new ChatMessage("viewer", "!tts после выгрузки"));
 
         // Освобождение источника происходит при выходе из приложения; подписка после
         // него должна исчезнуть, иначе обработчик модуля жил бы после окна.
@@ -420,7 +419,7 @@ public class TwitchServiceTests
         public bool Stopped { get; private set; }
         public int Raised { get; private set; }
 
-        public event Action<TwitchChatMessage>? MessageReceived;
+        public event Action<ChatMessage>? MessageReceived;
 
         /// <summary>
         /// Подписчика здесь нет намеренно: интеграция его не использует, и объявлять
@@ -442,7 +441,7 @@ public class TwitchServiceTests
         }
 
         /// <summary>Подсунуть реплику, как если бы она пришла из чата.</summary>
-        public void Raise(TwitchChatMessage message)
+        public void Raise(ChatMessage message)
         {
             Raised++;
             MessageReceived?.Invoke(message);
@@ -536,6 +535,7 @@ public class TwitchServiceTests
     {
         public AppSettings Settings { get; set; } = settings;
         public void Save() { }
+        public AppSettings CreateFullSnapshot() => Settings;
     }
 
     /// <summary>

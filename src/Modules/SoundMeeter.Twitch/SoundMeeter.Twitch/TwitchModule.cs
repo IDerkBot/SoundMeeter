@@ -3,6 +3,7 @@ using SoundMeeter.Framework.Base.Modules;
 using SoundMeeter.Twitch.Contract;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Twitch.UseCases;
 using System.Net.Http;
 
 namespace SoundMeeter.Twitch
@@ -33,7 +34,8 @@ namespace SoundMeeter.Twitch
             services.AddSingleton<TwitchChatReader>();
             services.AddSingleton<ITwitchChatReader>(sp => sp.GetRequiredService<TwitchChatReader>());
 
-            services.AddSingleton<ITwitchService, TwitchService>();
+            services.AddSingleton<TwitchService>();
+            services.AddSingleton<ITwitchService>(sp => sp.GetRequiredService<TwitchService>());
             services.AddSingleton<TwitchViewModel>();
             services.AddSingleton<TwitchSettingsViewModel>();
 

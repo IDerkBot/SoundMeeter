@@ -1,12 +1,12 @@
-using SoundMeeter.Tests.Infrastructure;
 using System.Globalization;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SoundMeeter.App.Tests.Infrastructure;
 using SoundMeeter.Framework.Presentation.Converters;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Значки приложений после SM-A10 (этап 2).

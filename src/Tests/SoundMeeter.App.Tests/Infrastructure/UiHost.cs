@@ -1,11 +1,11 @@
-using SoundMeeter.ChangeLanguage.Presentation;
-using SoundMeeter.ChangeLanguage.UseCases;
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using SoundMeeter.ChangeLanguage.Presentation;
+using SoundMeeter.ChangeLanguage.UseCases;
 
-namespace SoundMeeter.Tests.Infrastructure;
+namespace SoundMeeter.App.Tests.Infrastructure;
 
 /// <summary>
 /// Единственный STA-поток с <see cref="Application"/> и установленным
@@ -83,6 +83,13 @@ public static class UiHost
         app.Resources.MergedDictionaries.Add(new ResourceDictionary
         {
             Source = new Uri("/StreamerTools.Style;component/Themes/DarkTheme.xaml", UriKind.Relative)
+        });
+
+        // MixerTheme из App содержит шаблоны для элементов микшера (EffectKnobTemplate
+        // и др.), которые используются в Audio.Presentation (EqualizerWindow).
+        app.Resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("/SoundMeeter;component/Views/Controls/MixerTheme.xaml", UriKind.Relative)
         });
 
         // Неявный стиль Button из App.xaml: без него кнопки в тестах выглядели бы

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Contract.Implementation\SoundMeeter.Audio.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\..\Modules\SoundMeeter.Audio\SoundMeeter.Audio.Presentation\SoundMeeter.Audio.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Core\SoundMeeter.Core.UseCases\SoundMeeter.Core.UseCases.csproj" />
     <!-- VM модальных окон: синтез речи, Twitch, журнал. -->
     <ProjectReference Include="..\..\Modules\SoundMeeter.Midi\SoundMeeter.Midi.UseCases\SoundMeeter.Midi.UseCases.csproj" />
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract\SoundMeeter.AppRouting.Contract.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Entities\SoundMeeter.AppRouting.Entities.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.AppRouting\SoundMeeter.AppRouting.Contract.Implementation\SoundMeeter.AppRouting.Contract.Implementation.csproj" />
+    <ProjectReference Include="..\..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.Presentation\SoundMeeter.TextToSpeech.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.TextToSpeech\SoundMeeter.TextToSpeech.UseCases\SoundMeeter.TextToSpeech.UseCases.csproj" />
     <!-- Pcm16MonoStream внутренний, но конвертация байтов SAPI в сэмплы проверяется
          напрямую — дешевле, чем слушать. -->
@@ -38,6 +40,7 @@
     <ProjectReference Include="..\..\Modules\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Docking\SoundMeeter.Docking.Contract.Implementation\SoundMeeter.Docking.Contract.Implementation.csproj" />
     <ProjectReference Include="..\..\Modules\SoundMeeter.Update\SoundMeeter.Update.UseCases\SoundMeeter.Update.UseCases.csproj" />
+    <ProjectReference Include="..\..\SoundMeeter.App\SoundMeeter.App.csproj" />
   </ItemGroup>
 
 </Project>

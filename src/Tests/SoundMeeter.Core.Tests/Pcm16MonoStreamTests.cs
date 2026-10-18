@@ -1,9 +1,7 @@
-using System.Text;
-
-using Xunit;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
+using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Конвертация PCM16/моно → float/стерео 48 кГц (SM-E01).

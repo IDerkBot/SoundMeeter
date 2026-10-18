@@ -1,16 +1,15 @@
 using SoundMeeter.Audio.Entities;
+using SoundMeeter.Tests.Infrastructure;
 using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
 using SoundMeeter.Infrastructure.Contract;
 using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.TextToSpeech.Contract;
-using SoundMeeter.TextToSpeech.UseCases;
-using SoundMeeter.Tests.Infrastructure;
-using SoundMeeter.TextToSpeech.Entities;
-using Xunit;
 using SoundMeeter.TextToSpeech.Contract.Implementation;
+using SoundMeeter.TextToSpeech.Entities;
+using SoundMeeter.TextToSpeech.UseCases;
+using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Модуль синтеза речи (SM-E01) целиком: включение, очередь, дроссель, выбор
@@ -112,6 +111,7 @@ public class TextToSpeechServiceTests
         public int Saves { get; private set; }
 
         public void Save() => Saves++;
+        public AppSettings CreateFullSnapshot() => Settings;
     }
 
     private sealed class Harness : IDisposable

@@ -1,10 +1,9 @@
 using System.Net;
 using System.Text;
-using SoundMeeter.Twitch.UseCases;
 using SoundMeeter.Twitch.Contract.Implementation;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Разговор с Helix API Twitch (SM-F01).

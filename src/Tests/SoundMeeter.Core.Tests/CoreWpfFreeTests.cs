@@ -1,8 +1,9 @@
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Reflection;
+using SoundMeeter.Core.UseCases;
+using SoundMeeter.ViewModels;
 using Xunit;
-using MainViewModel = SoundMeeter.Core.Presentation.ViewModels.MainViewModel;
+
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Ядро обязано оставаться переносимым в не-WPF хост (SM-A10).
@@ -82,7 +83,7 @@ public class CoreWpfFreeTests
     }
 
     private static Dictionary<string, Assembly> CoreGraph() =>
-        ReachableModules(typeof(MainViewModel).Assembly);
+        ReachableModules(typeof(MixerCoordinator).Assembly);
 
     private static string[] DirectReferences(Assembly assembly) =>
         assembly.GetReferencedAssemblies().Select(a => a.Name ?? string.Empty).ToArray();
@@ -110,6 +111,6 @@ public class CoreWpfFreeTests
         // Проверка «у приложения точка входа есть» живёт в SoundMeeter.App.Tests
         // (ModuleBoundaryTests): этот проект видит только ядро, и сборки
         // SoundMeeter.dll рядом с ним просто нет.
-        Assert.Null(typeof(MainViewModel).Assembly.EntryPoint);
+        Assert.Null(typeof(MixerCoordinator).Assembly.EntryPoint);
     }
 }

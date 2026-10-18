@@ -1,20 +1,12 @@
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Presentation.ViewModels;
-using SoundMeeter.Framework.UseCases;
 using System.Reflection;
+using SoundMeeter.AppRouting.Presentation.ViewModels;
 using SoundMeeter.Audio.Contract;
+using SoundMeeter.Audio.Presentation.ViewModels;
 using SoundMeeter.Core.UseCases;
+using SoundMeeter.ViewModels;
 using Xunit;
-using AppViewModel = SoundMeeter.Core.Presentation.ViewModels.AppViewModel;
-using AudioDeviceViewModel = SoundMeeter.Core.Presentation.ViewModels.AudioDeviceViewModel;
-using EqBandViewModel = SoundMeeter.Core.Presentation.ViewModels.EqBandViewModel;
-using EqualizerViewModel = SoundMeeter.Core.Presentation.ViewModels.EqualizerViewModel;
-using FuncButtonViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncButtonViewModel;
-using FuncTargetViewModel = SoundMeeter.Core.Presentation.ViewModels.FuncTargetViewModel;
-using LanguageOptionViewModel = SoundMeeter.Core.Presentation.ViewModels.LanguageOptionViewModel;
-using MainViewModel = SoundMeeter.Core.Presentation.ViewModels.MainViewModel;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Граница между сценариями ядра и его представлением — единственное место,
@@ -112,26 +104,30 @@ public class CoreLayeringBoundaryTests
     [Fact]
     public void EveryMixerViewModelLivesInThePresentationLayer()
     {
-        Type[] viewModels =
-        [
-            typeof(MainViewModel),
-            typeof(LanguageOptionViewModel),
-            typeof(InputChannelViewModel),
-            typeof(OutputBusViewModel),
-            typeof(OutputOptionViewModel),
-            typeof(FuncButtonViewModel),
-            typeof(FuncTargetViewModel),
-            typeof(StripEffectViewModel),
-            typeof(EqualizerViewModel),
-            typeof(EqBandViewModel),
-            typeof(AppViewModel),
-            typeof(InstalledAppViewModel),
-            typeof(ConfiguredAppViewModel),
-            typeof(AudioDeviceViewModel),
-        ];
+        // ViewModel'ы распределены по модулям:
+        // - MainViewModel и LanguageOptionViewModel в SoundMeeter.App (SoundMeeter.ViewModels)
+        // - Audio-related VM'ы в SoundMeeter.Audio.Presentation.ViewModels
+        // - AppRouting VM'ы в SoundMeeter.AppRouting.Presentation.ViewModels
+        var expectedNamespaces = new Dictionary<Type, string>
+        {
+            [typeof(MainViewModel)] = "SoundMeeter.ViewModels",
+            [typeof(LanguageOptionViewModel)] = "SoundMeeter.ViewModels",
+            [typeof(InputChannelViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(OutputBusViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(OutputOptionViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(FuncButtonViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(FuncTargetViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(StripEffectViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(EqualizerViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(EqBandViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(ConfiguredAppViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(AudioDeviceViewModel)] = "SoundMeeter.Audio.Presentation.ViewModels",
+            [typeof(AppViewModel)] = "SoundMeeter.AppRouting.Presentation.ViewModels",
+            [typeof(InstalledAppViewModel)] = "SoundMeeter.AppRouting.Presentation.ViewModels",
+        };
 
-        foreach (var type in viewModels)
-            Assert.Equal("SoundMeeter.Core.Presentation.ViewModels", type.Namespace);
+        foreach (var (type, expectedNamespace) in expectedNamespaces)
+            Assert.Equal(expectedNamespace, type.Namespace);
     }
 
     /// <summary>

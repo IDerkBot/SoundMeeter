@@ -1,9 +1,9 @@
+using System.Reflection;
 using SoundMeeter.Twitch.Contract.Implementation;
 using SoundMeeter.Twitch.Entities;
-using System.Reflection;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.Core.Tests;
 
 /// <summary>
 /// Границы модуля Twitch (SM-F01).

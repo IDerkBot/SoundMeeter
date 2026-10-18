@@ -1,7 +1,7 @@
 using SoundMeeter.Framework.Presentation.Controls;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Разбор markdown описания релиза.

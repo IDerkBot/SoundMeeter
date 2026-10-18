@@ -11,6 +11,11 @@
     <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Contract.Implementation\SoundMeeter.Framework.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Infrastructure.Contract\SoundMeeter.Infrastructure.Contract.csproj" />
+    <ProjectReference Include="..\SoundMeeter.Infrastructure.Entities\SoundMeeter.Infrastructure.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SoundMeeter.Core.Tests" />
   </ItemGroup>
 
 </Project>

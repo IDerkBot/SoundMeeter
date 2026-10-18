@@ -1,19 +1,16 @@
 using Microsoft.Extensions.Logging;
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.ChangeLanguage.UseCases;
-using SoundMeeter.Core.UseCases;
-using SoundMeeter.Framework.Contract;
-using SoundMeeter.Framework.Entities;
 using SoundMeeter.Docking.UseCases;
+using SoundMeeter.Framework.Contract;
+using SoundMeeter.Framework.Contract.Implementation;
+using SoundMeeter.Infrastructure.Contract.Implementation;
+using SoundMeeter.Infrastructure.Entities;
 using SoundMeeter.Midi.UseCases;
 using SoundMeeter.TextToSpeech.UseCases;
 using SoundMeeter.Twitch.UseCases;
-using SoundMeeter.Infrastructure.Entities;
-using SoundMeeter.Infrastructure.Contract.Implementation;
-using SoundMeeter.Twitch.Presentation.ViewModels;
-using SoundMeeter.Framework.Contract.Implementation;
 
-namespace SoundMeeter.Framework.UseCases;
+namespace SoundMeeter.Core.UseCases;
 
 /// <summary>
 /// Оркестрация микшера: подписки на движок, таймер метров, таймер сохранения,

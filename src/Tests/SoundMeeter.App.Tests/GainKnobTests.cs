@@ -1,10 +1,9 @@
+using SoundMeeter.App.Tests.Infrastructure;
 using SoundMeeter.Audio.Entities;
-using SoundMeeter.Framework.Entities;
 using SoundMeeter.Framework.Presentation.Controls;
-using SoundMeeter.Tests.Infrastructure;
 using Xunit;
 
-namespace SoundMeeter.Tests;
+namespace SoundMeeter.App.Tests;
 
 /// <summary>
 /// Крутилка <see cref="GainKnob"/>: две шкалы, линейная и логарифмическая.
