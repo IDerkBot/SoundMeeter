@@ -22,7 +22,6 @@
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,8 +5,8 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:panels="clr-namespace:SoundMeeter.Controls"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
+    xmlns:controls1="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"
     d:DesignHeight="400"
     d:DesignWidth="1200"
     mc:Ignorable="d">
@@ -76,7 +76,7 @@
                     <ItemsControl x:Name="InputsList" ItemsSource="{Binding Inputs}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <panels:HorizontalFillPanel AllowReorder="True" />
+                                <controls1:HorizontalFillPanel AllowReorder="True" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -128,7 +128,7 @@
                     <ItemsControl x:Name="BusesList" ItemsSource="{Binding Buses}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <panels:HorizontalFillPanel AllowReorder="True" />
+                                <controls1:HorizontalFillPanel AllowReorder="True" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>

@@ -1,4 +1,3 @@
-using SoundMeeter.Controls;
 using SoundMeeter.Framework.Entities;
 using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
@@ -10,6 +9,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SoundMeeter.Audio.Entities;
+using SoundMeeter.Audio.Presentation.Controls;
+using SoundMeeter.Framework.Presentation.Controls;
 using Xunit;
 using EqBandViewModel = SoundMeeter.Core.Presentation.ViewModels.EqBandViewModel;
 

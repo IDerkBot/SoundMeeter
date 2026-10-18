@@ -10,7 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.1.2</Version>
+    <Version>0.2.0</Version>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -62,8 +62,6 @@
     <ProjectReference Include="..\Modules\SoundMeeter.Update\SoundMeeter.Update.Presentation\SoundMeeter.Update.Presentation.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.StartUp\SoundMeeter.StartUp.UseCases\SoundMeeter.StartUp.UseCases.csproj" />
     <ProjectReference Include="..\Modules\SoundMeeter.TrayIcon\SoundMeeter.TrayIcon.UseCases\SoundMeeter.TrayIcon.UseCases.csproj" />
-    <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
-    <ProjectReference Include="..\Modules\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.UiTimer\SoundMeeter.Infrastructure.UiTimer.csproj" />
     <ProjectReference Include="..\StreamerTools.Style\StreamerTools.Style.csproj" />
   </ItemGroup>
 

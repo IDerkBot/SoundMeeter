@@ -1,8 +1,9 @@
-using SoundMeeter.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using SoundMeeter.Audio.Presentation;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Framework.Presentation.Controls;
 using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
 
 namespace SoundMeeter.Views.Controls

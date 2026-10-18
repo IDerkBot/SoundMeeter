@@ -139,10 +139,6 @@ internal static class AppServices
         services.AddSingleton<AppBehaviourService>();
         services.AddSingleton<MixerCoordinator>();
 
-        // Singleton: OnStartup восстанавливает пресет через этот же экземпляр,
-        // что и окно (transient давал окну второй экземпляр с пустыми стрипами).
-        services.AddSingleton<MainViewModel>();
-
         IModule[] modules =
         {
             // AudioEngine
@@ -179,6 +175,11 @@ internal static class AppServices
         }
 
         services.AddSingleton<DockController>();
+        
+        // Singleton: OnStartup восстанавливает пресет через этот же экземпляр,
+        // что и окно (transient давал окну второй экземпляр с пустыми стрипами).
+        services.AddSingleton<MainViewModel>();
+        
         services.AddTransient<MainWindow>();
 
         return services;

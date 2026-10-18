@@ -1,10 +1,10 @@
-using SoundMeeter.Controls;
 using SoundMeeter.Tests.Infrastructure;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Navigation;
+using SoundMeeter.Framework.Presentation.Controls;
 using Xunit;
 
 namespace SoundMeeter.Tests;

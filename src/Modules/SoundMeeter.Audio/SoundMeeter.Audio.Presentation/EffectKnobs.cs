@@ -1,16 +1,18 @@
-﻿namespace SoundMeeter.Audio.Presentation;
+﻿using SoundMeeter.Audio.Presentation.ViewModels;
+
+namespace SoundMeeter.Audio.Presentation;
 
 /// <summary>
 /// Заводит крутилку параметра эффекта со всеми её привязками к пресету.
 ///
-/// Фабрика отдельная от <see cref="StripEffectViewModel.Knobs"/>, потому что
+/// Фабрика отдельная от <see cref="ViewModels.StripEffectViewModel.Knobs"/>, потому что
 /// крутилки заводят не только эффекты с попапом: окно эквалайзера собирает свои
 /// ползунки иначе, но диапазоны, шаг сброса и отметка «пресет изменён» должны
 /// вести себя у всех одинаково.
 /// </summary>
 internal static class EffectKnobs
 {
-    public static EffectKnobViewModel Create(
+    public static ViewModels.EffectKnobViewModel Create(
         string nameKey,
         string unit,
         string format,

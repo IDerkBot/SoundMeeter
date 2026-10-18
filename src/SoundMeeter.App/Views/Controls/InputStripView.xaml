@@ -5,9 +5,9 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:panels="clr-namespace:SoundMeeter.Controls"
     xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
+    xmlns:controls1="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"
     d:DesignWidth="160"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -437,7 +437,7 @@
                 VerticalAlignment="Center"
                 Visibility="{Binding ShowGainKnob, Converter={StaticResource BoolToVisibility}}">
                 <Grid>
-                    <panels:GainKnob
+                    <controls1:GainKnob
                         Width="86"
                         Height="86"
                         HorizontalAlignment="Center"

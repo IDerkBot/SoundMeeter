@@ -19,7 +19,6 @@
     <ProjectReference Include="..\..\SoundMeeter.Framework\SoundMeeter.Framework.Base\SoundMeeter.Framework.Base.csproj" />
     <ProjectReference Include="..\SoundMeeter.TrayIcon.Contract.Implementation\SoundMeeter.TrayIcon.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.TrayIcon.Contract\SoundMeeter.TrayIcon.Contract.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using SoundMeeter.Audio.Presentation;
+using SoundMeeter.Audio.Presentation.ViewModels;
 
 namespace SoundMeeter.Views.Controls
 {

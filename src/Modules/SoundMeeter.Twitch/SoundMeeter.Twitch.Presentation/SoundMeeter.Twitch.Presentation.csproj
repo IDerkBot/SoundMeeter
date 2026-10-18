@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract.Implementation\SoundMeeter.Twitch.Contract.Implementation.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Contract\SoundMeeter.Twitch.Contract.csproj" />
     <ProjectReference Include="..\SoundMeeter.Twitch.Entities\SoundMeeter.Twitch.Entities.csproj" />

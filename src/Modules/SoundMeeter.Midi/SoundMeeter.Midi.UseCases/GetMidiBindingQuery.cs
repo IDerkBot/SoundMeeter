@@ -1,10 +1,7 @@
 ﻿using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SoundMeeter.Midi.Presentation.UseCases;
+namespace SoundMeeter.Midi.UseCases;
 
 public class GetMidiBindingQuery
 {

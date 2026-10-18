@@ -43,8 +43,6 @@
     <ProjectReference Include="..\..\SoundMeeter.Docking\SoundMeeter.Docking.UseCases\SoundMeeter.Docking.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.StartUp\SoundMeeter.StartUp.Contract\SoundMeeter.StartUp.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Settings\SoundMeeter.Infrastructure.Settings.csproj" />
   </ItemGroup>
 
   <ItemGroup>

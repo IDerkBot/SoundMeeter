@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.Audio.Presentation;
+using SoundMeeter.Audio.Presentation.ViewModels;
 using SoundMeeter.Core.Presentation.ViewModels;
 using SoundMeeter.ViewModels;
 using Xunit;

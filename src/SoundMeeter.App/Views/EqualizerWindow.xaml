@@ -2,7 +2,7 @@
     x:Class="SoundMeeter.Views.EqualizerWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:SoundMeeter.Controls"
+    xmlns:controls1="clr-namespace:SoundMeeter.Audio.Presentation.Controls;assembly=SoundMeeter.Audio.Presentation"
     Title="{Binding Title}"
     Width="960"
     Height="470"
@@ -92,7 +92,7 @@
             BorderBrush="#3F3F46"
             BorderThickness="1"
             CornerRadius="3">
-            <controls:EqualizerCurveView
+            <controls1:EqualizerCurveView
                 Bands="{Binding Bands}"
                 HighCutHz="{Binding HighCut.Value}"
                 IsActive="{Binding IsEnabled}"

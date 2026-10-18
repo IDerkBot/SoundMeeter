@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SoundMeeter.Docking\SoundMeeter.Docking.Entities\SoundMeeter.Docking.Entities.csproj" />
-    <ProjectReference Include="..\..\SoundMeeter.Infrastructure\SoundMeeter.Infrastructure.Logger\SoundMeeter.Infrastructure.Logger.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.UseCases\SoundMeeter.ChangeLanguage.UseCases.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Midi\SoundMeeter.Midi.Entities\SoundMeeter.Midi.Entities.csproj" />
     <ProjectReference Include="..\SoundMeeter.Core.Entities\SoundMeeter.Core.Entities.csproj" />

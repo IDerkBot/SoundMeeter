@@ -1,10 +1,11 @@
-using SoundMeeter.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using SoundMeeter.Audio.Presentation;
+using SoundMeeter.Audio.Presentation.ViewModels;
+using SoundMeeter.Framework.Presentation.Controls;
 
 namespace SoundMeeter.Views.Controls
 {

@@ -6,7 +6,6 @@ using SoundMeeter.Midi.Contract;
 using SoundMeeter.Midi.Entities;
 using SoundMeeter.Midi.Presentation.Dto;
 using SoundMeeter.Midi.Presentation.Helpers;
-using SoundMeeter.Midi.Presentation.UseCases;
 using SoundMeeter.Midi.UseCases;
 using System.Collections.ObjectModel;
 using SoundMeeter.Core.Contract;

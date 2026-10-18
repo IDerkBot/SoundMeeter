@@ -1,9 +1,9 @@
-using SoundMeeter.Converters;
 using SoundMeeter.Tests.Infrastructure;
 using System.Globalization;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SoundMeeter.Framework.Presentation.Converters;
 using Xunit;
 
 namespace SoundMeeter.Tests;

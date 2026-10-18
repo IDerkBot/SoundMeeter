@@ -1,6 +1,7 @@
 using SoundMeeter.Audio.Contract;
 using SoundMeeter.Audio.Entities;
 using SoundMeeter.Framework.Entities;
+using SoundMeeter.Framework.Presentation.Controls;
 using SoundMeeter.Framework.Presentation.ViewModels;
 using SoundMeeter.Framework.UseCases;
 using SoundMeeter.Tests.Infrastructure;
@@ -92,7 +93,7 @@ public class StripEffectTests
             var popup = new StripEffectSettingsView { DataContext = vm.Compressor };
             VisualTree.Layout(popup, 272, 400);
 
-            var knobs = VisualTree.FindAll<SoundMeeter.Controls.GainKnob>(popup);
+            var knobs = VisualTree.FindAll<GainKnob>(popup);
             Assert.Equal(5, knobs.Count);
             Assert.Equal(vm.Model.CompressorThresholdDb, (float)knobs[0].Value, 2);
             Assert.Equal(vm.Model.CompressorAttackMs, (float)knobs[2].Value, 2);

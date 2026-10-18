@@ -1,4 +1,4 @@
-using SoundMeeter.Controls;
+using SoundMeeter.Framework.Presentation.Controls;
 using Xunit;
 
 namespace SoundMeeter.Tests;

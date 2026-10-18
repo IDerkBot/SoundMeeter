@@ -1,5 +1,6 @@
 using System.Windows;
 using SoundMeeter.Audio.Presentation;
+using SoundMeeter.Audio.Presentation.ViewModels;
 
 namespace SoundMeeter.Views.Controls
 {
