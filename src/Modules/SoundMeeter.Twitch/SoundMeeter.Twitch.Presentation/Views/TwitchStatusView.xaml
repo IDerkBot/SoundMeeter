@@ -1,0 +1,39 @@
+<UserControl
+    x:Class="SoundMeeter.Twitch.Presentation.Views.TwitchStatusView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:SoundMeeter.Twitch.Presentation.ViewModels"
+    d:DataContext="{d:DesignInstance vm:TwitchStatusViewModel}"
+    d:DesignHeight="30"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="12"
+            Foreground="#CCC"
+            Text="{Binding UserName}" />
+        <Ellipse
+            Width="8"
+            Height="8"
+            Margin="6,0,4,0"
+            VerticalAlignment="Center">
+            <Ellipse.Style>
+                <Style TargetType="Ellipse">
+                    <Setter Property="Fill" Value="#666" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsLive}" Value="True">
+                            <Setter Property="Fill" Value="#E91E63" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Ellipse.Style>
+        </Ellipse>
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="11"
+            Foreground="#999"
+            Text="{Binding StatusText}" />
+    </StackPanel>
+</UserControl>

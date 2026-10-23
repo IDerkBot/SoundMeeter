@@ -71,7 +71,7 @@ public partial class InputChannelViewModel : LocalizedViewModel, IInputStrip
     /// смысл раскрыт во всплывающей подсказке.
     /// </summary>
     public string AppTargetText => CanChooseAppTarget
-        ? $"▸ {(AppSourceDeviceId != null ? AppTargetName : Loc.Get("Sm.Strip.AppTargetChoose"))} ▾"
+        ? $"{(AppSourceDeviceId != null ? AppTargetName : Loc.Get("Sm.Strip.AppTargetChoose"))}"
         : "";
 
     /// <summary>Имя устройства, куда уходят приложения, для подписи в списке.</summary>
@@ -475,8 +475,8 @@ public partial class InputChannelViewModel : LocalizedViewModel, IInputStrip
         Func2.UpdateBusChannelName(busId, channelName);
     }
 
-    public string OutButtonText => $"OUT {HardwareOutputs.Count(o => o.IsEnabled)}/{HardwareOutputs.Count} ▾";
-    public string VirtButtonText => $"VIRT {VirtualOutputs.Count(o => o.IsEnabled)}/{VirtualOutputs.Count} ▾";
+    public string OutButtonText => $"{HardwareOutputs.Count(o => o.IsEnabled)}/{HardwareOutputs.Count}";
+    public string VirtButtonText => $"{VirtualOutputs.Count(o => o.IsEnabled)}/{VirtualOutputs.Count}";
     public bool HasHardware => HardwareOutputs.Count > 0;
     public bool HasVirtual => VirtualOutputs.Count > 0;
 

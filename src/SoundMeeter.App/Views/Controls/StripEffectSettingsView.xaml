@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+                <ResourceDictionary Source="/SoundMeeter.Framework.Presentation;component/Controls/SupportTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -35,7 +36,10 @@
                 Text="{Binding Title}"
                 ToolTip="{Binding ToolTip}" />
 
-            <ItemsControl Margin="0,6,0,0" ItemTemplate="{StaticResource EffectKnobTemplate}" ItemsSource="{Binding Knobs}">
+            <ItemsControl
+                Margin="0,6,0,0"
+                ItemTemplate="{StaticResource EffectKnobTemplate}"
+                ItemsSource="{Binding Knobs}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="3" />

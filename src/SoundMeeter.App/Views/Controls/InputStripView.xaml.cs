@@ -133,6 +133,28 @@ namespace SoundMeeter.Views.Controls
 
         private void OnVirtClick(object sender, RoutedEventArgs e) => VirtPopup.IsOpen = !VirtPopup.IsOpen;
 
+        /// <summary>ЛКМ по имени канала: начать перетаскивание стрипа.</summary>
+        private void OnTitleMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                OnStripDragStart(sender, e);
+            }
+        }
+
+        /// <summary>ПКМ по имени канала: переименовать канал.</summary>
+        private void OnTitleRightClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is InputChannelViewModel vm)
+            {
+                vm.IsRenaming = true;
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>Кнопка меню эффектов (): открыть/закрыть попап с эффектами.</summary>
+        private void OnMenuClick(object sender, RoutedEventArgs e) => EffectsPopup.IsOpen = !EffectsPopup.IsOpen;
+
         /// <summary>ПКМ по DEN — открыть/закрыть попап настроек денойзера (ЛКМ — включение).</summary>
         private void OnDenRightClick(object sender, MouseButtonEventArgs e)
         {

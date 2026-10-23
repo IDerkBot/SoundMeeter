@@ -3,8 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strip="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"
     d:DesignHeight="220"
     d:DesignWidth="240"
     mc:Ignorable="d">
@@ -45,11 +45,11 @@
                         Text="{Binding DenoiserNoiseRemover, StringFormat={}{0:F0}%}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserNoiseRemoverCommand}"
                     Maximum="100"
                     Minimum="0"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserNoiseRemover}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserNoiseRemoverCommand}" />
+                    Value="{Binding DenoiserNoiseRemover}" />
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -66,11 +66,11 @@
                         Text="{Binding DenoiserDryWet, StringFormat={}{0:F0}%}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserDryWetCommand}"
                     Maximum="100"
                     Minimum="0"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserDryWet}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserDryWetCommand}" />
+                    Value="{Binding DenoiserDryWet}" />
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -87,11 +87,11 @@
                         Text="{Binding DenoiserFormantLowDb, StringFormat={}{0:F1} dB}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserFormantLowDbCommand}"
                     Maximum="24"
                     Minimum="-24"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserFormantLowDb}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserFormantLowDbCommand}" />
+                    Value="{Binding DenoiserFormantLowDb}" />
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -108,11 +108,11 @@
                         Text="{Binding DenoiserFormantMidDb, StringFormat={}{0:F1} dB}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserFormantMidDbCommand}"
                     Maximum="24"
                     Minimum="-24"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserFormantMidDb}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserFormantMidDbCommand}" />
+                    Value="{Binding DenoiserFormantMidDb}" />
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -129,11 +129,11 @@
                         Text="{Binding DenoiserFormantHighDb, StringFormat={}{0:F1} dB}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserFormantHighDbCommand}"
                     Maximum="24"
                     Minimum="-24"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserFormantHighDb}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserFormantHighDbCommand}" />
+                    Value="{Binding DenoiserFormantHighDb}" />
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -150,11 +150,11 @@
                         Text="{Binding DenoiserFormantGroupDb, StringFormat={}{0:F1} dB}" />
                 </Grid>
                 <Slider
+                    strip:ParamReset.Command="{Binding ResetDenoiserFormantGroupDbCommand}"
                     Maximum="12"
                     Minimum="-12"
                     Style="{StaticResource DenSlider}"
-                    Value="{Binding DenoiserFormantGroupDb}"
-                    strip:ParamReset.Command="{Binding ResetDenoiserFormantGroupDbCommand}" />
+                    Value="{Binding DenoiserFormantGroupDb}" />
             </StackPanel>
         </StackPanel>
     </Border>

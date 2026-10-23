@@ -1,0 +1,30 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:strips="clr-namespace:SoundMeeter.Framework.Presentation.Controls">
+    <DataTemplate x:Key="EffectKnobTemplate">
+        <StackPanel Width="78" Margin="0,4,0,0">
+            <strips:GainKnob
+                Width="56"
+                Height="56"
+                HorizontalAlignment="Center"
+                strips:ParamReset.Command="{Binding ResetCommand}"
+                IsLogarithmic="{Binding IsLogarithmic}"
+                Maximum="{Binding Maximum}"
+                Minimum="{Binding Minimum}"
+                ToolTip="{Binding ToolTip}"
+                Value="{Binding Value, Mode=TwoWay}" />
+            <TextBlock
+                Margin="0,2,0,0"
+                HorizontalAlignment="Center"
+                FontSize="9"
+                Foreground="#9A9A9A"
+                Text="{Binding Name}" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="9"
+                Foreground="#EEE"
+                Text="{Binding Display}" />
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

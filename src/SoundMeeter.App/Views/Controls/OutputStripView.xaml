@@ -2,12 +2,11 @@
     x:Class="SoundMeeter.Views.Controls.OutputStripView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
-    d:DesignHeight="360"
-    d:DesignWidth="138"
+    d:DesignHeight="400"
+    d:DesignWidth="150"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -17,88 +16,136 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <!--
+        Layout стрипа выхода:
+        - Имя канала сверху (редактируемое)
+        - Имя устройства (кнопка выбора)
+        - Meter+Fader слева, кнопки MONO/SOLO/MUTE справа вертикально
+        - Громкость внизу
+    -->
     <Border
         Width="150"
         Margin="0,0,10,6"
         Padding="6"
         Background="#3E3E42"
-        CornerRadius="3"
+        CornerRadius="6"
         Opacity="{Binding IsAvailable, Converter={StaticResource BoolToOpacity}}">
-        <StackPanel>
-            <!--  Имя канала: сверху стрипа, над именем устройства. ПКМ — переименовать, ЛКМ с протяжкой — перетащить.  -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Имя канала: сверху стрипа. ПКМ — переименовать, ЛКМ с протяжкой — перетащить.  -->
             <Border
+                Grid.Row="0"
                 Background="Transparent"
                 PreviewMouseLeftButtonDown="OnStripDragStart"
                 PreviewMouseMove="OnStripDragMove">
                 <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
             </Border>
 
-            <DockPanel Margin="0,0,0,4" LastChildFill="True">
-                <Button
-                    Width="18"
-                    Height="26"
-                    Margin="0"
-                    Padding="0"
-                    wpf:Button.Icon="Close"
-                    wpf:Button.IconHeight="8"
-                    wpf:Button.IconWidth="8"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnRemoveClick"
-                    DockPanel.Dock="Right"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Foreground="#AAA"
-                    ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
-                <Button
-                    Height="26"
-                    Padding="0"
-                    HorizontalAlignment="Center"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnBusNameClick"
-                    Content="{Binding Name}"
-                    FontSize="11"
-                    FontWeight="Bold"
-                    Foreground="White"
-                    ToolTip="{DynamicResource Sm.Strip.ChooseOutputTip}" />
-            </DockPanel>
+            <!--  Имя устройства (кнопка выбора)  -->
+            <Button
+                Grid.Row="1"
+                Height="22"
+                Margin="0,2,0,4"
+                Padding="0"
+                HorizontalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="OnBusNameClick"
+                Content="{Binding Name}"
+                FontSize="9"
+                FontWeight="Bold"
+                Foreground="#808080"
+                ToolTip="{DynamicResource Sm.Strip.ChooseOutputTip}" />
 
-            <UniformGrid Columns="2">
+            <!--  Основной контент: Meter+Fader слева, кнопки справа  -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Meter + Fader  -->
                 <ContentControl
-                    Height="420"
+                    Grid.Column="0"
+                    Height="260"
                     Content="{Binding}"
                     ContentTemplate="{StaticResource MeterAndFader}" />
-                <UniformGrid VerticalAlignment="Top" Rows="3">
+
+                <!--  Кнопки вертикально: MONO / SOLO / MUTE  -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="2,0,0,0">
                     <ToggleButton
-                        Margin="2"
+                        Margin="0,1"
                         Content="{DynamicResource Sm.Strip.MonoShort}"
                         IsChecked="{Binding IsMono}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
+                        ToolTip="{DynamicResource Sm.Strip.MonoTip}">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
+                                <Setter Property="Height" Value="22" />
+                                <Setter Property="FontSize" Value="9" />
+                                <Setter Property="Background" Value="#3A3A3D" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Background" Value="#0051FF" />
+                                        <Setter Property="BorderBrush" Value="#105AC9" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
                     <ToggleButton
-                        Margin="2"
+                        Margin="0,1"
                         Content="{DynamicResource Sm.Strip.SoloShort}"
                         IsChecked="{Binding IsSolo}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
+                        ToolTip="{DynamicResource Sm.Strip.SoloTip}">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
+                                <Setter Property="Height" Value="22" />
+                                <Setter Property="FontSize" Value="9" />
+                                <Setter Property="Background" Value="#3A3A3D" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Background" Value="#C95D10" />
+                                        <Setter Property="BorderBrush" Value="#FF9500" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
                     <ToggleButton
-                        Margin="2"
+                        Margin="0,1"
                         Content="{DynamicResource Sm.Strip.Mute}"
                         IsChecked="{Binding IsMuted}"
-                        Style="{StaticResource LedToggle}"
-                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
-                </UniformGrid>
-            </UniformGrid>
+                        ToolTip="{DynamicResource Sm.Strip.MuteTip}">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
+                                <Setter Property="Height" Value="22" />
+                                <Setter Property="FontSize" Value="9" />
+                                <Setter Property="Background" Value="#3A3A3D" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Background" Value="#fc4747" />
+                                        <Setter Property="BorderBrush" Value="#d90404" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
 
+            <!--  Громкость  -->
             <TextBlock
-                Margin="0,2,0,4"
-                HorizontalAlignment="Center"
-                FontSize="10"
-                Foreground="#AAA"
+                Grid.Row="3"
+                Style="{StaticResource VolumeDisplay}"
                 Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
-
-
-        </StackPanel>
+        </Grid>
     </Border>
 </UserControl>

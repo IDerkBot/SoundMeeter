@@ -2,6 +2,9 @@ using SoundMeeter.ChangeLanguage.Presentation;
 using SoundMeeter.StartUp.Contract;
 using SoundMeeter.TrayIcon.Contract;
 using SoundMeeter.TrayIcon.Contract.Implementation;
+using SoundMeeter.Twitch.Contract;
+using SoundMeeter.Twitch.Presentation.ViewModels;
+using SoundMeeter.Twitch.Presentation.Views;
 using System.ComponentModel;
 using System.Windows;
 using MainViewModel = SoundMeeter.ViewModels.MainViewModel;
@@ -15,6 +18,7 @@ namespace SoundMeeter.Views
     public partial class MainWindow : Window
     {
         private readonly ITrayIconService _tray;
+        private TwitchStatusViewModel? _twitchStatusVm;
         private bool _reallyClosing;
 
         public MainWindow(MainViewModel viewModel, IStartupService startup)
@@ -41,9 +45,13 @@ namespace SoundMeeter.Views
             viewModel.NotifyTray = (title, message) => Dispatcher.Invoke(() => _tray.ShowBalloon(title, message));
             ApplyTraySettings();
 
+            // Инициализация title bar
+            SetupTitleBar(viewModel);
+
             Closed += (_, _) =>
             {
                 _tray.Dispose();
+                _twitchStatusVm?.Dispose();
                 viewModel.OnApplyTraySettings = null;
                 viewModel.NotifyTray = null;
                 viewModel.SaveNow();
@@ -101,6 +109,19 @@ namespace SoundMeeter.Views
             // Окно скрыто, но трей выключили: возвращаем пользователя в интерфейс,
             // иначе он останется с невидимым приложением без иконки.
             if (!ViewModel.TrayEnabled && !IsVisible) ShowFromTray();
+        }
+
+        /// <summary>
+        /// Настроить title bar: Twitch статус, кнопки обновления, версия.
+        /// </summary>
+        private void SetupTitleBar(MainViewModel viewModel)
+        {
+            // 1. Twitch статус — берём ITwitchState из TwitchService
+            var twitchState = viewModel.TwitchModule?.Twitch as ITwitchState;
+            if (twitchState == null) return;
+            _twitchStatusVm = new TwitchStatusViewModel(twitchState);
+            var twitchView = new TwitchStatusView(_twitchStatusVm);
+            TitleBar.SetTwitchStatus(twitchView);
         }
     }
 }

@@ -26,13 +26,25 @@
         Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}">
         <DockPanel>
             <Button
+                Width="100"
                 Height="30"
                 Margin="0,0,4,0"
                 Padding="0"
                 VerticalAlignment="Center"
                 Background="Transparent"
-                Command="{Binding RequestInstallCommand}"
-                Content="{DynamicResource Sm.Toolbar.CheckUpdates}" />
+                Command="{Binding RequestInstallCommand}">
+                <Button.Content>
+                    <TextBlock
+                        Margin="0"
+                        Padding="0"
+                        FontSize="12"
+                        LineHeight="12"
+                        LineStackingStrategy="BlockLineHeight"
+                        Text="{DynamicResource Sm.Toolbar.CheckUpdates}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
+                </Button.Content>
+            </Button>
             <Border
                 Width="2"
                 Height="26"
@@ -46,6 +58,7 @@
                 Background="Transparent"
                 Command="{Binding DismissUpdateCommand}"
                 Content="Не обновлять"
+                FontSize="12"
                 ToolTip="{DynamicResource Sm.Update.Banner.DismissTip}" />
         </DockPanel>
     </Border>

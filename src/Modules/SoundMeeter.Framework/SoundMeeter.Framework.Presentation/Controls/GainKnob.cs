@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -83,6 +84,10 @@ public class GainKnob : Control
 
         Focusable = true;
         Cursor = Cursors.Hand;
+        // Transparent (а не null) — на случай, если шаблон когда-нибудь появится:
+        // тогда Border шаблона будет hit-testable. А пока HitTestCore ниже
+        // гарантирует, что колесо мыши работает по всей площади контрола.
+        Background = Brushes.Transparent;
 
         AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
         AddHandler(MouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
@@ -147,6 +152,43 @@ public class GainKnob : Control
         set => SetValue(IsLogarithmicProperty, value);
     }
 
+    public static readonly DependencyProperty TextFormatProperty = DependencyProperty.Register(
+        nameof(TextFormat), typeof(string), typeof(GainKnob),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>
+    /// Формат отображения значения (например, "{0:F1} dB"). Если null или пустой,
+    /// текст не отображается.
+    /// </summary>
+    public string TextFormat
+    {
+        get => (string)GetValue(TextFormatProperty);
+        set => SetValue(TextFormatProperty, value);
+    }
+
+    public static readonly DependencyProperty TextForegroundProperty = DependencyProperty.Register(
+        nameof(TextForeground), typeof(Brush), typeof(GainKnob),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0xEE, 0xEE, 0xEE)),
+            FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>Цвет текста значения.</summary>
+    public Brush TextForeground
+    {
+        get => (Brush)GetValue(TextForegroundProperty);
+        set => SetValue(TextForegroundProperty, value);
+    }
+
+    public static readonly DependencyProperty TextFontSizeProperty = DependencyProperty.Register(
+        nameof(TextFontSize), typeof(double), typeof(GainKnob),
+        new FrameworkPropertyMetadata(11.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>Размер шрифта текста значения.</summary>
+    public double TextFontSize
+    {
+        get => (double)GetValue(TextFontSizeProperty);
+        set => SetValue(TextFontSizeProperty, value);
+    }
+
     #endregion
 
     protected override void OnRender(DrawingContext dc)
@@ -171,7 +213,41 @@ public class GainKnob : Control
         dc.DrawLine(_pointerPen,
             center + dir * (radius - TrackThickness),
             center + dir * (radius - TrackThickness - 6));
+
+        // Отображение текста значения в центре контрола.
+        if (!string.IsNullOrEmpty(TextFormat))
+        {
+            var text = string.Format(CultureInfo.CurrentCulture, TextFormat, Value);
+            var foreground = TextForeground ?? Brushes.White;
+            var typeface = new Typeface("Segoe UI");
+            var formattedText = new FormattedText(
+                text,
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                typeface,
+                TextFontSize,
+                foreground,
+                1.0);
+
+            var textOrigin = new Point(
+                center.X - formattedText.Width / 2,
+                center.Y - formattedText.Height / 2);
+
+            dc.DrawText(formattedText, textOrigin);
+        }
     }
+
+    /// <summary>
+    /// Весь прямоугольник контрола участвует в hit-test, а не только
+    /// нарисованные пиксели (дуга, текст). Иначе <see cref="UIElement.MouseWheel"/>
+    /// и другие события мыши не доходили бы до контрола, когда курсор над
+    /// пустым фоном: для Control без явного шаблона <c>Background = Transparent</c>
+    /// недостаточно — шаблон не отрисовывает Border, и hit-test работает только
+    /// по содержимому <c>OnRender</c>. Это переопределение решает проблему
+    /// надёжно, независимо от наличия шаблона.
+    /// </summary>
+    protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        => new PointHitTestResult(this, hitTestParameters.HitPoint);
 
     /// <summary>Положение значения на шкале, 0…1 (вне диапазона зажато).</summary>
     private double Normalized(double value)

@@ -17,14 +17,14 @@
 
     <Border
         Margin="0,0,5,0"
-        Padding="15"
+        Padding="12"
         Background="#252526"
         CornerRadius="8">
         <DockPanel>
             <Grid DockPanel.Dock="Top">
                 <TextBlock
                     VerticalAlignment="Center"
-                    FontSize="18"
+                    FontSize="14"
                     FontWeight="SemiBold"
                     Foreground="White"
                     Text="{DynamicResource Sm.Apps.WithAudio}" />
@@ -32,11 +32,10 @@
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding RefreshDataCommand}"
-                    Content="{DynamicResource Sm.Apps.Refresh}"
-                    DockPanel.Dock="Top" />
+                    Content="{DynamicResource Sm.Apps.Refresh}" />
             </Grid>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
                 <ItemsControl ItemsSource="{Binding RunningApps}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -46,7 +45,6 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border
-                                Width="110"
                                 Cursor="Hand"
                                 MouseLeftButtonDown="App_MouseLeftButtonDown"
                                 PreviewMouseMove="App_PreviewMouseMove"
@@ -55,10 +53,10 @@
                                     <Image
                                         Width="32"
                                         Height="32"
-                                        Margin="0,0,0,8"
+                                        Margin="0,0,0,4"
                                         Source="{Binding ProcessId, Converter={StaticResource ProcessIconConverter}}" />
                                     <TextBlock
-                                        FontSize="12"
+                                        FontSize="10"
                                         Foreground="White"
                                         Text="{Binding Name}"
                                         TextAlignment="Center"

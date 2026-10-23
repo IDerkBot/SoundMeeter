@@ -5,10 +5,11 @@
     xmlns:controls="clr-namespace:SoundMeeter.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:strip="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:strip="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"
+    xmlns:vm="clr-namespace:SoundMeeter.Audio.Presentation.ViewModels;assembly=SoundMeeter.Audio.Presentation"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
-    xmlns:controls1="clr-namespace:SoundMeeter.Framework.Presentation.Controls;assembly=SoundMeeter.Framework.Presentation"
-    d:DesignWidth="160"
+    d:DataContext="{d:DesignInstance vm:InputChannelViewModel}"
+    d:DesignWidth="150"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -19,16 +20,20 @@
     </UserControl.Resources>
 
     <!--
-        Строчный план: заголовок, имя источника, метры (их высота фиксирована
-        дизайном) и выбор выхода — всё по содержимому, а панель приложений
-        забирает оставшуюся высоту стрипа.
+        Новый layout стрипа по наброску:
+        - Имя канала сверху
+        - Имя устройства под ним
+        - Кнопки маршрутизации горизонтально
+        - Meter+Fader слева, кнопки вертикально справа
+        - Громкость внизу
+        - GainKnob (микрофон) или список приложений (виртуальный вход) — под стрипом
     -->
     <Border
         Width="150"
         Margin="0,0,10,6"
         Padding="6"
         AllowDrop="True"
-        CornerRadius="3"
+        CornerRadius="6"
         DragEnter="Device_DragEnter"
         DragLeave="Device_DragLeave"
         DragOver="Device_DragEnter"
@@ -46,8 +51,10 @@
                 </Style.Triggers>
             </Style>
         </Border.Style>
+
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -55,411 +62,437 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!--
-                Имя канала: сверху стрипа, над именем устройства. ПКМ — переименовать,
-                ЛКМ с протяжкой — перетащить стрип на другое место (SM-C06).
-            -->
+            <!--  Имя канала: сверху стрипа. ПКМ — переименовать, ЛКМ с протяжкой — перетащить.  -->
             <Border
                 Grid.Row="0"
                 Background="Transparent"
-                PreviewMouseLeftButtonDown="OnStripDragStart"
-                PreviewMouseMove="OnStripDragMove">
+                MouseLeftButtonDown="OnTitleMouseDown"
+                MouseRightButtonUp="OnTitleRightClick">
                 <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StripTitleTemplate}" />
             </Border>
 
-            <DockPanel
+            <!--  Имя устройства  -->
+            <Button
                 Grid.Row="1"
-                Margin="0,0,0,4"
-                LastChildFill="True">
-                <Button
-                    Width="18"
-                    Height="26"
-                    Margin="0"
-                    Padding="0"
-                    wpf:Button.Icon="Close"
-                    wpf:Button.IconHeight="8"
-                    wpf:Button.IconWidth="8"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnRemoveClick"
-                    DockPanel.Dock="Right"
-                    Foreground="#AAA"
-                    ToolTip="{DynamicResource Sm.Strip.RemoveTip}" />
-                <Button
-                    Height="26"
-                    Padding="0"
-                    HorizontalAlignment="Center"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnInputNameClick"
-                    Content="{Binding Name}"
-                    FontSize="11"
-                    FontWeight="Bold"
-                    Foreground="White"
-                    ToolTip="{DynamicResource Sm.Strip.ChooseInputTip}" />
-            </DockPanel>
+                Height="22"
+                Padding="0"
+                HorizontalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="OnInputNameClick"
+                Content="{Binding Name}"
+                FontSize="9"
+                FontWeight="Bold"
+                Foreground="White"
+                ToolTip="{DynamicResource Sm.Strip.ChooseInputTip}" />
 
-            <Grid Grid.Row="2">
+            <!--  Основной контент: Meter+Fader слева, кнопки справа  -->
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="68" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel
-                    Grid.Row="0"
+                <!--  Meter + Fader  -->
+                <ContentControl
                     Grid.Column="0"
+                    Height="260"
+                    Content="{Binding}"
+                    ContentTemplate="{StaticResource MeterAndFader}" />
+
+                <!--  Кнопки вертикально  -->
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="2,0,0,0"
                     VerticalAlignment="Top">
-                    <ContentControl
-                        Height="260"
-                        Content="{Binding}"
-                        ContentTemplate="{StaticResource MeterAndFader}" />
-                    <TextBlock
-                        Margin="0,8,0,4"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        FontSize="10"
-                        Foreground="#AAA"
-                        Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
+                    <Button
+                        x:Name="OutBtn"
+                        Click="OnOutClick"
+                        IsEnabled="{Binding HasHardware}"
+                        Style="{StaticResource RouteBtnCompact}"
+                        ToolTip="{DynamicResource Sm.Strip.HardwareOutputsTip}">
+                        <Button.Content>
+                            <Grid Width="52">
+                                <TextBlock HorizontalAlignment="Left" Text="OUT" />
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding OutButtonText}" />
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                    <Button
+                        x:Name="VirtBtn"
+                        Click="OnVirtClick"
+                        IsEnabled="{Binding HasVirtual}"
+                        Style="{StaticResource RouteBtnCompact}"
+                        ToolTip="{DynamicResource Sm.Strip.VirtualOutputsTip}">
+                        <Button.Content>
+                            <Grid Width="52">
+                                <TextBlock HorizontalAlignment="Left" Text="OUT" />
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding VirtButtonText}" />
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                    <ToggleButton
+                        Content="{DynamicResource Sm.Strip.Mono}"
+                        IsChecked="{Binding IsMono}"
+                        Style="{StaticResource StripBlueBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
+
+                    <ToggleButton
+                        Content="{DynamicResource Sm.Strip.Solo}"
+                        IsChecked="{Binding IsSolo}"
+                        Style="{StaticResource StripOrangeBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
+
+                    <ToggleButton
+                        Content="{DynamicResource Sm.Strip.Mute}"
+                        IsChecked="{Binding IsMuted}"
+                        Style="{StaticResource StripRedBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
+
+                    <ToggleButton
+                        x:Name="DenBtn"
+                        Content="{DynamicResource Sm.Strip.Denoiser}"
+                        IsChecked="{Binding DenoiserEnabled}"
+                        MouseRightButtonUp="OnDenRightClick"
+                        Style="{StaticResource StripPurpleBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
+
+                    <!--  FUNC1  -->
+                    <Grid DataContext="{Binding Func1}">
+                        <ToggleButton
+                            x:Name="Func1Btn"
+                            Margin="0,1"
+                            Click="OnFuncClick"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                            MouseRightButtonUp="OnFuncRightClick"
+                            Opacity="{Binding ButtonOpacity}"
+                            Style="{StaticResource StripWhiteBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+
+                    <!--  FUNC2  -->
+                    <Grid DataContext="{Binding Func2}">
+                        <ToggleButton
+                            x:Name="Func2Btn"
+                            Margin="0,1"
+                            Click="OnFuncClick"
+                            Content="{Binding ButtonText}"
+                            IsChecked="{Binding IsEngaged, Mode=TwoWay}"
+                            MouseRightButtonUp="OnFuncRightClick"
+                            Opacity="{Binding ButtonOpacity}"
+                            Style="{StaticResource StripWhiteBtn}"
+                            ToolTip="{Binding ToolTip}" />
+                    </Grid>
+
+                    <!--  Кнопка меню эффектов ()  -->
+                    <Button
+                        x:Name="MenuBtn"
+                        Width="64"
+                        Height="24"
+                        Margin="0,4,0,0"
+                        Padding="0"
+                        wpf:Button.Icon="ReorderHorizontal"
+                        wpf:Hint.CornerRadius="3"
+                        Background="#3A3A3D"
+                        BorderBrush="#555"
+                        BorderThickness="1"
+                        Click="OnMenuClick"
+                        Foreground="White"
+                        ToolTip="Эффекты" />
                 </StackPanel>
+            </Grid>
 
-                <!--
-                    Колонка кнопок стрипа: маршрутизация и состояние (слева в
-                    этом списке), ниже — две кнопки FUNC и сетка эффектов 2×2.
-                    Всё в одной колонке, поэтому ряды не наезжают друг на друга,
-                    а полоса растёт вниз по мере надобности.
-                -->
-                <StackPanel Grid.Column="1">
-                    <UniformGrid Columns="1">
-                        <Button
-                            x:Name="OutBtn"
-                            Margin="2"
-                            Click="OnOutClick"
-                            Content="{Binding OutButtonText}"
-                            IsEnabled="{Binding HasHardware}"
-                            Style="{StaticResource RouteBtn}"
-                            ToolTip="{DynamicResource Sm.Strip.HardwareOutputsTip}" />
-                        <Button
-                            x:Name="VirtBtn"
-                            Margin="2"
-                            Click="OnVirtClick"
-                            Content="{Binding VirtButtonText}"
-                            IsEnabled="{Binding HasVirtual}"
-                            Style="{StaticResource RouteBtn}"
-                            ToolTip="{DynamicResource Sm.Strip.VirtualOutputsTip}" />
-                        <ToggleButton
-                            Margin="2"
-                            Content="{DynamicResource Sm.Strip.Mono}"
-                            IsChecked="{Binding IsMono}"
-                            Style="{StaticResource LedToggle}"
-                            ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
-                        <ToggleButton
-                            Margin="2"
-                            Content="{DynamicResource Sm.Strip.Solo}"
-                            IsChecked="{Binding IsSolo}"
-                            Style="{StaticResource LedToggle}"
-                            ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
-                        <ToggleButton
-                            Margin="2"
-                            Content="{DynamicResource Sm.Strip.Mute}"
-                            IsChecked="{Binding IsMuted}"
-                            Style="{StaticResource LedToggle}"
-                            ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
-                        <ToggleButton
-                            x:Name="DenBtn"
-                            Margin="2"
-                            Content="{DynamicResource Sm.Strip.Denoiser}"
-                            IsChecked="{Binding DenoiserEnabled}"
-                            MouseRightButtonUp="OnDenRightClick"
-                            Style="{StaticResource LedToggle}"
-                            ToolTip="{DynamicResource Sm.Strip.DenoiserTip}" />
+            <!--  Громкость  -->
+            <TextBlock
+                Grid.Row="4"
+                Style="{StaticResource VolumeDisplay}"
+                Text="{Binding VolumeDb, StringFormat={}{0:F1} dB}" />
 
-                        <!--
-                            Кнопки FUNC — переключатели: нажатие применяет
-                            назначенные выходы к роутингу стрипа, повторное снимает
-                            и возвращает прежний. ПКМ — назначение (попап).
-                            
-                            Кнопку без назначения отключать нельзя: у отключённого
-                            элемента не приходит ПКМ, и назначить выходы было бы
-                            уже нечем (попап открывает только она). Вместо этого
-                            приглушаем её, а нажатие такой кнопки открывает попап
-                            назначения (OnFuncClick).
-                            
-                            Обёртка нужна ради DataContext: привязки идут к
-                            FuncButtonViewModel, а не к стрипу.
-                        -->
-                        <Grid DataContext="{Binding Func1}">
-                            <ToggleButton
-                                x:Name="Func1Btn"
-                                Margin="2"
-                                Click="OnFuncClick"
-                                Content="{Binding ButtonText}"
-                                IsChecked="{Binding IsEngaged, Mode=TwoWay}"
-                                MouseRightButtonUp="OnFuncRightClick"
-                                Opacity="{Binding ButtonOpacity}"
-                                Style="{StaticResource FuncBtn}"
-                                ToolTip="{Binding ToolTip}" />
-                        </Grid>
-                        <Grid DataContext="{Binding Func2}">
-                            <ToggleButton
-                                x:Name="Func2Btn"
-                                Margin="2"
-                                Click="OnFuncClick"
-                                Content="{Binding ButtonText}"
-                                IsChecked="{Binding IsEngaged, Mode=TwoWay}"
-                                MouseRightButtonUp="OnFuncRightClick"
-                                Opacity="{Binding ButtonOpacity}"
-                                Style="{StaticResource FuncBtn}"
-                                ToolTip="{Binding ToolTip}" />
-                        </Grid>
-                    </UniformGrid>
+            <!--  AppTarget (выбор устройства для приложений)  -->
+            <Border
+                Grid.Row="5"
+                Margin="0,10,0,0"
+                Background="#1a1a1a"
+                CornerRadius="6"
+                Visibility="{Binding CanChooseAppTarget, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <Button
+                        Width="118"
+                        Height="20"
+                        Margin="0,0,0,4"
+                        Padding="0"
+                        VerticalAlignment="Top"
+                        wpf:Button.IconHeight="8"
+                        wpf:Button.IconStrokeColor="White"
+                        wpf:Button.IconWidth="10"
+                        wpf:Button.LeftIcon="MenuRight"
+                        wpf:Button.RightIcon="MenuLeft"
+                        wpf:Hint.CornerRadius="0"
+                        Background="Transparent"
+                        BorderBrush="#555555"
+                        BorderThickness="0,0,0,1"
+                        Click="OnAppTargetClick"
+                        Content="{Binding AppTargetText}"
+                        FontSize="10"
+                        Foreground="White"
+                        ToolTip="{DynamicResource Sm.Strip.AppTargetTip}" />
 
-                    <!--
-                        Эффекты стрипа (SM-B05): компрессор, trim, задержка,
-                        реверберация. Сетка 2×2, чтобы колонка кнопок не выросла на
-                        четыре ряда: кнопки узкие, подписи в две буквы. ЛКМ — вкл/выкл,
-                        ПКМ — попап с крутилками.
-                    -->
-                    <UniformGrid Columns="2">
+                    <!--  Список приложений  -->
+                    <controls:StripAppsView VerticalAlignment="Bottom" Visibility="{Binding ShowAppList, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+            </Border>
+
+            <!--  GainKnob (для микрофона) или список приложений  -->
+            <Grid Grid.Row="5" VerticalAlignment="Bottom">
+                <!--  GainKnob: только для микрофона  -->
+                <StackPanel
+                    Margin="0,4,0,0"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding ShowGainKnob, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <strip:GainKnob
+                            Width="86"
+                            Height="86"
+                            HorizontalAlignment="Center"
+                            strip:ParamReset.Command="{Binding ResetGainCommand}"
+                            Maximum="60"
+                            TextFontSize="11"
+                            TextForeground="#EEE"
+                            TextFormat="{}{0:F1} dB"
+                            ToolTip="{DynamicResource Sm.Strip.GainTip}"
+                            Value="{Binding GainDb, Mode=TwoWay}" />
+                    </Grid>
+                    <TextBlock
+                        Margin="0,2,0,0"
+                        HorizontalAlignment="Center"
+                        FontSize="9"
+                        Foreground="#808080"
+                        Text="{DynamicResource Sm.Strip.GainLabel}" />
+                </StackPanel>
+            </Grid>
+
+            <!--  Popup: OUT  -->
+            <Popup
+                x:Name="OutPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=OutBtn}"
+                StaysOpen="False">
+                <Border
+                    Padding="6"
+                    Background="#2B2B2B"
+                    BorderBrush="#555"
+                    BorderThickness="1"
+                    CornerRadius="3">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontSize="10"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="{DynamicResource Sm.Strip.HardwareOutputs}" />
+                        <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding HardwareOutputs}" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!--  Popup: VIRT  -->
+            <Popup
+                x:Name="VirtPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=VirtBtn}"
+                StaysOpen="False">
+                <Border
+                    Padding="6"
+                    Background="#2B2B2B"
+                    BorderBrush="#555"
+                    BorderThickness="1"
+                    CornerRadius="3">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontSize="10"
+                            FontWeight="Bold"
+                            Text="{DynamicResource Sm.Strip.VirtualOutputs}" />
+                        <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding VirtualOutputs}" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!--  Popup: Denoiser  -->
+            <Popup
+                x:Name="DenPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=DenBtn}"
+                StaysOpen="False">
+                <controls:DenoiserSettingsView />
+            </Popup>
+
+            <!--  Popup: FUNC1  -->
+            <Popup
+                x:Name="Func1Popup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=Func1Btn}"
+                StaysOpen="False">
+                <controls:FuncButtonSettingsView x:Name="Func1View" DataContext="{Binding Func1}" />
+            </Popup>
+
+            <!--  Popup: FUNC2  -->
+            <Popup
+                x:Name="Func2Popup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=Func2Btn}"
+                StaysOpen="False">
+                <controls:FuncButtonSettingsView x:Name="Func2View" DataContext="{Binding Func2}" />
+            </Popup>
+
+            <!--  Popup: Effects menu ()  -->
+            <Popup
+                x:Name="EffectsPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Left"
+                PlacementTarget="{Binding ElementName=MenuBtn}"
+                StaysOpen="False">
+                <Border
+                    Padding="6"
+                    Background="#2B2B2B"
+                    BorderBrush="#555"
+                    BorderThickness="1"
+                    CornerRadius="3">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontSize="10"
+                            FontWeight="Bold"
+                            Foreground="#9A9A9A"
+                            Text="Эффекты" />
+
+                        <!--  Compressor  -->
                         <Grid DataContext="{Binding Compressor}">
                             <ToggleButton
                                 x:Name="CompressorBtn"
-                                Margin="2"
+                                Margin="0,2"
                                 Content="{Binding ButtonText}"
                                 IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                 MouseRightButtonUp="OnEffectRightClick"
                                 Style="{StaticResource EffectBtn}"
                                 ToolTip="{Binding ToolTip}" />
                         </Grid>
+
+                        <!--  FxGain  -->
                         <Grid DataContext="{Binding FxGain}">
                             <ToggleButton
                                 x:Name="FxGainBtn"
-                                Margin="2"
+                                Margin="0,2"
                                 Content="{Binding ButtonText}"
                                 IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                 MouseRightButtonUp="OnEffectRightClick"
                                 Style="{StaticResource EffectBtn}"
                                 ToolTip="{Binding ToolTip}" />
                         </Grid>
+
+                        <!--  Delay  -->
                         <Grid DataContext="{Binding Delay}">
                             <ToggleButton
                                 x:Name="DelayBtn"
-                                Margin="2"
+                                Margin="0,2"
                                 Content="{Binding ButtonText}"
                                 IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                 MouseRightButtonUp="OnEffectRightClick"
                                 Style="{StaticResource EffectBtn}"
                                 ToolTip="{Binding ToolTip}" />
                         </Grid>
+
+                        <!--  Reverb  -->
                         <Grid DataContext="{Binding Reverb}">
                             <ToggleButton
                                 x:Name="ReverbBtn"
-                                Margin="2"
+                                Margin="0,2"
                                 Content="{Binding ButtonText}"
                                 IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                 MouseRightButtonUp="OnEffectRightClick"
                                 Style="{StaticResource EffectBtn}"
                                 ToolTip="{Binding ToolTip}" />
                         </Grid>
-                    </UniformGrid>
 
-                    <!--
-                        Эквалайзер: ЛКМ, как у остальных эффектов, — вкл/выкл, а ПКМ
-                        открывает отдельное окно. Отдельное, а не попап: десять полос с
-                        кривой не влезают в 272 px попапа, а окно можно держать открытым
-                        и свернуть микшер — правка слышна сразу.
-                        
-                        Обёртка нужна ради DataContext: привязки идут к
-                        EqualizerViewModel, а не к стрипу.
-                    -->
-                    <Grid DataContext="{Binding Equalizer}">
-                        <ToggleButton
-                            x:Name="EqBtn"
-                            Margin="2"
-                            Content="{Binding ButtonText}"
-                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                            MouseRightButtonUp="OnEqRightClick"
-                            Style="{StaticResource EffectBtn}"
-                            ToolTip="{Binding ToolTip}" />
-                    </Grid>
-                </StackPanel>
+                        <Border
+                            Height="1"
+                            Margin="0,4"
+                            Background="#3F3F46" />
 
-                <Popup
-                    x:Name="OutPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=OutBtn}"
-                    StaysOpen="False">
-                    <Border
-                        Padding="6"
-                        Background="#2B2B2B"
-                        BorderBrush="#555"
-                        BorderThickness="1"
-                        CornerRadius="3">
-                        <StackPanel>
-                            <TextBlock
-                                Margin="0,0,0,4"
-                                FontSize="10"
-                                FontWeight="Bold"
-                                Foreground="White"
-                                Text="{DynamicResource Sm.Strip.HardwareOutputs}" />
-                            <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding HardwareOutputs}" />
-                            </ScrollViewer>
-                        </StackPanel>
-                    </Border>
-                </Popup>
+                        <!--  EQ (отдельное окно)  -->
+                        <Grid DataContext="{Binding Equalizer}">
+                            <ToggleButton
+                                x:Name="EqBtn"
+                                Margin="0,2"
+                                Content="{Binding ButtonText}"
+                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                MouseRightButtonUp="OnEqRightClick"
+                                Style="{StaticResource EffectBtn}"
+                                ToolTip="{Binding ToolTip}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Popup>
 
-                <Popup
-                    x:Name="VirtPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=VirtBtn}"
-                    StaysOpen="False">
-                    <Border
-                        Padding="6"
-                        Background="#2B2B2B"
-                        BorderBrush="#555"
-                        BorderThickness="1"
-                        CornerRadius="3">
-                        <StackPanel>
-                            <TextBlock
-                                Margin="0,0,0,4"
-                                FontSize="10"
-                                FontWeight="Bold"
-                                Text="{DynamicResource Sm.Strip.VirtualOutputs}" />
-                            <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemTemplate="{StaticResource OutputOptionTemplate}" ItemsSource="{Binding VirtualOutputs}" />
-                            </ScrollViewer>
-                        </StackPanel>
-                    </Border>
-                </Popup>
+            <!--  Popup: Compressor settings  -->
+            <Popup
+                x:Name="CompressorPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=CompressorBtn}"
+                StaysOpen="False">
+                <controls:StripEffectSettingsView DataContext="{Binding Compressor}" />
+            </Popup>
 
-                <Popup
-                    x:Name="DenPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=DenBtn}"
-                    StaysOpen="False">
-                    <controls:DenoiserSettingsView />
-                </Popup>
+            <!--  Popup: FxGain settings  -->
+            <Popup
+                x:Name="FxGainPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=FxGainBtn}"
+                StaysOpen="False">
+                <controls:StripEffectSettingsView DataContext="{Binding FxGain}" />
+            </Popup>
 
-                <Popup
-                    x:Name="Func1Popup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=Func1Btn}"
-                    StaysOpen="False">
-                    <controls:FuncButtonSettingsView x:Name="Func1View" DataContext="{Binding Func1}" />
-                </Popup>
+            <!--  Popup: Delay settings  -->
+            <Popup
+                x:Name="DelayPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=DelayBtn}"
+                StaysOpen="False">
+                <controls:StripEffectSettingsView DataContext="{Binding Delay}" />
+            </Popup>
 
-                <Popup
-                    x:Name="Func2Popup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=Func2Btn}"
-                    StaysOpen="False">
-                    <controls:FuncButtonSettingsView x:Name="Func2View" DataContext="{Binding Func2}" />
-                </Popup>
-
-                <Popup
-                    x:Name="CompressorPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=CompressorBtn}"
-                    StaysOpen="False">
-                    <controls:StripEffectSettingsView DataContext="{Binding Compressor}" />
-                </Popup>
-
-                <Popup
-                    x:Name="FxGainPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=FxGainBtn}"
-                    StaysOpen="False">
-                    <controls:StripEffectSettingsView DataContext="{Binding FxGain}" />
-                </Popup>
-
-                <Popup
-                    x:Name="DelayPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=DelayBtn}"
-                    StaysOpen="False">
-                    <controls:StripEffectSettingsView DataContext="{Binding Delay}" />
-                </Popup>
-
-                <Popup
-                    x:Name="ReverbPopup"
-                    Width="272"
-                    AllowsTransparency="True"
-                    Placement="Bottom"
-                    PlacementTarget="{Binding ElementName=ReverbBtn}"
-                    StaysOpen="False">
-                    <controls:StripEffectSettingsView DataContext="{Binding Reverb}" />
-                </Popup>
-            </Grid>
-
-            <!--
-                Куда уходят приложения канала: над блоком приложений, а не внутри
-                него — список прокручивается, а этот выбор нужен постоянно. Показывается
-                только у входа виртуального кабеля: его выход движок обычно определяет
-                сам, но имя кабеля задаёт пользователь, поэтому нужен и ручной выбор.
-            -->
-            <Button
-                Grid.Row="3"
-                Margin="0,4,0,2"
-                Padding="2,3"
-                Click="OnAppTargetClick"
-                Content="{Binding AppTargetText}"
-                FontSize="9"
-                Style="{StaticResource RouteBtn}"
-                ToolTip="{DynamicResource Sm.Strip.AppTargetTip}"
-                Visibility="{Binding CanChooseAppTarget, Converter={StaticResource BoolToVisibility}}" />
-
-            <controls:StripAppsView Grid.Row="4" Visibility="{Binding ShowAppList, Converter={StaticResource BoolToVisibility}}" />
-
-            <!--
-                На стрипе микрофона вместо списка приложений — входное усиление:
-                приложения в микрофон не уходят (список был бы всегда пустым), а
-                тихий сигнал микрофона без подъёма вверх не вытянуть.
-            -->
-            <StackPanel
-                Grid.Row="4"
-                Margin="0,8,0,0"
-                VerticalAlignment="Center"
-                Visibility="{Binding ShowGainKnob, Converter={StaticResource BoolToVisibility}}">
-                <Grid>
-                    <controls1:GainKnob
-                        Width="86"
-                        Height="86"
-                        HorizontalAlignment="Center"
-                        strip:ParamReset.Command="{Binding ResetGainCommand}"
-                        Maximum="60"
-                        ToolTip="{DynamicResource Sm.Strip.GainTip}"
-                        Value="{Binding GainDb, Mode=TwoWay}" />
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontSize="11"
-                        FontWeight="Bold"
-                        Foreground="#EEE"
-                        Text="{Binding GainDb, StringFormat={}{0:F1} dB}" />
-                </Grid>
-                <TextBlock
-                    Margin="0,2,0,0"
-                    HorizontalAlignment="Center"
-                    FontSize="9"
-                    Foreground="#808080"
-                    Text="{DynamicResource Sm.Strip.GainLabel}" />
-            </StackPanel>
+            <!--  Popup: Reverb settings  -->
+            <Popup
+                x:Name="ReverbPopup"
+                Width="272"
+                AllowsTransparency="True"
+                Placement="Bottom"
+                PlacementTarget="{Binding ElementName=ReverbBtn}"
+                StaysOpen="False">
+                <controls:StripEffectSettingsView DataContext="{Binding Reverb}" />
+            </Popup>
         </Grid>
     </Border>
 </UserControl>

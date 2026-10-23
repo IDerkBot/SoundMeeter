@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace SoundMeeter.Views.Controls;
+namespace SoundMeeter.Framework.Presentation.Controls;
 
 /// <summary>
 /// Сброс параметра к значению по умолчанию двойным щелчком по регулятору
