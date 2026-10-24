@@ -660,3 +660,9 @@ fabric.properties
 /.vscode
 /ImageProcessor/BuildInfo.g.cs
 /Sura/BuildInfo.g.cs
+
+
+.agents/
+.opencode
+.qwen
+skills-lock.json
