@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:icon="clr-namespace:StreamerTools.Style.Controls;assembly=StreamerTools.Style"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
     xmlns:twitch="clr-namespace:SoundMeeter.Twitch.Presentation.Views;assembly=SoundMeeter.Twitch.Presentation"
     xmlns:wpf="clr-namespace:StreamerTools.Style.AttachedProperties;assembly=StreamerTools.Style"
     d:DesignHeight="24"
@@ -94,9 +95,7 @@
     <!--  Title bar: app icon+name on left, user info+updates+version+window controls on right  -->
     <Grid
         Background="#1E1E1E"
-        MouseLeftButtonDown="OnTitleBarMouseDown"
-        MouseLeftButtonUp="OnTitleBarMouseUp"
-        MouseMove="OnTitleBarMouseMove">
+        MouseLeftButtonDown="OnTitleBarMouseDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -149,6 +148,7 @@
                 Width="34"
                 Height="24"
                 Padding="0"
+                shell:WindowChrome.IsHitTestVisibleInChrome="True"
                 wpf:Button.Icon="WindowMinimize"
                 wpf:Hint.CornerRadius="0"
                 ToolTip="Свернуть" />
@@ -157,6 +157,7 @@
                 Width="34"
                 Height="24"
                 Padding="0"
+                shell:WindowChrome.IsHitTestVisibleInChrome="True"
                 wpf:Button.Icon="WindowMaximize"
                 wpf:Hint.CornerRadius="0"
                 ToolTip="Развернуть" />
@@ -165,6 +166,7 @@
                 Width="34"
                 Height="24"
                 Padding="0"
+                shell:WindowChrome.IsHitTestVisibleInChrome="True"
                 wpf:Button.Icon="Close"
                 wpf:Hint.CornerRadius="0"
                 ToolTip="Закрыть" />

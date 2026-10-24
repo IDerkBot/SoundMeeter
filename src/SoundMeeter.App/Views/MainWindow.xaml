@@ -6,60 +6,44 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SoundMeeter.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:wpf="clr-namespace:SoundMeeter.Views.Controls"
+    xmlns:shell="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
     Title="SoundMeeter"
     Width="1280"
     Height="1000"
     MinWidth="900"
     MinHeight="600"
-    AllowsTransparency="True"
-    Background="Transparent"
-    ResizeMode="NoResize"
+    Background="#1E1E1E"
+    SourceInitialized="Window_SourceInitialized"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
 
     <!--
-        Кастомный chrome: WindowStyle=None + AllowsTransparency=True для скруглённых
-        углов. ResizeMode=NoResize — стандартный resize отключён, вместо него
-        8 handle-зон по периметру Grid 3×3.
+        Кастомный chrome: WindowStyle=None + WindowChrome для нативного Aero Snap.
+        WM_GETMINMAXINFO hook корректирует размеры максимизированного окна,
+        чтобы контент не уходил за пределы экрана.
     -->
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="32"
+            CornerRadius="8"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="6"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
     <Border Background="#1E1E1E" CornerRadius="8">
-        <Grid x:Name="RootGrid" wpf:WindowChromeBehavior.IsEnabled="True">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="4" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="4" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="4" />
-            </Grid.ColumnDefinitions>
 
-            <!--  8 resize handle-зон  -->
-            <Border Grid.Row="0" Grid.Column="1" Tag="Resize_Top" Background="Transparent" />
-            <Border Grid.Row="2" Grid.Column="1" Tag="Resize_Bottom" Background="Transparent" />
-            <Border Grid.Row="1" Grid.Column="0" Tag="Resize_Left" Background="Transparent" />
-            <Border Grid.Row="1" Grid.Column="2" Tag="Resize_Right" Background="Transparent" />
-            <Border Grid.Row="0" Grid.Column="0" Tag="Resize_TopLeft" Background="Transparent" />
-            <Border Grid.Row="0" Grid.Column="2" Tag="Resize_TopRight" Background="Transparent" />
-            <Border Grid.Row="2" Grid.Column="0" Tag="Resize_BottomLeft" Background="Transparent" />
-            <Border Grid.Row="2" Grid.Column="2" Tag="Resize_BottomRight" Background="Transparent" />
+            <!--  Кастомный title bar  -->
+            <controls:TitleBarView x:Name="TitleBar" Grid.Row="0" />
 
-            <!--  Основное содержимое окна  -->
-            <Grid Grid.Row="1" Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!--  Кастомный title bar  -->
-                <controls:TitleBarView x:Name="TitleBar" Grid.Row="0" />
-
-                <!--  Основной контент  -->
-                <local:MainView Grid.Row="1" DataContext="{Binding}" />
-            </Grid>
+            <!--  Основной контент  -->
+            <local:MainView Grid.Row="1" DataContext="{Binding}" />
         </Grid>
     </Border>
 </Window>

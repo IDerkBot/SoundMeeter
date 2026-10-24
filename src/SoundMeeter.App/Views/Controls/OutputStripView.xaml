@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/SoundMeeter;component/Views/Controls/MixerTheme.xaml" />
+                <ResourceDictionary Source="/SoundMeeter;component/Style/StripToggleButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -27,6 +28,7 @@
         Width="150"
         Margin="0,0,10,6"
         Padding="6"
+        VerticalAlignment="Top"
         Background="#3E3E42"
         CornerRadius="6"
         Opacity="{Binding IsAvailable, Converter={StaticResource BoolToOpacity}}">
@@ -78,66 +80,30 @@
                     ContentTemplate="{StaticResource MeterAndFader}" />
 
                 <!--  Кнопки вертикально: MONO / SOLO / MUTE  -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="2,0,0,0">
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="2,0,0,0"
+                    VerticalAlignment="Top">
                     <ToggleButton
                         Margin="0,1"
-                        Content="{DynamicResource Sm.Strip.MonoShort}"
+                        Content="{DynamicResource Sm.Strip.Mono}"
                         IsChecked="{Binding IsMono}"
-                        ToolTip="{DynamicResource Sm.Strip.MonoTip}">
-                        <ToggleButton.Style>
-                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
-                                <Setter Property="Height" Value="22" />
-                                <Setter Property="FontSize" Value="9" />
-                                <Setter Property="Background" Value="#3A3A3D" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Background" Value="#0051FF" />
-                                        <Setter Property="BorderBrush" Value="#105AC9" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
+                        Style="{StaticResource StripBlueBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.MonoTip}" />
 
                     <ToggleButton
                         Margin="0,1"
-                        Content="{DynamicResource Sm.Strip.SoloShort}"
+                        Content="{DynamicResource Sm.Strip.Solo}"
                         IsChecked="{Binding IsSolo}"
-                        ToolTip="{DynamicResource Sm.Strip.SoloTip}">
-                        <ToggleButton.Style>
-                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
-                                <Setter Property="Height" Value="22" />
-                                <Setter Property="FontSize" Value="9" />
-                                <Setter Property="Background" Value="#3A3A3D" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Background" Value="#C95D10" />
-                                        <Setter Property="BorderBrush" Value="#FF9500" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
+                        Style="{StaticResource StripOrangeBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.SoloTip}" />
 
                     <ToggleButton
                         Margin="0,1"
                         Content="{DynamicResource Sm.Strip.Mute}"
                         IsChecked="{Binding IsMuted}"
-                        ToolTip="{DynamicResource Sm.Strip.MuteTip}">
-                        <ToggleButton.Style>
-                            <Style TargetType="ToggleButton" BasedOn="{StaticResource StripToggleButton}">
-                                <Setter Property="Height" Value="22" />
-                                <Setter Property="FontSize" Value="9" />
-                                <Setter Property="Background" Value="#3A3A3D" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Property="Background" Value="#fc4747" />
-                                        <Setter Property="BorderBrush" Value="#d90404" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
+                        Style="{StaticResource StripRedBtn}"
+                        ToolTip="{DynamicResource Sm.Strip.MuteTip}" />
                 </StackPanel>
             </Grid>
 

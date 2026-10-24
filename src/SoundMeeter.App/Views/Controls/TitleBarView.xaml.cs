@@ -7,9 +7,6 @@ namespace SoundMeeter.Views.Controls;
 
 public partial class TitleBarView : UserControl
 {
-    private Point _dragStart;
-    private bool _isDragging;
-
     public TitleBarView()
     {
         InitializeComponent();
@@ -82,30 +79,12 @@ public partial class TitleBarView : UserControl
             return;
         }
 
-        _dragStart = e.GetPosition(GetWindow());
-        _isDragging = true;
-        (sender as UIElement)?.CaptureMouse();
-    }
-
-    private void OnTitleBarMouseUp(object sender, MouseButtonEventArgs e)
-    {
-        _isDragging = false;
-        (sender as UIElement)?.ReleaseMouseCapture();
-    }
-
-    private void OnTitleBarMouseMove(object sender, MouseEventArgs e)
-    {
-        if (!_isDragging) return;
-
-        var window = GetWindow();
-        if (window == null || window.WindowState == WindowState.Maximized) return;
-
-        var pos = e.GetPosition(window);
-        var dx = pos.X - _dragStart.X;
-        var dy = pos.Y - _dragStart.Y;
-
-        window.Left += dx;
-        window.Top += dy;
+        // Используем нативный DragMove — WindowChrome автоматически обрабатывает
+        // Aero Snap: maximize при перетаскивании к верху, snap к половинам экрана и т.д.
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            GetWindow()?.DragMove();
+        }
     }
 
     #endregion
