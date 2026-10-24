@@ -72,8 +72,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
                 TargetType = MidiTargetTypes.Input,
                 StripId = input.Id
             };
-            foreach (var descriptor in MidiParameters.ForInput())
-                row.Params.Add(CreateCell(row, descriptor));
+            AddGroupedCells(row, MidiParameters.ForInput());
             Strips.Add(row);
         }
 
@@ -85,8 +84,7 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
                 TargetType = MidiTargetTypes.Bus,
                 StripId = bus.Id
             };
-            foreach (var descriptor in MidiParameters.ForBus())
-                row.Params.Add(CreateCell(row, descriptor));
+            AddGroupedCells(row, MidiParameters.ForBus());
             Strips.Add(row);
         }
 
@@ -141,6 +139,31 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
             StripId = row.StripId
         };
 
+    /// <summary>
+    /// Разложить дескрипторы по группам и добавить в стрип.
+    /// Порядок групп сохраняется по порядку первого появления в списке,
+    /// чтобы окно шло от «Basic» к «Denoiser», а не по алфавиту.
+    /// </summary>
+    private void AddGroupedCells(MidiStripRow row, IReadOnlyList<MidiParameterDescriptor> descriptors)
+    {
+        var groups = new Dictionary<string, MidiParamGroupRow>();
+        foreach (var descriptor in descriptors)
+        {
+            var groupKey = string.IsNullOrEmpty(descriptor.GroupKey) ? "" : descriptor.GroupKey;
+            if (!groups.TryGetValue(groupKey, out var group))
+            {
+                group = new MidiParamGroupRow
+                {
+                    Title = string.IsNullOrEmpty(groupKey) ? "" : Loc.Get(groupKey),
+                    GroupKey = groupKey
+                };
+                groups[groupKey] = group;
+                row.Groups.Add(group);
+            }
+            group.Params.Add(CreateCell(row, descriptor));
+        }
+    }
+
     partial void OnSelectedDeviceChanged(MidiDeviceOption? value)
     {
         if (value is null) return;
@@ -170,8 +193,9 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
     public void BeginLearn(MidiParamCell cell)
     {
         foreach (var row in Strips)
-            foreach (var p in row.Params)
-                p.IsLearning = false;
+            foreach (var group in row.Groups)
+                foreach (var p in group.Params)
+                    p.IsLearning = false;
 
         _learning = cell;
         cell.IsLearning = true;
@@ -240,8 +264,9 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
     private void RefreshAll()
     {
         foreach (var row in Strips)
-            foreach (var p in row.Params)
-                p.Refresh();
+            foreach (var group in row.Groups)
+                foreach (var p in group.Params)
+                    p.Refresh();
     }
 
     private void UpdateStatus() =>
@@ -256,8 +281,13 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
     protected override void OnLanguageChangedCore()
     {
         foreach (var row in Strips)
-            foreach (var cell in row.Params)
-                cell.Refresh();
+            foreach (var group in row.Groups)
+            {
+                if (!string.IsNullOrEmpty(group.GroupKey))
+                    group.Title = Loc.Get(group.GroupKey);
+                foreach (var cell in group.Params)
+                    cell.Refresh();
+            }
         UpdateStatus();
     }
 
@@ -266,7 +296,8 @@ public partial class MidiBindingsViewModel : LocalizedViewModel
         _midi.MessageReceived -= OnRawMessage;
         foreach (var option in DeviceOptions) option.Dispose();
         foreach (var row in Strips)
-            foreach (var cell in row.Params)
-                cell.Dispose();
+            foreach (var group in row.Groups)
+                foreach (var cell in group.Params)
+                    cell.Dispose();
     }
 }

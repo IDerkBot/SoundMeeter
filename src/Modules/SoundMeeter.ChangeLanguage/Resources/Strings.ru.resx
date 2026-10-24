@@ -723,6 +723,18 @@
   <data name="Sm.Midi.Param.DenoiserFormantGroupDb" xml:space="preserve">
     <value>DEN Формант: общий</value>
   </data>
+  <data name="Sm.Midi.Group.Basic" xml:space="preserve">
+    <value>Основные</value>
+  </data>
+  <data name="Sm.Midi.Group.Func" xml:space="preserve">
+    <value>Функциональные кнопки</value>
+  </data>
+  <data name="Sm.Midi.Group.Fx" xml:space="preserve">
+    <value>Эффекты</value>
+  </data>
+  <data name="Sm.Midi.Group.Denoiser" xml:space="preserve">
+    <value>Шумоподавление</value>
+  </data>
   <data name="Sm.Obs.Title" xml:space="preserve">
     <value>Док в OBS</value>
   </data>

@@ -723,6 +723,18 @@
   <data name="Sm.Midi.Param.DenoiserFormantGroupDb" xml:space="preserve">
     <value>DEN Form. Gain</value>
   </data>
+  <data name="Sm.Midi.Group.Basic" xml:space="preserve">
+    <value>Basic</value>
+  </data>
+  <data name="Sm.Midi.Group.Func" xml:space="preserve">
+    <value>Func Buttons</value>
+  </data>
+  <data name="Sm.Midi.Group.Fx" xml:space="preserve">
+    <value>Effects</value>
+  </data>
+  <data name="Sm.Midi.Group.Denoiser" xml:space="preserve">
+    <value>Denoiser</value>
+  </data>
   <data name="Sm.Obs.Title" xml:space="preserve">
     <value>OBS dock</value>
   </data>

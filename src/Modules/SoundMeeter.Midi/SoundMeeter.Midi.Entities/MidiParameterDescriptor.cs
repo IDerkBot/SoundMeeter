@@ -8,6 +8,12 @@ public sealed class MidiParameterDescriptor
     /// <summary>Ключ подписи в <c>Resources/Strings.resx</c> (SM-C07).</summary>
     public string LabelKey { get; init; } = "";
 
+    /// <summary>
+    /// Ключ группы параметров в <c>Resources/Strings.resx</c>.
+    /// Используется UI для сворачивания параметров в экспандеры.
+    /// </summary>
+    public string GroupKey { get; init; } = "";
+
     public bool ForInput { get; init; }
     public bool ForBus { get; init; }
     public MidiParamShape Shape { get; init; }

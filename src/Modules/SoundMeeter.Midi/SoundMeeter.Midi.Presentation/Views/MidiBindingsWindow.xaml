@@ -27,24 +27,19 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left">
             <TextBlock
-                Grid.Column="0"
-                Margin="0,0,8,0"
+                Margin="5,0,8,0"
                 VerticalAlignment="Center"
                 FontSize="12"
                 Foreground="#CCC"
                 Text="{DynamicResource Sm.Midi.Input}" />
             <ComboBox
-                Grid.Column="1"
+                MinWidth="200"
                 DisplayMemberPath="Display"
                 ItemsSource="{Binding DeviceOptions}"
                 SelectedItem="{Binding SelectedDevice}" />
-        </Grid>
+        </StackPanel>
 
         <Border
             Grid.Row="1"
@@ -106,8 +101,10 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border
+                                Width="280"
                                 Margin="0,0,10,0"
                                 Padding="5"
+                                VerticalAlignment="Top"
                                 Background="#262626"
                                 BorderBrush="#3A3A3A"
                                 CornerRadius="6">
@@ -118,7 +115,7 @@
                                         FontSize="20"
                                         Style="{StaticResource StripHeader}"
                                         Text="{Binding Title}" />
-                                    <ItemsControl ItemsSource="{Binding Params}">
+                                    <ItemsControl ItemsSource="{Binding Groups}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <StackPanel />
@@ -126,94 +123,115 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Margin="0,0,0,10">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="*" />
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <StackPanel>
+                                                <Expander Margin="0,0,0,10">
+                                                    <Expander.Header>
                                                         <TextBlock
-                                                            FontSize="12"
-                                                            FontWeight="Bold"
-                                                            Foreground="#FFFFFF"
-                                                            Text="{Binding Descriptor.Key}"
-                                                            TextAlignment="Left" />
+                                                            FontWeight="SemiBold"
+                                                            Foreground="#CCC"
+                                                            Text="{Binding Title}" />
+                                                    </Expander.Header>
+                                                    <StackPanel Margin="8,4,0,0">
+                                                        <ItemsControl ItemsSource="{Binding Params}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <StackPanel />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Grid Margin="0,0,0,5">
+                                                                        <Grid.RowDefinitions>
+                                                                            <RowDefinition Height="*" />
+                                                                            <RowDefinition Height="Auto" />
+                                                                            <RowDefinition Height="Auto" />
+                                                                        </Grid.RowDefinitions>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
 
-                                                        <TextBlock
-                                                            FontSize="12"
-                                                            FontWeight="Light"
-                                                            Foreground="#FFFFFF"
-                                                            Text="{Binding Display, Mode=OneWay}"
-                                                            TextAlignment="Left" />
+                                                                        <StackPanel>
+                                                                            <TextBlock
+                                                                                FontSize="12"
+                                                                                FontWeight="Bold"
+                                                                                Foreground="#FFFFFF"
+                                                                                Text="{Binding Descriptor.Key}"
+                                                                                TextAlignment="Left" />
+
+                                                                            <TextBlock
+                                                                                FontSize="12"
+                                                                                FontWeight="Light"
+                                                                                Foreground="#FFFFFF"
+                                                                                Text="{Binding Display, Mode=OneWay}"
+                                                                                TextAlignment="Left" />
+                                                                        </StackPanel>
+
+                                                                        <StackPanel
+                                                                            Grid.Row="0"
+                                                                            Grid.Column="1"
+                                                                            HorizontalAlignment="Right"
+                                                                            Orientation="Horizontal">
+                                                                            <Button
+                                                                                Width="30"
+                                                                                Height="30"
+                                                                                Margin="0"
+                                                                                attachedProperties:Button.Icon="Pencil"
+                                                                                attachedProperties:Button.Position="First"
+                                                                                Command="{Binding LearnCommand}"
+                                                                                Style="{StaticResource CellButton}" />
+                                                                            <Button
+                                                                                Width="30"
+                                                                                Height="30"
+                                                                                Margin="0"
+                                                                                attachedProperties:Button.Icon="Close"
+                                                                                attachedProperties:Button.Position="Last"
+                                                                                Command="{Binding ClearCommand}"
+                                                                                IsEnabled="{Binding IsBound}"
+                                                                                Style="{StaticResource CellButton}" />
+                                                                        </StackPanel>
+
+                                                                        <ComboBox
+                                                                            Grid.Row="1"
+                                                                            Grid.Column="0"
+                                                                            Width="140"
+                                                                            Margin="0,5,0,0"
+                                                                            HorizontalAlignment="Left"
+                                                                            VerticalAlignment="Center"
+                                                                            DisplayMemberPath="Name"
+                                                                            FontSize="10"
+                                                                            ItemsSource="{Binding ModeOptions}"
+                                                                            SelectedValue="{Binding Mode}"
+                                                                            SelectedValuePath="Value"
+                                                                            ToolTip="{DynamicResource Sm.Midi.ModeTip}"
+                                                                            Visibility="{Binding IsButton, Converter={StaticResource BoolToVis}}" />
+
+                                                                        <CheckBox
+                                                                            Grid.Row="1"
+                                                                            Grid.Column="1"
+                                                                            Margin="0,5,5,0"
+                                                                            HorizontalAlignment="Left"
+                                                                            VerticalAlignment="Top"
+                                                                            Content="{DynamicResource Sm.Midi.Reverse}"
+                                                                            FontSize="10"
+                                                                            Foreground="#CCC"
+                                                                            IsChecked="{Binding IsInverted}"
+                                                                            Style="{StaticResource CheckBoxCompact}"
+                                                                            ToolTip="{DynamicResource Sm.Midi.ReverseTip}"
+                                                                            Visibility="{Binding IsButton, Converter={StaticResource BoolToVis}}" />
+
+                                                                        <Border
+                                                                            Grid.Row="2"
+                                                                            Grid.Column="0"
+                                                                            Grid.ColumnSpan="2"
+                                                                            Margin="0,4,0,0"
+                                                                            BorderBrush="#3A3A3A"
+                                                                            BorderThickness="0,0,0,1" />
+                                                                    </Grid>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
                                                     </StackPanel>
-
-                                                    <StackPanel
-                                                        Grid.Row="0"
-                                                        Grid.Column="1"
-                                                        HorizontalAlignment="Right"
-                                                        Orientation="Horizontal">
-                                                        <Button
-                                                            Width="30"
-                                                            Height="30"
-                                                            Margin="0"
-                                                            attachedProperties:Button.Icon="Pencil"
-                                                            attachedProperties:Button.Position="First"
-                                                            Command="{Binding LearnCommand}"
-                                                            Style="{StaticResource CellButton}" />
-                                                        <Button
-                                                            Width="30"
-                                                            Height="30"
-                                                            Margin="0"
-                                                            attachedProperties:Button.Icon="Close"
-                                                            attachedProperties:Button.Position="Last"
-                                                            Command="{Binding ClearCommand}"
-                                                            IsEnabled="{Binding IsBound}"
-                                                            Style="{StaticResource CellButton}" />
-                                                    </StackPanel>
-
-                                                    <ComboBox
-                                                        Grid.Row="1"
-                                                        Grid.Column="0"
-                                                        Width="130"
-                                                        Margin="0,5,0,0"
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Center"
-                                                        DisplayMemberPath="Name"
-                                                        FontSize="10"
-                                                        ItemsSource="{Binding ModeOptions}"
-                                                        SelectedValue="{Binding Mode}"
-                                                        SelectedValuePath="Value"
-                                                        ToolTip="{DynamicResource Sm.Midi.ModeTip}"
-                                                        Visibility="{Binding IsButton, Converter={StaticResource BoolToVis}}" />
-
-                                                    <CheckBox
-                                                        Grid.Row="1"
-                                                        Grid.Column="1"
-                                                        Margin="0,5,0,0"
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Top"
-                                                        Content="{DynamicResource Sm.Midi.Reverse}"
-                                                        FontSize="10"
-                                                        Foreground="#CCC"
-                                                        IsChecked="{Binding IsInverted}"
-                                                        Style="{StaticResource CheckBoxCompact}"
-                                                        ToolTip="{DynamicResource Sm.Midi.ReverseTip}"
-                                                        Visibility="{Binding IsButton, Converter={StaticResource BoolToVis}}" />
-
-                                                    <Border
-                                                        Grid.Row="2"
-                                                        Grid.Column="0"
-                                                        Grid.ColumnSpan="2"
-                                                        Margin="0,4,0,0"
-                                                        BorderBrush="#3A3A3A"
-                                                        BorderThickness="0,0,0,1" />
-                                                </Grid>
+                                                </Expander>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
