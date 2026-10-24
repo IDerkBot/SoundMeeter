@@ -10,6 +10,7 @@
   <!-- Окно привязок и его ViewModel'ы. Сценарии — в SoundMeeter.Midi.UseCases:
        отсюда только вызовы, вся работа с привязками и настройками там. -->
   <ItemGroup>
+    <ProjectReference Include="..\..\..\StreamerTools.Style\StreamerTools.Style.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Audio\SoundMeeter.Audio.Contract\SoundMeeter.Audio.Contract.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.ChangeLanguage\SoundMeeter.ChangeLanguage.Presentation\SoundMeeter.ChangeLanguage.Presentation.csproj" />
     <ProjectReference Include="..\..\SoundMeeter.Core\SoundMeeter.Core.Contract\SoundMeeter.Core.Contract.csproj" />
