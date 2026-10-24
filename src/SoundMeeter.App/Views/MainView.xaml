@@ -51,13 +51,23 @@
         <controls:MixerView Grid.Row="2" />
 
         <!--  Приложения с аудио и установленные приложения  -->
-        <Grid Grid.Row="3" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <controls:RunningAppsView Grid.Column="0" />
-            <controls:InstalledAppsView Grid.Column="1" />
-        </Grid>
+        <Border
+            Grid.Row="3"
+            Background="#252526"
+            CornerRadius="6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="330" />
+                    <ColumnDefinition Width="*" MinWidth="660" />
+                </Grid.ColumnDefinitions>
+                <controls:RunningAppsView Grid.Column="0" />
+                <GridSplitter
+                    Grid.Column="0"
+                    Width="2"
+                    Margin="0,20"
+                    Background="#69696E" />
+                <controls:InstalledAppsView Grid.Column="2" />
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

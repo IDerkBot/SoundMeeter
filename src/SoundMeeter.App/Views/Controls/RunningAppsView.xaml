@@ -15,11 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Border
-        Margin="0,0,5,0"
-        Padding="12"
-        Background="#252526"
-        CornerRadius="8">
+    <Border Padding="10">
         <DockPanel>
             <Grid DockPanel.Dock="Top">
                 <TextBlock
@@ -35,7 +31,7 @@
                     Content="{DynamicResource Sm.Apps.Refresh}" />
             </Grid>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+            <ScrollViewer Margin="0,8,0,0" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding RunningApps}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -45,22 +41,28 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border
-                                Cursor="Hand"
                                 MouseLeftButtonDown="App_MouseLeftButtonDown"
                                 PreviewMouseMove="App_PreviewMouseMove"
                                 Style="{StaticResource AppCard}">
-                                <StackPanel HorizontalAlignment="Center">
+                                <StackPanel
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal">
                                     <Image
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,0,4"
+                                        Width="28"
+                                        Height="28"
                                         Source="{Binding ProcessId, Converter={StaticResource ProcessIconConverter}}" />
                                     <TextBlock
+                                        Margin="5,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontFamily="Cascadia Code"
                                         FontSize="10"
+                                        FontWeight="Regular"
                                         Foreground="White"
                                         Text="{Binding Name}"
                                         TextAlignment="Center"
-                                        TextTrimming="CharacterEllipsis" />
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="WrapWithOverflow" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

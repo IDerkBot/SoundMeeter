@@ -16,18 +16,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Border
-        Margin="5,0,0,0"
-        Padding="12"
-        Background="#252526"
-        CornerRadius="8">
+    <Border Padding="10">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top">
                 <TextBlock
                     VerticalAlignment="Center"
                     DockPanel.Dock="Left"
-                    FontSize="14"
-                    FontWeight="SemiBold"
+                    FontSize="16"
+                    FontWeight="Bold"
                     Foreground="White"
                     Text="{DynamicResource Sm.Apps.Installed}" />
 
@@ -74,10 +70,8 @@
                 Text="{DynamicResource Sm.Apps.Loading}"
                 Visibility="{Binding IsLoadingInstalledApps, Converter={StaticResource BoolToVisibility}}" />
 
-            <ScrollViewer
-                VerticalScrollBarVisibility="Auto"
-                Visibility="{Binding IsLoadingInstalledApps, Converter={StaticResource InverseBoolToVisibility}}">
-                <ItemsControl ItemsSource="{Binding FilteredInstalledApps}" Margin="0,8,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsLoadingInstalledApps, Converter={StaticResource InverseBoolToVisibility}}">
+                <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding FilteredInstalledApps}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -86,41 +80,29 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border
-                                Height="80"
-                                Margin="3"
-                                Padding="8"
-                                Background="#2D2D30"
-                                BorderBrush="#3F3F46"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Cursor="Hand"
                                 MouseLeftButtonDown="App_MouseLeftButtonDown"
                                 PreviewMouseMove="App_PreviewMouseMove"
                                 Style="{StaticResource AppCard}"
                                 ToolTip="{Binding Publisher}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-
+                                <StackPanel Orientation="Horizontal">
                                     <Image
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,0,4"
-                                        HorizontalAlignment="Center"
+                                        Width="28"
+                                        Height="28"
                                         Source="{Binding IconPath, Converter={StaticResource FileIconConverter}}" />
 
                                     <TextBlock
-                                        Grid.Row="1"
+                                        Width="96"
+                                        Margin="5,0,0,0"
                                         VerticalAlignment="Center"
+                                        FontFamily="Cascadia Code"
                                         FontSize="10"
+                                        FontWeight="Regular"
                                         Foreground="White"
                                         Text="{Binding Name}"
-                                        TextAlignment="Center"
+                                        TextAlignment="Left"
                                         TextTrimming="CharacterEllipsis"
-                                        TextWrapping="Wrap" />
-                                </Grid>
+                                        TextWrapping="WrapWithOverflow" />
+                                </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
